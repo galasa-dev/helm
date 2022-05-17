@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  galasaEcosystem:
+  - apiVersion: v2
+    appVersion: 0.23.0
+    created: "2022-05-17T10:38:09.434300096Z"
+    description: Galasa Ecosystem helm chart
+    digest: a478dd2cbef4151ebb940934ab1b29c56f249d5958d050968dd5e9cdc28190ae
+    name: galasaEcosystem
+    type: application
+    urls:
+    - https://github.com/galasa-dev/helm/releases/download/galasaEcosystem-0.23.0/galasaEcosystem-0.23.0.tgz
+    version: 0.23.0
+generated: "2022-05-17T10:38:09.121137719Z"
