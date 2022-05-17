@@ -37,4 +37,4 @@ spec:
         - file:galasa.obr
         - --validateeco
         - --bootstrap
-        - http://api:8080/bootstrap
+        - http://{{ .Release.Name }}-api:8080/bootstrap

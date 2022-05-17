@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: etcd
+  name: {{ .Release.Name }}-etcd
   labels:
-    app: etcd
+    app: {{ .Release.Name }}-etcd
 spec:
-  serviceName: etcd
+  serviceName: {{ .Release.Name }}-etcd
   replicas: 1
   selector:
     matchLabels:
-      app: etcd
+      app: {{ .Release.Name }}-etcd
   template:
     metadata:
-      name: etcd
+      name: {{ .Release.Name }}-etcd
       labels:
-        app: etcd
+        app: {{ .Release.Name }}-etcd
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
@@ -33,7 +33,7 @@ spec:
         - name: INITIAL_CLUSTER_SIZE
           value: "1"
         - name: SET_NAME
-          value: etcd
+          value: {{ .Release.Name }}-etcd
         volumeMounts:
         - name: data
           mountPath: /var/run/etcd
@@ -171,18 +171,6 @@ spec:
                 --initial-cluster ${PEERS} \
                 --initial-cluster-state new \
                 --data-dir /var/run/etcd/default.etcd
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - etcd
-              topologyKey: kubernetes.io/hostname
   volumeClaimTemplates:
   - metadata:
       name: data

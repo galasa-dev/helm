@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: engine-controller
+  name: {{ .Release.Name }}-engine-controller
   labels:
-    app: engine-controller
+    app: {{ .Release.Name }}-engine-controller
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: engine-controller
+      app: {{ .Release.Name }}-engine-controller
   template:
     metadata:
-      name: engine-controller
+      name: {{ .Release.Name }}-engine-controller
       labels:
-        app: engine-controller
+        app: {{ .Release.Name }}-engine-controller
     spec:
       serviceAccountName: galasa
       nodeSelector:
         kubernetes.io/arch: amd64
         tekton: build
       containers:
-      - name: resource-monitor
+      - name: engine-controller
         image: harbor-cicsk8s.hursley.ibm.com/galasadev/galasa-ibm-boot-embedded-amd64:iss990
         imagePullPolicy: Always
         command: ["java"]
@@ -32,20 +32,22 @@ spec:
         - --trace
         - --k8scontroller
         - --bootstrap
-        - http://api:8080/bootstrap
+        - http://{{ .Release.Name }}-api:8080/bootstrap
         env:
         - name: NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: CONFIG
+          value: {{ .Release.Name }}-config
         - name: GALASA_CONFIG_STORE
-          value: etcd:http://etcd:2379
+          value: etcd:http://{{ .Release.Name }}-etcd:2379
         - name: GALASA_DYNAMICSTATUS_STORE
-          value: etcd:http://etcd:2379
+          value: etcd:http://{{ .Release.Name }}-etcd:2379
         - name: GALASA_RESULTARCHIVE_STORE
-          value: couchdb:http://couchdb:5984
+          value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
-          value: etcd:http://etcd:2379
+          value: etcd:http://{{ .Release.Name }}-etcd:2379
         ports:
         - containerPort: 9010
           name: metrics

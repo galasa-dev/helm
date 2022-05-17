@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}-post"
+  name: "{{ .Release.Name }}-post-setup"
   labels:
     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -32,12 +32,13 @@ spec:
         command: ["/galasa/helm-post-install.sh"]
         args: 
         - cicsk8sm.hursley.ibm.com
+        - {{ .Release.Name }}-
         env:
         - name: GALASA_CONFIG_STORE
-          value: etcd:http://etcd:2379
+          value: etcd:http://{{ .Release.Name }}-etcd:2379
         - name: GALASA_DYNAMICSTATUS_STORE
-          value: etcd:http://etcd:2379
+          value: etcd:http://{{ .Release.Name }}-etcd:2379
         - name: GALASA_RESULTARCHIVE_STORE
-          value: couchdb:http://couchdb:5984
+          value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
-          value: etcd:http://etcd:2379
+          value: etcd:http://{{ .Release.Name }}-etcd:2379
