@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: metrics
+  name: {{ .Release.Name }}-metrics
   labels:
-    app: metrics
+    app: {{ .Release.Name }}-metrics
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: metrics
+      app: {{ .Release.Name }}-metrics
   template:
     metadata:
-      name: metrics
+      name: {{ .Release.Name }}-metrics
       labels:
-        app: metrics
+        app: {{ .Release.Name }}-metrics
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
