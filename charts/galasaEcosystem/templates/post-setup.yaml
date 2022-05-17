@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-post"
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-post"
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      restartPolicy: Never
+      serviceAccountName: galasa
+      containers:
+      - name: post-install
+        image: harbor-cicsk8s.hursley.ibm.com/galasadev/galasa-ibm-boot-embedded-amd64:iss990
+        imagePullPolicy: Always
+        command: ["/galasa/helm-post-install.sh"]
+        args: 
+        - cicsk8sm.hursley.ibm.com
+        env:
+        - name: GALASA_CONFIG_STORE
+          value: etcd:http://etcd:2379
+        - name: GALASA_DYNAMICSTATUS_STORE
+          value: etcd:http://etcd:2379
+        - name: GALASA_RESULTARCHIVE_STORE
+          value: couchdb:http://couchdb:5984
+        - name: GALASA_CREDENTIALS_STORE
+          value: etcd:http://etcd:2379

@@ -1,0 +1,20 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-external
+  labels:
+    app: api-external
+spec:
+  type: NodePort
+  ports:
+  - port: 9010
+    name: metrics
+  - port: 9011
+    name: health
+  - port: 8080
+    name: http
+  selector:
+    app: api

@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics
+  labels:
+    app: metrics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metrics
+  template:
+    metadata:
+      name: metrics
+      labels:
+        app: metrics
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        tekton: build
+      containers:
+      - name: metrics
+        image: harbor-cicsk8s.hursley.ibm.com/galasadev/galasa-ibm-boot-embedded-amd64:iss990
+        imagePullPolicy: Always
+        command: ["java"]
+        args: 
+        - -jar
+        - boot.jar
+        - --obr
+        - file:galasa.obr
+        - --metricserver
+        - --trace
+        - --bootstrap
+        - http://api:8080/bootstrap
+        env:
+        - name: GALASA_CONFIG_STORE
+          value: etcd:http://etcd:2379
+        - name: GALASA_DYNAMICSTATUS_STORE
+          value: etcd:http://etcd:2379
+        - name: GALASA_RESULTARCHIVE_STORE
+          value: couchdb:http://couchdb:5984
+        - name: GALASA_CREDENTIALS_STORE
+          value: etcd:http://etcd:2379
+        ports:
+        - containerPort: 9010
+          name: metrics
+        - containerPort: 9011
+          name: health
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9011
+          initialDelaySeconds: 5
+          periodSeconds: 60
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 9010
+          initialDelaySeconds: 5
+          periodSeconds: 10

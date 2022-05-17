@@ -1,0 +1,17 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: v1
+kind: Service
+metadata:
+  name: metrics-external
+  labels:
+    app: metrics-external
+spec:
+  ports:
+  - port: 9010
+    name: metrics
+  - port: 9011
+    name: health
+  selector:
+    app: metrics
