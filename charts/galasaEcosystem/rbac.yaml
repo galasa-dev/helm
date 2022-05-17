@@ -1,6 +1,13 @@
 #
 # Copyright contributors to the Galasa project 
 #
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: galasa
+
+---
+
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
