@@ -1,0 +1,11 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: v2
+name: ecosystem
+description: Galasa Ecosystem
+type: application
+#
+home: "galasa.dev"
+#
+version: "0.0.1"

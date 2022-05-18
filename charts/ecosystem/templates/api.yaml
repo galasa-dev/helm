@@ -1,3 +1,6 @@
+#
+# Copyright contributors to the Galasa project 
+#
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,13 +19,12 @@ spec:
         app: {{ .Release.Name }}-api
     spec:
       nodeSelector:
-        kubernetes.io/arch: amd64
-        longhorn: "true"
-        tekton: build
+        kubernetes.io/arch: {{ .Values.architecture }}
+{{ toYaml .Values.nodeSelectors | indent 8 }}
       containers:
       - name: api
-        image: harbor-cicsk8s.hursley.ibm.com/galasadev/galasa-ibm-boot-embedded-amd64:iss990
-        imagePullPolicy: Always
+        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
         command: ["java"]
         args: 
         - -jar

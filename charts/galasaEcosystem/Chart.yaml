@@ -1,9 +1,0 @@
-#
-# Copyright contributors to the Galasa project 
-#
-apiVersion: v2
-name: galasaEcosystem
-description: Galasa Ecosystem helm chart
-type: application
-version: 0.23.0
-appVersion: "0.23.0"

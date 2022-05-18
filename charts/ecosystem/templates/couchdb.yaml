@@ -1,3 +1,6 @@
+#
+# Copyright contributors to the Galasa project 
+#
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -17,12 +20,11 @@ spec:
         app: {{ .Release.Name }}-ras
     spec:
       nodeSelector:
-        kubernetes.io/arch: amd64
-        longhorn: "true"
-        tekton: build
+        kubernetes.io/arch: {{ .Values.architecture }}
+{{ toYaml .Values.nodeSelectors | indent 8 }}
       containers:
       - name: couchdb
-        image: docker.galasa.dev/couchdb:2.3.1
+        image: {{ .Values.couchdbImage }}
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5984
@@ -45,9 +47,11 @@ spec:
   - metadata:
       name: data
     spec:
-      storageClassName: "longhorn-temp"
+      {{- if .Values.storageClass }}
+      storageClassName: {{ .Values.storageClass }}
+      {{- end }}
       accessModes:
         - "ReadWriteOnce"
       resources:
         requests:
-          storage: 10Gi
+          storage: {{ .Values.couchdbDiskSize }}

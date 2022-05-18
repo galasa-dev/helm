@@ -1,3 +1,6 @@
+#
+# Copyright contributors to the Galasa project 
+#
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,12 +19,12 @@ spec:
         app: {{ .Release.Name }}-resource-monitor
     spec:
       nodeSelector:
-        kubernetes.io/arch: amd64
-        tekton: build
+        kubernetes.io/arch: {{ .Values.architecture }}
+{{ toYaml .Values.nodeSelectors | indent 8 }}
       containers:
       - name: resource-monitor
-        image: harbor-cicsk8s.hursley.ibm.com/galasadev/galasa-ibm-boot-embedded-amd64:iss990
-        imagePullPolicy: Always
+        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
         command: ["java"]
         args: 
         - -jar
@@ -54,7 +57,7 @@ spec:
             path: /
             port: 9011
           initialDelaySeconds: 5
-          periodSeconds: 60
+          periodSeconds: 30
         readinessProbe:
           httpGet:
             path: /

@@ -1,3 +1,6 @@
+#
+# Copyright contributors to the Galasa project 
+#
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -5,9 +8,11 @@ metadata:
   annotations:
     helm.sh/resource-policy: "keep"
 spec:
-  storageClassName: "longhorn-temp"
+  {{- if .Values.storageClass }}
+  storageClassName: {{ .Values.storageClass }}
+  {{- end }}
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: {{ .Values.catalogDiskSize }}

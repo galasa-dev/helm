@@ -1,9 +1,0 @@
-#
-# Copyright contributors to the Galasa project 
-#
-#galasaVersion: 0.22.0
-galasaVersion: "iss990"
-
-dockerRegistry: harbor-cicsk8s.hursley.ibm.com/galasadev
-
-externalHostname: cicsk8sm.hursley.ibm.com

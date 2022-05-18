@@ -1,3 +1,6 @@
+#
+# Copyright contributors to the Galasa project 
+#
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -17,12 +20,11 @@ spec:
         app: {{ .Release.Name }}-etcd
     spec:
       nodeSelector:
-        kubernetes.io/arch: amd64
-        longhorn: "true"
-        tekton: build
+        kubernetes.io/arch: {{ .Values.architecture }}
+{{ toYaml .Values.nodeSelectors | indent 8 }}
       containers:
       - name: etcd
-        image: quay.io/coreos/etcd:v3.2.25
+        image: {{ .Values.etcdImage }}
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 2379
@@ -175,9 +177,11 @@ spec:
   - metadata:
       name: data
     spec:
-      storageClassName: "longhorn-temp"
+      {{- if .Values.storageClass }}
+      storageClassName: {{ .Values.storageClass }}
+      {{- end }}
       accessModes:
         - "ReadWriteOnce"
       resources:
         requests:
-          storage: 1Gi
+          storage: {{ .Values.etcdDiskSize }}
