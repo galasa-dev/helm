@@ -9,6 +9,8 @@ metadata:
     app: {{ .Release.Name }}-metrics
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: {{ .Release.Name }}-metrics
@@ -23,7 +25,7 @@ spec:
 {{ toYaml .Values.nodeSelectors | indent 8 }}
       containers:
       - name: metrics
-        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-amd64:iss990
+        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command: ["java"]
         args: 

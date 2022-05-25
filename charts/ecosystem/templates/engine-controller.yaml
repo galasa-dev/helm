@@ -9,6 +9,8 @@ metadata:
     app: {{ .Release.Name }}-engine-controller
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: {{ .Release.Name }}-engine-controller

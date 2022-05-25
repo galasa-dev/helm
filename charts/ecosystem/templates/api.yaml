@@ -9,6 +9,8 @@ metadata:
     app: {{ .Release.Name }}-api
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: {{ .Release.Name }}-api
@@ -21,6 +23,16 @@ spec:
       nodeSelector:
         kubernetes.io/arch: {{ .Values.architecture }}
 {{ toYaml .Values.nodeSelectors | indent 8 }}
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ .Release.Name }}-api
+            topologyKey: "kubernetes.io/hostname"
       initContainers:
       - name: init-chown-data
         image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}

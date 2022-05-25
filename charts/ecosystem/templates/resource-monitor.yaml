@@ -9,6 +9,8 @@ metadata:
     app: {{ .Release.Name }}-resource-monitor
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: {{ .Release.Name }}-resource-monitor

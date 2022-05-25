@@ -18,8 +18,8 @@ data:
 # The label for the engine pods and the prefix of the engine names
   engine_label: "{{ .Release.Name }}-k8s-standard-engine"
 #
-  engine_image: "harbor-cicsk8s.hursley.ibm.com/galasadev/galasa-boot-embedded-amd64:{{ .Values.galasaVersion }}"
-  node_arch: "amd64"
+  engine_image: "{{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}"
+  node_arch: "{{ .Values.architecture }}"
 #  node_arch: ""
 #  node_preferred_affinity: "beta.kubernetes.io/arch=s390x"
 #  node_preferred_affinity: ""

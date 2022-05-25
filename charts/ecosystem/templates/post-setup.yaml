@@ -30,7 +30,7 @@ spec:
       serviceAccountName: galasa
       containers:
       - name: post-install
-        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-amd64:{{ .Values.galasaVersion }}
+        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command: ["/galasa/helm-post-install.sh"]
         args: 
