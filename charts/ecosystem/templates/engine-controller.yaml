@@ -24,7 +24,7 @@ spec:
 {{ toYaml .Values.nodeSelectors | indent 8 }}
       containers:
       - name: engine-controller
-        image: {{ .Values.galasaRegistry }}/galasa-ibm-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
+        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
         imagePullPolicy: Always
         command: ["java"]
         args: 
