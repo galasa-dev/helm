@@ -22,7 +22,9 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/arch: {{ .Values.architecture }}
+        {{- if .Values.nodeSelectors }}
 {{ toYaml .Values.nodeSelectors | indent 8 }}
+        {{- end }}
       containers:
       - name: resource-monitor
         image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}

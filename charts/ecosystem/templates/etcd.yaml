@@ -21,7 +21,9 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/arch: {{ .Values.architecture }}
+        {{- if .Values.nodeSelectors }}
 {{ toYaml .Values.nodeSelectors | indent 8 }}
+        {{- end }}
       containers:
       - name: etcd
         image: {{ .Values.etcdImage }}

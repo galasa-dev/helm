@@ -23,7 +23,9 @@ spec:
       serviceAccountName: galasa
       nodeSelector:
         kubernetes.io/arch: {{ .Values.architecture }}
+        {{- if .Values.nodeSelectors }}
 {{ toYaml .Values.nodeSelectors | indent 8 }}
+        {{- end }}
       containers:
       - name: engine-controller
         image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
