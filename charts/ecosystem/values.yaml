@@ -4,22 +4,22 @@
 #
 # The External host name the Kubernetes NodePorts can be accessed on, can be an IP address
 #
-externalHostname: "cicsk8sm.hursley.ibm.com"
+externalHostname: "example.com"
 #
 # The version of Galasa you want to run with, it is better that you do not use "latest" to ensure
 # all the components are running the same version and a controlled upgrade can be performed
 #
-galasaVersion: "iss990"
+galasaVersion: "0.23.0"
 #
 #
 # The container registry the Galasa images can be found in
 #
-galasaRegistry: "harbor-cicsk8s.hursley.ibm.com/galasadev"
+galasaRegistry: "icr.io/galasadev"
 #
 #
 # The pull policy to be used for the Galasa images, only useful for Galasa development purposes
 #
-pullPolicy: "Always"
+pullPolicy: "IfNotPresent"
 #
 #
 # The architecture the pods will be run on, at the moment, only adm64 is supported
@@ -29,13 +29,13 @@ architecture: amd64
 #
 # Any nodeselectors you wish to use to restrict the nodes the pods will run on
 #
-nodeSelectors:
-  tekton: build
+#nodeSelectors:
+#  tekton: build
 #
 #
 # The storage class to be used for persistent volumes
 #
-storageClass: "longhorn-temp"
+storageClass: ""
 #
 #
 # The size of the persistent volumes for the data stores
