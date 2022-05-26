@@ -52,3 +52,11 @@ test-api-external                 NodePort    10.107.160.208   <none>        901
 ```
 
 If the external hostname you provided was `example.com`,  the bootstrap URL will be `http://example.com:30960/boostrap`.  You will enter this into the Eclipse plugin preferences, or the galasactl command.
+
+### Upgrading the Galasa Ecosystem chart
+
+If you want to upgrade the Galasa Ecosystem to increase the Galasa version, for example, then you can use the following command:-
+
+     helm upgrade --reuse-values --set galasaVersion=0.24.0 --wait
+     
+**Warning**: If you have made changes to the configmaps that this helm chart manages, those changes will be lost and will have to be reapplied manually.
