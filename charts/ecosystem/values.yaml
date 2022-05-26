@@ -29,7 +29,7 @@ architecture: amd64
 #
 # Any nodeselectors you wish to use to restrict the nodes the pods will run on
 #
-#nodeSelectors:
+nodeSelectors: {}
 #  tekton: build
 #
 #
