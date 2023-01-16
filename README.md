@@ -3,7 +3,7 @@
 Galasa provides Helm charts to install various components, the main one being a Galasa Ecosystem.
 
 ## Usage
-**Note: The Galasa Ecosystem chart only supports x86-64 at the moment.**
+**Note: The Galasa Ecosystem chart only supports x86-64 at the moment. It cannot be installed on ARM64-based systems.**
 
 [Helm](https://helm.sh) must be installed to use the charts.  Please refer to
 Helm's [documentation](https://helm.sh/docs) to get started.
@@ -17,7 +17,7 @@ helm repo add galasa https://galasa-dev.github.io/helm
 If you had already added this repo earlier, run `helm repo update` to retrieve
 the latest versions of the packages. You can then run `helm search repo galasa` to see the charts.
 
-If you would like to install the chart into minikube, ensure you have minikube [installed](https://minikube.sigs.k8s.io/docs/start/).
+If you would like to install the chart into minikube, ensure you have minikube [installed](https://minikube.sigs.k8s.io/docs/start/) and that it is running with `minikube status`. If minikube is not running, start it by running `minikube start`. 
 
 ## Galasa Ecosystem chart
 ### RBAC
