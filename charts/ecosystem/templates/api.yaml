@@ -20,6 +20,7 @@ spec:
       labels:
         app: {{ .Release.Name }}-api
     spec:
+      serviceAccountName: galasa
       nodeSelector:
         kubernetes.io/arch: {{ .Values.architecture }}
         {{- if .Values.nodeSelectors }}
@@ -47,6 +48,26 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
           runAsUser: 0
+      - name: wait-for-etcd
+        image: bitnami/kubectl
+        command:
+          - kubectl
+        args:
+          - wait
+          - pods
+          - -l=app={{ .Release.Name }}-etcd
+          - --for=condition=Ready
+          - --timeout=90s
+      - name: wait-for-ras
+        image: bitnami/kubectl
+        command:
+          - kubectl
+        args:
+          - wait
+          - pods
+          - -l=app={{ .Release.Name }}-ras
+          - --for=condition=Ready
+          - --timeout=90s
       containers:
       - name: api
         image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}

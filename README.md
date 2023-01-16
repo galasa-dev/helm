@@ -23,9 +23,9 @@ If you would like to install the chart into minikube, ensure you have minikube [
 ### RBAC
 If RBAC is active on your Kubernetes cluster, you will need to get your Kubernetes administrator to apply a couple of RBAC yaml files to allow the Galasa Ecosystem to operate and for you to install the helm chart. This also applies to minikube clusters.
 
-The first RBAC file [(rbac.yaml)](https://raw.githubusercontent.com/galasa-dev/helm/release/charts/ecosystem/rbac.yaml) can be applied without modification. It allows Galasa to complete the installation, creates a Galasa service account so the Engine Controller can create and manage engine pods.
+The first RBAC file [(rbac.yaml)](./charts/ecosystem/rbac.yaml) can be applied without modification. It allows Galasa to complete the installation by creating a Galasa service account so the API, Engine Controller, Metrics, and Resource Monitor can coordinate, while allowing the Engine Controller to create and manage engine pods.
 
-The second RBAC file [(rbac-admin.yaml)](https://raw.githubusercontent.com/galasa-dev/helm/release/charts/ecosystem/rbac-admin.yaml) allows someone to run the helm install/upgrade/delete commands, this will need to be modified slightly to include authorised users.
+The second RBAC file [(rbac-admin.yaml)](./charts/ecosystem/rbac-admin.yaml) allows someone to run the helm install/upgrade/delete commands, this will need to be modified slightly to include authorised users.
 
 ### Installation
 To install a Galasa Ecosystem using Helm, use the following command (after adding the repo detailed above). Note: The Galasa Ecosystem Helm chart will deploy three persistent volumes. If you need to provide a Kubernetes storage class for these PVs, you can override the `storageClass` value as shown in the command below. If you are deploying to minikube, you can use the `standard` storage class created for you by minikube.
@@ -36,7 +36,7 @@ helm install [--set storageClass=mystorageclass] --set galasaVersion=0.23.0 --se
 
 To install the latest development version of the Galasa Ecosystem chart, replace `galasa/ecosystem` in the above command with the path to the [`ecosystem`](./charts/ecosystem) directory in this repository.
 
-It is very important that the `--wait` is included as the chart uses a post-install hook to complete the installation.  During the installation, you will see the engine-controller, metrics and resource-monitor pods restart a few times, this is expected as they cannot start until the api pod has correct initialised and the api pod cannot start until the etcd and couchdb have completed their startups. 
+It is very important that the `--wait` is included as the chart uses a post-install hook to complete the installation. During the installation, the API pod waits for the etcd and RAS pods to initialise while the engine-controller, metrics, and resource-monitor pods wait for the API pod to initialise.
 
 The `galasaVersion` value is the version of Galasa you want to run. You should not use latest to ensure each pod in the Ecosystem is running at the same level.
 
