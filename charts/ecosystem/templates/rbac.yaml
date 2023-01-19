@@ -1,6 +1,7 @@
 #
 # Copyright contributors to the Galasa project 
 #
+{{- if not (lookup "v1" "ServiceAccount" .Release.Namespace "galasa") }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -39,3 +40,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: galasa
+{{- end }}
