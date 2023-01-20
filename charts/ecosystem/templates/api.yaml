@@ -68,6 +68,16 @@ spec:
           - -l=app={{ .Release.Name }}-ras
           - --for=condition=Ready
           - --timeout=90s
+      - name: configure-bootstrap
+        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
+        command:
+          - /bin/bash
+          - -ec
+          - |
+            source /galasa/set-external-env.sh --hostname {{ .Values.externalHostname }} --prefix {{ .Release.Name }}-
+            kubectl get configmap {{ .Release.Name }}-bootstrap-file -o yaml > bootstrap.yaml
+            sed "s;etcd:http://etcd:2379;${GALASA_EXTERNAL_ETCD_STORE};g" bootstrap.yaml > bootstrap-new.yaml
+            kubectl replace -f bootstrap-new.yaml
       containers:
       - name: api
         image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}

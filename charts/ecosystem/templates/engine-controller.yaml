@@ -1,5 +1,5 @@
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
 apiVersion: apps/v1
 kind: Deployment
@@ -40,17 +40,14 @@ spec:
       containers:
       - name: engine-controller
         image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
-        imagePullPolicy: Always
-        command: ["java"]
-        args: 
-        - -jar
-        - boot.jar
-        - --obr
-        - file:galasa.obr
-        - --trace
-        - --k8scontroller
-        - --bootstrap
-        - http://{{ .Release.Name }}-api:8080/bootstrap
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        command:
+          - /bin/bash
+          - -ec
+          - |
+            source /galasa/set-external-env.sh --hostname {{ .Values.externalHostname }} --prefix {{ .Release.Name }}-
+            java -jar boot.jar --obr file:galasa.obr --bootstrap http://{{ .Release.Name }}-api:8080/bootstrap --setupeco
+            java -jar boot.jar --obr file:galasa.obr --bootstrap http://{{ .Release.Name }}-api:8080/bootstrap --k8scontroller
         env:
         - name: NAMESPACE
           valueFrom:
