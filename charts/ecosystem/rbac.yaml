@@ -1,0 +1,41 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: galasa
+
+---
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: galasa
+rules:
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get","update"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get","patch","list","watch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get","list","create","delete"]
+
+---
+
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: galasa
+roleRef:
+  kind: Role
+  name: galasa
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: galasa
