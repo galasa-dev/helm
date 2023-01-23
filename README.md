@@ -44,7 +44,7 @@ If you are deploying to minikube, you can use the `standard` storage class creat
 
 In your [values.yaml](charts/ecosystem/values.yaml) file:
 
-  1. Set the `galasaVersion` value to a version of galasa you want to run (see [releases](https://galasa.dev/releases) for latest versions). You should not use latest to ensure each pod in the Ecosystem is running at the same level.
+  1. Set the `galasaVersion` value to a version of galasa you want to run (see [releases](https://galasa.dev/releases) for released versions). You should not use latest to ensure each pod in the Ecosystem is running at the same level.
   2. Set the `externalHostname` value to the DNS hostname or IP address of the Kubernetes node that will be used to access the Galasa NodePort services.
      * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
 
@@ -98,5 +98,3 @@ If you want to upgrade the Galasa Ecosystem to use a newer version of Galasa, fo
 ```console
 helm upgrade --reuse-values --set galasaVersion=0.24.0 --wait
 ```
-
-**Warning**: If you have made changes to the configmaps that this helm chart manages, those changes will be lost and will have to be reapplied manually.
