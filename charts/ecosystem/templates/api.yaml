@@ -76,8 +76,8 @@ spec:
           - |
             source /galasa/set-external-env.sh --hostname {{ .Values.externalHostname }} --prefix {{ .Release.Name }}-
             kubectl get configmap {{ .Release.Name }}-bootstrap-file -o yaml > bootstrap.yaml
-            sed "s;etcd:http://etcd:2379;${GALASA_EXTERNAL_ETCD_STORE};g" bootstrap.yaml > bootstrap-new.yaml
-            kubectl replace -f bootstrap-new.yaml
+            sed -i "s;etcd:http://etcd:2379;${GALASA_EXTERNAL_ETCD_STORE};g" bootstrap.yaml
+            kubectl replace -f bootstrap.yaml
       containers:
       - name: api
         image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
