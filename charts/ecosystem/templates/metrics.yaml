@@ -20,11 +20,23 @@ spec:
       labels:
         app: {{ .Release.Name }}-metrics
     spec:
+      serviceAccountName: galasa
       nodeSelector:
         kubernetes.io/arch: {{ .Values.architecture }}
         {{- if .Values.nodeSelectors }}
 {{ toYaml .Values.nodeSelectors | indent 8 }}
         {{- end }}
+      initContainers:
+        - name: wait-for-api
+          image: bitnami/kubectl
+          command:
+            - kubectl
+          args:
+            - wait
+            - pods
+            - -l=app={{ .Release.Name }}-api
+            - --for=condition=Ready
+            - --timeout=180s
       containers:
       - name: metrics
         image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
