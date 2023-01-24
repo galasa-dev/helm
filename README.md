@@ -54,8 +54,6 @@ Having configured your [values.yaml](charts/ecosystem/values.yaml) file, use the
 helm install <release-name> galasa/ecosystem --wait 
 ``` 
 
-To install the latest development version of the Galasa Ecosystem chart, replace `galasa/ecosystem` in the above command with the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
-
 The `--wait` flag ensures the chart installation has completed before marking it as "Deployed". During the installation, the API pod waits for the etcd and RAS pods to initialise while the engine-controller, metrics, and resource-monitor pods wait for the API pod to initialise.
 
 You can view the status of the deployed pods at any time by running `kubectl get pods` in another terminal. The results should look similar to the following:
@@ -86,7 +84,7 @@ kubectl get svc
 Look for the `api-external` service and the NodePort associated with the 8080 port. Combine that with the external hostname you provided to form the bootstrap URL. For example, the following snippet shows `30960` to be associated with port 8080:
 
 ```console
-test-api-external                 NodePort    10.107.160.208   <none>        9010:31359/TCP,9011:31422/TCP,8080:30960/TCP   18s
+test-api-external  NodePort  10.107.160.208  <none>  9010:31359/TCP,9011:31422/TCP,8080:30960/TCP  18s
 ```
 
 If the external hostname you provided was `example.com`, the bootstrap URL will be `http://example.com:30960/boostrap`. You will enter this into the Eclipse plugin preferences, or in a galasactl command's `--bootstrap` option.
@@ -96,5 +94,21 @@ If the external hostname you provided was `example.com`, the bootstrap URL will 
 If you want to upgrade the Galasa Ecosystem to use a newer version of Galasa, for example, then you can use the following command:
 
 ```console
-helm upgrade --reuse-values --set galasaVersion=0.24.0 --wait
+helm upgrade --reuse-values --set galasaVersion=0.25.0 --wait
 ```
+
+### Development
+To install the latest development version of the Galasa Ecosystem chart, clone this repository and update the following values in your [values.yaml](charts/ecosystem/values.yaml) file:
+
+1. Set the `galasaVersion` value to `main`
+2. Set the `galasaRegistry` value to `harbor.galasa.dev/galasadev`
+3. Set the `externalHostname` value to the DNS hostname or IP address of the Kubernetes node that will be used to access the Galasa NodePort services.
+   * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
+
+Next, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
+
+```console
+helm install <release-name> /path/to/helm/charts/ecosystem --wait 
+``` 
+
+Once the `helm install` command ends with a successful deployment message, you can follow the installation instructions above to test the deployed ecosystem using `helm test` and determine the bootstrap URL.
