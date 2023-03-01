@@ -23,9 +23,9 @@ If multiple users require admin privileges, multiple groups, users, or ServiceAc
 
 For chart versions following 0.23.0, the other RBAC file ([rbac.yaml](./charts/ecosystem/templates/rbac.yaml)) is applied automatically when installing the ecosystem chart. It creates a Galasa service account if one does not already exist so the API, Engine Controller, Metrics, and Resource Monitor can coordinate, while allowing the Engine Controller to create and manage engine pods.
 
-For chart version 0.23.0 and prior, you will need to apply [rbac.yaml](./charts/ecosystem/rbac.yaml) manually. You can do this by running the following command in this repository's [`ecosystem`](./charts/ecosystem/) directory:
+For chart version 0.23.0 and prior, you will need to apply [rbac.yaml](./charts/ecosystem/rbac.yaml) manually. You can do this by running the following command:
 ```console
-kubectl apply -f rbac.yaml
+kubectl apply -f https://raw.githubusercontent.com/galasa-dev/helm/ecosystem-0.23.0/charts/ecosystem/rbac.yaml
 ```
 
 ### Installation
@@ -42,7 +42,7 @@ Note: The Galasa Ecosystem Helm chart will deploy three persistent volumes. If y
 
 If you are deploying to minikube, you can use the `standard` storage class created for you by minikube, but this is not required.
 
-In your [values.yaml](charts/ecosystem/values.yaml) file:
+Download the [values.yaml](charts/ecosystem/values.yaml) file and within it:
 
   1. Set the `galasaVersion` value to a version of galasa you want to run (see [releases](https://galasa.dev/releases) for released versions). You should not use latest to ensure each pod in the Ecosystem is running at the same level.
   2. Set the `externalHostname` value to the DNS hostname or IP address of the Kubernetes node that will be used to access the Galasa NodePort services.
@@ -51,8 +51,10 @@ In your [values.yaml](charts/ecosystem/values.yaml) file:
 Having configured your [values.yaml](charts/ecosystem/values.yaml) file, use the following command to install the Galasa Ecosystem chart:
 
 ```console
-helm install <release-name> galasa/ecosystem --wait 
+helm install -f /path/to/values.yaml <release-name> galasa/ecosystem --wait 
 ``` 
+
+where `/path/to/values.yaml` is the path to the `values.yaml` file that you downloaded, and `<release-name>` is the name that you want to give the ecosystem.
 
 The `--wait` flag ensures the chart installation has completed before marking it as "Deployed". During the installation, the API pod waits for the etcd and RAS pods to initialise while the engine-controller, metrics, and resource-monitor pods wait for the API pod to initialise.
 
@@ -72,6 +74,8 @@ After the `helm install` command ends with a successful deployment message, you 
 ```console
 helm test <release-name>
 ```
+
+where `<release-name>` is the name that you gave the ecosystem during installation.
 
 Once the `helm test` command ends and displays a success message, the Ecosystem has been set up correctly and is ready to be used.
 
