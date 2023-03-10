@@ -28,6 +28,11 @@ spec:
       - name: couchdb
         image: {{ .Values.couchdbImage }}
         imagePullPolicy: IfNotPresent
+        env:
+        - name: COUCHDB_USER
+          value: "admin"
+        - name: COUCHDB_PASSWORD
+          value: "password"
         ports:
         - containerPort: 5984
           name: couchdbport
