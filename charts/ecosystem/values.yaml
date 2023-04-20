@@ -49,3 +49,9 @@ catalogDiskSize: "1Gi"
 #
 etcdImage: "quay.io/coreos/etcd:v3.2.25"
 couchdbImage: "couchdb:3.3.1"
+#
+#
+# Internal RAS Token
+# !!!CURRENTLY USES BASIC AUTHENTICATION TO TALK TO THE RAS!!!
+# FUTURE UPDATE WILL ENSURE THAT THIS IS DONE USING A USER TOKEN
+galasaRAStoken: "Basic UFdySk5RdVVHVExZVE9oUk5GUUNwdnpuelN0TEJFWmY6aHV6a09UT09lQWJRdVJyU2NlbmRZZ3lIcklWd2dRUXE="

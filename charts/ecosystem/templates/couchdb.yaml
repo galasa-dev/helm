@@ -30,9 +30,9 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
         - name: COUCHDB_USER
-          value: "admin"
+          value: "PWrJNQuUGTLYTOhRNFQCpvznzStLBEZf"
         - name: COUCHDB_PASSWORD
-          value: "password"
+          value: "huzkOTOOeAbQuRrScendYgyHrIVwgQQq"
         ports:
         - containerPort: 5984
           name: couchdbport
