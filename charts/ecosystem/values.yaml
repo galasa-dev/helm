@@ -49,3 +49,36 @@ catalogDiskSize: "1Gi"
 #
 etcdImage: "quay.io/coreos/etcd:v3.2.25"
 couchdbImage: "couchdb:2.3.1"
+dexImage: "ghcr.io/dexidp/dex:v2.32.0"
+#
+#
+# Values to enable and configure the use of ingress
+#
+ingress:
+  # Enables/disables the use of ingress
+  enabled: true
+
+  # Annotations to be added to ingresses
+  annotations: {}
+
+  # The host to access services through
+  host: example.com
+#
+#
+# Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
+#
+dexConfig:
+    issuer: http://example.com/dex
+    storage:
+      type: kubernetes
+      config:
+        inCluster: true
+    
+    # Default is set to use an example email and password.
+    enablePasswordDB: true
+    staticPasswords:
+    - email: "admin@example.com"
+      # bcrypt hash of the string "password": $(echo password | htpasswd -BinC 10 admin | cut -d: -f2)
+      hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+      username: "admin"
+      userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
