@@ -14,7 +14,31 @@ It is highly discouraged to use minikube for production purposes since it only p
 
 If you would like to install the chart into minikube, ensure you have minikube [installed](https://minikube.sigs.k8s.io/docs/start/) and that it is running with `minikube status`. If minikube is not running, start it by running `minikube start`.
 
-Once minikube is running, follow the instructions in the sections below to install the Galasa Ecosystem chart. 
+Once minikube is running, follow the instructions in the sections below to install the Galasa Ecosystem chart.
+
+### Dex
+**Note: The ecosystem chart's use of Dex is still under development and is subject to change.**
+
+In a future release, [Dex](https://dexidp.io) will be used to authenticate users attempting to interact with a Galasa Ecosystem.
+
+To configure dex to authenticate through GitHub:
+
+1. Register an OAuth application in [GitHub](https://github.com/settings/applications/new), ensuring the application's callback URL is set to `http://<your-dex-issuer>/callback`
+2. Add a GitHub connector to your dex configuration (see the `dexConfig` value in the [values.yaml](./charts/ecosystem/values.yaml) file) as follows:
+    ```yaml
+    dexConfig:
+      connectors:
+      - type: github
+        id: github
+        name: GitHub
+        config:
+          clientID: $GITHUB_CLIENT_ID
+          clientSecret: $GITHUB_CLIENT_SECRET
+          redirectURI: http://<your-dex-issuer>/callback
+    ```
+    where `$GITHUB_CLIENT_ID` and `$GITHUB_CLIENT_SECRET` correspond to the registered OAuth application's client ID and secret.
+
+For more information on configuring dex, refer to the [Dex documentation](https://dexidp.io/docs).
 
 ### RBAC
 If RBAC is active on your Kubernetes cluster, you will need to get your Kubernetes administrator to replace the [placeholder username](https://github.com/galasa-dev/helm/blob/main/charts/ecosystem/rbac-admin.yaml#L39) in the [rbac-admin.yaml](./charts/ecosystem/rbac-admin.yaml) file with a username corresponding to a user with access to your cluster to assign them the `galasa-admin` role. This role allows assigned users to run the helm install/upgrade/delete commands to interact with the helm chart.
