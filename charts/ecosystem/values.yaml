@@ -61,7 +61,7 @@ ingress:
   # Annotations to be added to ingresses
   annotations: {}
 
-  # The host to access services through
+  # The host to access services through - must not be an IP address.
   host: example.com
 #
 #

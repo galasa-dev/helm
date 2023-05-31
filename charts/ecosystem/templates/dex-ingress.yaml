@@ -8,9 +8,9 @@ metadata:
   name: {{ .Release.Name }}-dex
   annotations:
     {{- with .Values.ingress.annotations }}
-      {{- toYaml .Values.ingress.annotations | indent 4 }}
+      {{- toYaml . | indent 4 }}
     {{- end }}
-    nginx.ingress.kubernetes.io/rewrite-target: /dex/$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
   - host: {{ .Values.ingress.host }}
