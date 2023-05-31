@@ -13,7 +13,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
-  - host: {{ .Values.ingress.host }}
+  - host: {{ .Values.externalHostname }}
     http:
       paths:
       - path: /dex(/|$)(.*)

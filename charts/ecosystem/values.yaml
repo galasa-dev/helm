@@ -53,6 +53,7 @@ dexImage: "ghcr.io/dexidp/dex:v2.32.0"
 #
 #
 # Values to enable and configure the use of ingress
+# Note: The externalHostname value must be a valid DNS name for ingress to be used.
 #
 ingress:
   # Enables/disables the use of ingress
@@ -60,9 +61,6 @@ ingress:
 
   # Annotations to be added to ingresses
   annotations: {}
-
-  # The host to access services through - must not be an IP address.
-  host: example.com
 #
 #
 # Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
