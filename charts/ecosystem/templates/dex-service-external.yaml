@@ -15,6 +15,16 @@ spec:
   - name: http
     port: 5556
     targetPort: 5556
+    {{- if .Values.dex.nodePorts.http }}
+    nodePort: {{ .Values.dex.nodePorts.http }}
+    {{- end }}
+    protocol: TCP
+  - name: grpc
+    port: 5557
+    targetPort: 5557
+    {{- if .Values.dex.nodePorts.grpc }}
+    nodePort: {{ .Values.dex.nodePorts.grpc }}
+    {{- end }}
     protocol: TCP
   - name: telemetry
     port: 5558

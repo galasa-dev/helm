@@ -6,4 +6,4 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-dex-config
 data:
-  config.yaml: {{ .Values.dexConfig | toYaml | quote }}
+  config.yaml: {{ .Values.dex.config | toYaml | quote }}
