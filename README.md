@@ -72,11 +72,17 @@ Download the [values.yaml](charts/ecosystem/values.yaml) file and within it:
   2. Set the `externalHostname` value to the DNS hostname or IP address of the Kubernetes node that will be used to access the Galasa NodePort services.
      * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
 
+If you are deploying to minikube and are using Ingress to expose services, ensure the NGINX Ingress controller is enabled by running:
+
+```console
+minikube addons enable ingress
+```
+
 Having configured your [values.yaml](charts/ecosystem/values.yaml) file, use the following command to install the Galasa Ecosystem chart:
 
 ```console
-helm install -f /path/to/values.yaml <release-name> galasa/ecosystem --wait 
-``` 
+helm install -f /path/to/values.yaml <release-name> galasa/ecosystem --wait
+```
 
 where `/path/to/values.yaml` is the path to the `values.yaml` file that you downloaded, and `<release-name>` is the name that you want to give the ecosystem.
 
@@ -133,10 +139,16 @@ To install the latest development version of the Galasa Ecosystem chart, clone t
 3. Set the `externalHostname` value to the DNS hostname or IP address of the Kubernetes node that will be used to access the Galasa NodePort services.
    * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
 
+If you are deploying to minikube and are using Ingress to expose services, ensure the NGINX Ingress controller is enabled by running:
+
+```console
+minikube addons enable ingress
+```
+
 Next, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
 
 ```console
-helm install <release-name> /path/to/helm/charts/ecosystem --wait 
-``` 
+helm install <release-name> /path/to/helm/charts/ecosystem --wait
+```
 
 Once the `helm install` command ends with a successful deployment message, you can follow the installation instructions above to test the deployed ecosystem using `helm test` and determine the bootstrap URL.
