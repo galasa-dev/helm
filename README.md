@@ -109,6 +109,8 @@ where `<release-name>` is the name that you gave the ecosystem during installati
 
 Once the `helm test` command ends and displays a success message, the Ecosystem has been set up correctly and is ready to be used.
 
+### Accessing services
+
 To determine the URL of the Ecosystem bootstrap, issue the command:
 
 ```console
@@ -121,14 +123,20 @@ Look for the `api-external` service and the NodePort associated with the 8080 po
 test-api-external  NodePort  10.107.160.208  <none>  9010:31359/TCP,9011:31422/TCP,8080:30960/TCP  18s
 ```
 
-If the external hostname you provided was `example.com`, the bootstrap URL will be `http://example.com:30960/boostrap`. You will enter this into the Eclipse plugin preferences, or in a galasactl command's `--bootstrap` option.
+If the external hostname you provided was `example.com`, the bootstrap URL will be `http://example.com:30960/bootstrap`. You will enter this into the Eclipse plugin preferences, or in a galasactl command's `--bootstrap` option.
+
+If you have enabled ingress and are deploying to minikube, add an entry to your `/etc/hosts` file like the one shown below, ensuring the IP address matches the output of `minikube ip`.
+
+```console
+192.168.49.2 example.com
+```
 
 ### Upgrading the Galasa Ecosystem
 
 If you want to upgrade the Galasa Ecosystem to use a newer version of Galasa, for example, then you can use the following command:
 
 ```console
-helm upgrade --reuse-values --set galasaVersion=0.25.0 --wait
+helm upgrade <release-name> galasa/ecosystem --reuse-values --set galasaVersion=0.28.0 --wait
 ```
 
 ### Development
