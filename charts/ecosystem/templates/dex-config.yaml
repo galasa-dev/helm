@@ -1,0 +1,9 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-dex-config
+data:
+  config.yaml: {{ .Values.dex.config | toYaml | quote }}

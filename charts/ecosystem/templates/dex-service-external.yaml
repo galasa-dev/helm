@@ -1,0 +1,32 @@
+#
+# Copyright contributors to the Galasa project 
+#
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-dex-external
+  labels:
+    app: {{ .Release.Name }}-dex-external
+spec:
+  type: NodePort
+  selector:
+    app: {{ .Release.Name }}-dex
+  ports:
+  - name: http
+    port: 5556
+    targetPort: 5556
+    {{- if .Values.dex.nodePorts.http }}
+    nodePort: {{ .Values.dex.nodePorts.http }}
+    {{- end }}
+    protocol: TCP
+  - name: grpc
+    port: 5557
+    targetPort: 5557
+    {{- if .Values.dex.nodePorts.grpc }}
+    nodePort: {{ .Values.dex.nodePorts.grpc }}
+    {{- end }}
+    protocol: TCP
+  - name: telemetry
+    port: 5558
+    targetPort: 5558
+    protocol: TCP

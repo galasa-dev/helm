@@ -14,7 +14,31 @@ It is highly discouraged to use minikube for production purposes since it only p
 
 If you would like to install the chart into minikube, ensure you have minikube [installed](https://minikube.sigs.k8s.io/docs/start/) and that it is running with `minikube status`. If minikube is not running, start it by running `minikube start`.
 
-Once minikube is running, follow the instructions in the sections below to install the Galasa Ecosystem chart. 
+Once minikube is running, follow the instructions in the sections below to install the Galasa Ecosystem chart.
+
+### Dex
+**Note: The ecosystem chart's use of Dex is still under development and is subject to change.**
+
+In a future release, [Dex](https://dexidp.io) will be used to authenticate users attempting to interact with a Galasa Ecosystem.
+
+To configure dex to authenticate through GitHub:
+
+1. Register an OAuth application in [GitHub](https://github.com/settings/applications/new), ensuring the application's callback URL is set to `http://<your-dex-issuer>/callback`
+2. Add a GitHub connector to your dex configuration (see the `dexConfig` value in the [values.yaml](./charts/ecosystem/values.yaml) file) as follows:
+    ```yaml
+    dexConfig:
+      connectors:
+      - type: github
+        id: github
+        name: GitHub
+        config:
+          clientID: $GITHUB_CLIENT_ID
+          clientSecret: $GITHUB_CLIENT_SECRET
+          redirectURI: http://<your-dex-issuer>/callback
+    ```
+    where `$GITHUB_CLIENT_ID` and `$GITHUB_CLIENT_SECRET` correspond to the registered OAuth application's client ID and secret.
+
+For more information on configuring dex, refer to the [Dex documentation](https://dexidp.io/docs).
 
 ### RBAC
 If RBAC is active on your Kubernetes cluster, you will need to get your Kubernetes administrator to replace the [placeholder username](https://github.com/galasa-dev/helm/blob/main/charts/ecosystem/rbac-admin.yaml#L39) in the [rbac-admin.yaml](./charts/ecosystem/rbac-admin.yaml) file with a username corresponding to a user with access to your cluster to assign them the `galasa-admin` role. This role allows assigned users to run the helm install/upgrade/delete commands to interact with the helm chart.
@@ -48,11 +72,17 @@ Download the [values.yaml](charts/ecosystem/values.yaml) file and within it:
   2. Set the `externalHostname` value to the DNS hostname or IP address of the Kubernetes node that will be used to access the Galasa NodePort services.
      * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
 
+If you are deploying to minikube and are using Ingress to expose services, ensure the NGINX Ingress controller is enabled by running:
+
+```console
+minikube addons enable ingress
+```
+
 Having configured your [values.yaml](charts/ecosystem/values.yaml) file, use the following command to install the Galasa Ecosystem chart:
 
 ```console
-helm install -f /path/to/values.yaml <release-name> galasa/ecosystem --wait 
-``` 
+helm install -f /path/to/values.yaml <release-name> galasa/ecosystem --wait
+```
 
 where `/path/to/values.yaml` is the path to the `values.yaml` file that you downloaded, and `<release-name>` is the name that you want to give the ecosystem.
 
@@ -79,6 +109,8 @@ where `<release-name>` is the name that you gave the ecosystem during installati
 
 Once the `helm test` command ends and displays a success message, the Ecosystem has been set up correctly and is ready to be used.
 
+### Accessing services
+
 To determine the URL of the Ecosystem bootstrap, issue the command:
 
 ```console
@@ -91,14 +123,20 @@ Look for the `api-external` service and the NodePort associated with the 8080 po
 test-api-external  NodePort  10.107.160.208  <none>  9010:31359/TCP,9011:31422/TCP,8080:30960/TCP  18s
 ```
 
-If the external hostname you provided was `example.com`, the bootstrap URL will be `http://example.com:30960/boostrap`. You will enter this into the Eclipse plugin preferences, or in a galasactl command's `--bootstrap` option.
+If the external hostname you provided was `example.com`, the bootstrap URL will be `http://example.com:30960/bootstrap`. You will enter this into the Eclipse plugin preferences, or in a galasactl command's `--bootstrap` option.
+
+If you have enabled ingress and are deploying to minikube, add an entry to your `/etc/hosts` file like the one shown below, ensuring the IP address matches the output of `minikube ip`.
+
+```console
+192.168.49.2 example.com
+```
 
 ### Upgrading the Galasa Ecosystem
 
 If you want to upgrade the Galasa Ecosystem to use a newer version of Galasa, for example, then you can use the following command:
 
 ```console
-helm upgrade --reuse-values --set galasaVersion=0.25.0 --wait
+helm upgrade <release-name> galasa/ecosystem --reuse-values --set galasaVersion=0.28.0 --wait
 ```
 
 ### Development
@@ -109,10 +147,16 @@ To install the latest development version of the Galasa Ecosystem chart, clone t
 3. Set the `externalHostname` value to the DNS hostname or IP address of the Kubernetes node that will be used to access the Galasa NodePort services.
    * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
 
+If you are deploying to minikube and are using Ingress to expose services, ensure the NGINX Ingress controller is enabled by running:
+
+```console
+minikube addons enable ingress
+```
+
 Next, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
 
 ```console
-helm install <release-name> /path/to/helm/charts/ecosystem --wait 
-``` 
+helm install <release-name> /path/to/helm/charts/ecosystem --wait
+```
 
 Once the `helm install` command ends with a successful deployment message, you can follow the installation instructions above to test the deployed ecosystem using `helm test` and determine the bootstrap URL.

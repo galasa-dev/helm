@@ -49,3 +49,48 @@ catalogDiskSize: "1Gi"
 #
 etcdImage: "quay.io/coreos/etcd:v3.2.25"
 couchdbImage: "couchdb:2.3.1"
+dexImage: "ghcr.io/dexidp/dex:v2.32.0"
+#
+#
+# Values to enable and configure the use of ingress
+# Note: The externalHostname value must be a valid DNS name for ingress to be used.
+#
+ingress:
+  # Enables/disables the use of ingress
+  enabled: true
+
+  # Annotations to be added to ingresses
+  annotations: {}
+#
+#
+# Values to configure the ecosystem's use of Dex
+#
+dex:
+  # NodePorts to access Dex services through (Helm will dynamically assign NodePorts in the 
+  # 30000 to 32767 range if they are left blank).
+  nodePorts:
+    grpc: 32000
+    http: # blank - dynamically assigned
+
+  # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
+  config:
+    issuer: http://example.com/dex
+    storage:
+      type: kubernetes
+      config:
+        inCluster: true
+
+    # Enable Dex's gRPC API for clients to interact with.
+    grpc:
+      # The address of the exposed gRPC API server. Must be a valid {HOST}:{PORT} combination.
+      addr: example.com:32000
+      reflection: true
+    
+    # Default is set to use an example email and password.
+    enablePasswordDB: true
+    staticPasswords:
+    - email: "admin@example.com"
+      # bcrypt hash of the string "password": $(echo password | htpasswd -BinC 10 admin | cut -d: -f2)
+      hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+      username: "admin"
+      userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
