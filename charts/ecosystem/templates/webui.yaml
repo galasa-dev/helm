@@ -1,0 +1,66 @@
+#
+# Copyright contributors to the Galasa project
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-webui
+  labels:
+    app: {{ .Release.Name }}-webui
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-webui
+  template:
+    metadata:
+      name: {{ .Release.Name }}-webui
+      labels:
+        app: {{ .Release.Name }}-webui
+    spec:
+      serviceAccountName: galasa
+      {{- if .Values.nodeSelectors }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelectors | indent 8 }}
+      {{- end }}
+      initContainers:
+        - name: wait-for-dex
+          image: bitnami/kubectl
+          command:
+            - kubectl
+          args:
+            - wait
+            - pods
+            - -l=app={{ .Release.Name }}-dex
+            - --for=condition=Ready
+            - --timeout=180s
+      containers:
+      - name: webui
+        image: {{ .Values.galasaRegistry }}/galasa-ui:{{ .Values.galasaVersion }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        env:
+        - name: DEX_ISSUER_URL
+          value: http://{{ .Values.externalHostname }}/dex
+        - name: WEBUI_HOST_URL
+          value: http://{{ .Values.externalHostname }}
+        {{- with (first .Values.dex.staticClients) }}
+        - name: DEX_CLIENT_SECRET
+          value: {{ .secret }}/dex
+        {{- end }}
+        ports:
+        - containerPort: 8080
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 60
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10

@@ -1,0 +1,15 @@
+#
+# Copyright contributors to the Galasa project
+#
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-webui
+  labels:
+    app: {{ .Release.Name }}-webui
+spec:
+  ports:
+  - name: http
+    port: 8080
+  selector:
+    app: {{ .Release.Name }}-webui
