@@ -99,7 +99,7 @@ dex:
     staticClients:
     - id: galasa-webui
       redirectURIs:
-      - 'http://example.com/webui/auth/callback'
+      - 'http://example.com/auth/callback'
       name: 'Galasa Ecosystem Web UI'
       secret: example-webui-client-secret
 

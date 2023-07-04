@@ -10,13 +10,12 @@ metadata:
     {{- with .Values.ingress.annotations }}
       {{- toYaml . | indent 4 }}
     {{- end }}
-    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
   - host: {{ .Values.externalHostname }}
     http:
       paths:
-      - path: /webui(/|$)(.*)
+      - path: /
         pathType: Prefix
         backend:
           service:
