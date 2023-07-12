@@ -47,7 +47,7 @@ catalogDiskSize: "1Gi"
 #
 # The image names and versions for the non-Galasa images
 #
-etcdImage: "quay.io/coreos/etcd:v3.2.25"
+etcdImage: "quay.io/coreos/etcd:v3.5.9"
 couchdbImage: "couchdb:2.3.1"
 dexImage: "ghcr.io/dexidp/dex:v2.32.0"
 #
