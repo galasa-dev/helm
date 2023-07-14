@@ -1,5 +1,5 @@
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
 apiVersion: apps/v1
 kind: Deployment
@@ -19,6 +19,17 @@ spec:
 
     spec:
       serviceAccountName: galasa
+      initContainers:
+      - name: wait-for-etcd
+        image: bitnami/kubectl
+        command:
+          - kubectl
+        args:
+          - wait
+          - pods
+          - -l=app={{ .Release.Name }}-etcd
+          - --for=condition=Ready
+          - --timeout=90s
       containers:
       - image: {{ .Values.dexImage }}
         name: dex
