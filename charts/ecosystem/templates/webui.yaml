@@ -41,12 +41,13 @@ spec:
         image: {{ .Values.galasaRegistry }}/galasa-ui:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command:
-          - /bin/sh
-          - -ec
-          - DEX_ISSUER_URL=${DEX_ISSUER_URL} WEBUI_HOST_URL=${WEBUI_HOST_URL} DEX_CLIENT_SECRET=${DEX_CLIENT_SECRET} npm start
+          - npm
+          - start
         env:
         - name: DEX_ISSUER_URL
           value: {{ .Values.dex.config.issuer }}
+        - name: DEX_GRPC_HOSTNAME
+          value: {{ .Values.dex.config.grpc.addr }}
         - name: WEBUI_HOST_URL
           value: http://{{ .Values.externalHostname }}
         {{- with (first .Values.dex.config.staticClients) }}
