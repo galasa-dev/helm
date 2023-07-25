@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 #
 # The External host name the Kubernetes NodePorts can be accessed on, can be an IP address
 #
