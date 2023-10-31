@@ -1,4 +1,9 @@
 #
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+#
 # The configuration properties for the Galasa Ecosystem
 #
 apiVersion: v1
@@ -30,4 +35,3 @@ data:
 #  engine_memory_limit: "300"
   run_poll: "5"
   run_poll_recheck: "2"
-
