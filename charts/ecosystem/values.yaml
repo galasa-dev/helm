@@ -62,6 +62,11 @@ ingress:
   # Enables/disables the use of ingress
   enabled: true
 
+  # Values to configure the use of TLS in ingresses
+  tls:
+    enabled: false
+    secretName: ""
+
   # Annotations to be added to ingresses
   annotations: {}
 #
