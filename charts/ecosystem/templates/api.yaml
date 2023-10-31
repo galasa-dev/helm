@@ -86,7 +86,7 @@ spec:
         image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command: ["java"]
-        args: 
+        args:
         - -jar
         - boot.jar
         - --obr
@@ -104,6 +104,8 @@ spec:
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
           value: etcd:http://{{ .Release.Name }}-etcd:2379
+        - name: GALASA_DEX_ISSUER
+          value: {{ .Values.dex.config.issuer }}
         ports:
         - containerPort: 9010
           name: metrics
@@ -131,7 +133,7 @@ spec:
           mountPath: /galasa/load/dev.galasa.testcatalog.cfg
           subPath: dev.galasa.testcatalog.cfg
         - name: data
-          mountPath: /galasa/testcatalog    
+          mountPath: /galasa/testcatalog
       volumes:
       - name: bootstrap
         configMap:

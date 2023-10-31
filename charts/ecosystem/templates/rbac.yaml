@@ -44,33 +44,4 @@ subjects:
 - kind: ServiceAccount
   name: galasa
 
----
-
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: galasa-dex
-rules:
-- apiGroups: ["dex.coreos.com"]
-  resources: ["*"]
-  verbs: ["*"]
-- apiGroups: ["apiextensions.k8s.io"]
-  resources: ["customresourcedefinitions"]
-  verbs: ["list", "create"]
-
----
-
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: galasa-dex
-roleRef:
-  kind: ClusterRole
-  name: galasa-dex
-  apiGroup: rbac.authorization.k8s.io
-subjects:
-- kind: ServiceAccount
-  namespace: {{ .Release.Namespace }}
-  name: galasa
-
 {{- end }}

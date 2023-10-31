@@ -9,4 +9,12 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-dex-config
 data:
-  config.yaml: {{ .Values.dex.config | toYaml | quote }}
+  config.yaml: |-
+    {{ .Values.dex.config | toYaml | nindent 4 }}
+    {{- if not (hasKey .Values.dex.config "storage") }}
+    storage:
+      type: etcd
+      config:
+        endpoints:
+          - http://{{ .Release.Name }}-etcd:2379
+    {{- end }}

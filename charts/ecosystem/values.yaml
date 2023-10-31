@@ -62,6 +62,11 @@ ingress:
   # Enables/disables the use of ingress
   enabled: true
 
+  # Values to configure the use of TLS in ingresses
+  tls:
+    enabled: false
+    secretName: ""
+
   # Annotations to be added to ingresses
   annotations: {}
 #
@@ -69,26 +74,23 @@ ingress:
 # Values to configure the ecosystem's use of Dex
 #
 dex:
-  # NodePorts to access Dex services through (Helm will dynamically assign NodePorts in the 
+  # NodePorts to access Dex services through (Helm will dynamically assign NodePorts in the
   # 30000 to 32767 range if they are left blank).
   nodePorts:
     grpc: 32000
     http: # blank - dynamically assigned
 
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
+  # By default, etcd is used as the storage option for the Galasa Ecosystem.
   config:
     issuer: http://example.com/dex
-    storage:
-      type: kubernetes
-      config:
-        inCluster: true
 
     # Enable Dex's gRPC API for clients to interact with.
     grpc:
       # The address of the exposed gRPC API server. Must be a valid {HOST}:{PORT} combination.
       addr: example.com:32000
       reflection: true
-    
+
     # Default is set to use an example email and password.
     enablePasswordDB: true
     staticPasswords:
