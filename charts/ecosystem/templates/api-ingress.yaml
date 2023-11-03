@@ -8,12 +8,12 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}-dex
+  name: {{ .Release.Name }}-api
   annotations:
     {{- with .Values.ingress.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
-    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: {{ .Values.ingress.ingressClassName }}
   {{- with .Values.ingress.tls }}
@@ -24,11 +24,11 @@ spec:
   - host: {{ .Values.externalHostname }}
     http:
       paths:
-      - path: /dex(/|$)(.*)
+      - path: /api(/|$)(.*)
         pathType: ImplementationSpecific
         backend:
           service:
-            name: {{ .Release.Name }}-dex
+            name: {{ .Release.Name }}-api
             port:
-              number: 5556
+              number: 8080
 {{- end }}

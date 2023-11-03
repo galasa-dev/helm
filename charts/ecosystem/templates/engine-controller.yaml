@@ -1,6 +1,9 @@
 #
 # Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,7 +31,8 @@ spec:
         {{- end }}
       initContainers:
         - name: wait-for-api
-          image: bitnami/kubectl
+          image: {{ .Values.kubectlImage }}
+          imagePullPolicy: {{ .Values.pullPolicy }}
           command:
             - kubectl
           args:

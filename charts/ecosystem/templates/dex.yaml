@@ -1,6 +1,9 @@
 #
-# Copyright contributors to the Galasa project 
+# Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,8 +22,26 @@ spec:
 
     spec:
       serviceAccountName: galasa
+      nodeSelector:
+        kubernetes.io/arch: {{ .Values.architecture }}
+        {{- if .Values.nodeSelectors }}
+{{ toYaml .Values.nodeSelectors | indent 8 }}
+        {{- end }}
+      initContainers:
+      - name: wait-for-etcd
+        image: {{ .Values.kubectlImage }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        command:
+          - kubectl
+        args:
+          - wait
+          - pods
+          - -l=app={{ .Release.Name }}-etcd
+          - --for=condition=Ready
+          - --timeout=90s
       containers:
       - image: {{ .Values.dexImage }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
         name: dex
         args:
           - dex

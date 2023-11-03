@@ -1,6 +1,9 @@
 #
 # Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 #
 # The External host name the Kubernetes NodePorts can be accessed on, can be an IP address
 #
@@ -50,6 +53,7 @@ catalogDiskSize: "1Gi"
 etcdImage: "quay.io/coreos/etcd:v3.2.25"
 couchdbImage: "couchdb:2.3.1"
 dexImage: "ghcr.io/dexidp/dex:v2.32.0"
+kubectlImage: "bitnami/kubectl:1.28"
 #
 #
 # Values to enable and configure the use of ingress
@@ -59,7 +63,20 @@ ingress:
   # Enables/disables the use of ingress
   enabled: true
 
-  # Annotations to be added to ingresses
+  # The IngressClass to use for ingresses
+  ingressClassName: "nginx"
+
+  # Values to configure the use of TLS in ingresses. For example:
+  # tls:
+  #   - hosts:
+  #     - "*.example.com"
+  #     secretName: mysecret
+  tls: {}
+
+  # Annotations to be added to ingresses. For example:
+  # annotations:
+  #   nginx.ingress.kubernetes.io/proxy-body-size: "0"
+  #   nginx.ingress.kubernetes.io/ssl-redirect: "true"
   annotations: {}
 #
 #
@@ -73,12 +90,9 @@ dex:
     http: # blank - dynamically assigned
 
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
+  # By default, etcd is used as the storage option for the Galasa Ecosystem.
   config:
     issuer: http://example.com/dex
-    storage:
-      type: kubernetes
-      config:
-        inCluster: true
 
     # Enable Dex's gRPC API for clients to interact with.
     grpc:
