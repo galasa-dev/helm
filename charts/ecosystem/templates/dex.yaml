@@ -22,6 +22,11 @@ spec:
 
     spec:
       serviceAccountName: galasa
+      nodeSelector:
+        kubernetes.io/arch: {{ .Values.architecture }}
+        {{- if .Values.nodeSelectors }}
+{{ toYaml .Values.nodeSelectors | indent 8 }}
+        {{- end }}
       initContainers:
       - name: wait-for-etcd
         image: {{ .Values.kubectlImage }}
