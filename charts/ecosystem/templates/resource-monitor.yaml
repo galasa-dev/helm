@@ -31,7 +31,8 @@ spec:
         {{- end }}
       initContainers:
         - name: wait-for-api
-          image: bitnami/kubectl
+          image: {{ .Values.kubectlImage }}
+          imagePullPolicy: {{ .Values.pullPolicy }}
           command:
             - kubectl
           args:

@@ -52,7 +52,8 @@ spec:
           allowPrivilegeEscalation: false
           runAsUser: 0
       - name: wait-for-etcd
-        image: bitnami/kubectl
+        image: {{ .Values.kubectlImage }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
         command:
           - kubectl
         args:
@@ -62,7 +63,8 @@ spec:
           - --for=condition=Ready
           - --timeout=90s
       - name: wait-for-ras
-        image: bitnami/kubectl
+        image: {{ .Values.kubectlImage }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
         command:
           - kubectl
         args:
@@ -73,6 +75,7 @@ spec:
           - --timeout=90s
       - name: configure-bootstrap
         image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
         command:
           - /bin/bash
           - -ec

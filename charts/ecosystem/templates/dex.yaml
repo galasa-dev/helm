@@ -24,7 +24,8 @@ spec:
       serviceAccountName: galasa
       initContainers:
       - name: wait-for-etcd
-        image: bitnami/kubectl
+        image: {{ .Values.kubectlImage }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
         command:
           - kubectl
         args:
@@ -35,6 +36,7 @@ spec:
           - --timeout=90s
       containers:
       - image: {{ .Values.dexImage }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
         name: dex
         args:
           - dex
