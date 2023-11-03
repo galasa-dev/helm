@@ -62,12 +62,20 @@ ingress:
   # Enables/disables the use of ingress
   enabled: true
 
-  # Values to configure the use of TLS in ingresses
-  tls:
-    enabled: false
-    secretName: ""
+  # The IngressClass to use for ingresses
+  ingressClassName: "nginx"
 
-  # Annotations to be added to ingresses
+  # Values to configure the use of TLS in ingresses. For example:
+  # tls:
+  #   - hosts:
+  #     - "*.example.com"
+  #     secretName: mysecret
+  tls: {}
+
+  # Annotations to be added to ingresses. For example:
+  # annotations:
+  #   nginx.ingress.kubernetes.io/proxy-body-size: "0"
+  #   nginx.ingress.kubernetes.io/ssl-redirect: "true"
   annotations: {}
 #
 #

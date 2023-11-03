@@ -11,16 +11,21 @@ metadata:
   name: {{ .Release.Name }}-dex
   annotations:
     {{- with .Values.ingress.annotations }}
-      {{- toYaml . | indent 4 }}
+      {{- toYaml . | nindent 4 }}
     {{- end }}
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  {{- with .Values.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   rules:
   - host: {{ .Values.externalHostname }}
     http:
       paths:
       - path: /dex(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: {{ .Release.Name }}-dex
