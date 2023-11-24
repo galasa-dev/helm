@@ -5,7 +5,10 @@
 #
 
 #
-# The External host name the Kubernetes NodePorts can be accessed on, can be an IP address
+# The external host name the Kubernetes NodePorts can be accessed on, can be an IP address if you are not using ingresses
+#
+# If you wish to access your Galasa Ecosystem through ingresses (see the "ingress" value below),
+# this is the host name that will be used and it must not be an IP address
 #
 externalHostname: "example.com"
 #
@@ -72,6 +75,9 @@ ingress:
   #     - "*.example.com"
   #     secretName: mysecret
   tls: {}
+  
+  # The name of the Secret containing root and intermediate CA certificates in a single .pem file
+  certSecretName: ""
 
   # Annotations to be added to ingresses. For example:
   # annotations:
@@ -92,22 +98,18 @@ dex:
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
   # By default, etcd is used as the storage option for the Galasa Ecosystem.
   config:
-    issuer: http://example.com/dex
+    issuer: "http://{{ .Values.externalHostname }}/dex"
 
     # Enable Dex's gRPC API for clients to interact with.
     grpc:
       # The address of the exposed gRPC API server. Must be a valid {HOST}:{PORT} combination.
-      addr: example.com:32000
+      addr: "{{ .Values.externalHostname }}:{{ .Values.dex.nodePorts.grpc }}"
       reflection: true
 
-    # Default is set to use an example email and password.
-    enablePasswordDB: true
-    staticPasswords:
-    - email: "admin@example.com"
-      # bcrypt hash of the string "password": $(echo password | htpasswd -BinC 10 admin | cut -d: -f2)
-      hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
-      username: "admin"
-      userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
+    # OAuth 2.0 configuration values. By default, Dex has been configured to skip the additional
+    # access approval screen after logging in to the Galasa Ecosystem.
+    oauth2:
+      skipApprovalScreen: true
 
     # A list of known clients that authenticate with Dex
     staticClients:
@@ -119,4 +121,8 @@ dex:
 
     # Token expiry configuration
     expiry:
-      idTokens: "24h"
+      idTokens: 24h
+      refreshTokens:
+        reuseInterval: 24h
+        validIfNotUsedFor: 2160h # 90 days
+        absoluteLifetime: 3960h # 165 days

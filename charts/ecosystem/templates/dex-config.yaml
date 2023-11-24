@@ -5,12 +5,13 @@
 #
 
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
   name: {{ .Release.Name }}-dex-config
-data:
+type: Opaque
+stringData:
   config.yaml: |-
-    {{ .Values.dex.config | toYaml | nindent 4 }}
+    {{ tpl (.Values.dex.config | toYaml) . | nindent 4 }}
     {{- if not (hasKey .Values.dex.config "storage") }}
     storage:
       type: etcd

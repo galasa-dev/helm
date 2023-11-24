@@ -1,6 +1,9 @@
 #
 # Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -21,13 +24,15 @@ spec:
         app: {{ .Release.Name }}-webui
     spec:
       serviceAccountName: galasa
-      {{- if .Values.nodeSelectors }}
       nodeSelector:
+        kubernetes.io/arch: {{ .Values.architecture }}
+        {{- if .Values.nodeSelectors }}
 {{ toYaml .Values.nodeSelectors | indent 8 }}
-      {{- end }}
+        {{- end }}
       initContainers:
         - name: wait-for-dex
-          image: bitnami/kubectl
+          image: {{ .Values.kubectlImage }}
+          imagePullPolicy: {{ .Values.pullPolicy }}
           command:
             - kubectl
           args:
@@ -45,14 +50,18 @@ spec:
           - start
         env:
         - name: DEX_ISSUER_URL
-          value: {{ .Values.dex.config.issuer }}
+          value: {{ tpl .Values.dex.config.issuer . }}
         - name: DEX_GRPC_HOSTNAME
-          value: {{ .Values.dex.config.grpc.addr }}
+          value: {{ tpl .Values.dex.config.grpc.addr . }}
         - name: WEBUI_HOST_URL
-          value: http://{{ .Values.externalHostname }}
+          value: https://{{ .Values.externalHostname }}
         {{- with (first .Values.dex.config.staticClients) }}
         - name: DEX_CLIENT_SECRET
           value: {{ .secret }}
+        {{- end }}
+        {{- if .Values.ingress.tls }}
+        - name: NODE_EXTRA_CA_CERTS
+          value: /etc/ssl/certs/cacerts.pem
         {{- end }}
         ports:
         - containerPort: 8080
@@ -69,3 +78,13 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 10
+      {{- if .Values.ingress.tls }}
+        volumeMounts:
+          - name: cacert-store
+            mountPath: /etc/ssl/certs/cacerts.pem
+            subPath: cacerts.pem
+      volumes:
+        - name: cacert-store
+          secret:
+            secretName: {{ .Values.ingress.certSecretName }}
+      {{- end }}

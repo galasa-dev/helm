@@ -24,17 +24,20 @@ In a future release, [Dex](https://dexidp.io) will be used to authenticate users
 To configure dex to authenticate through GitHub:
 
 1. Register an OAuth application in [GitHub](https://github.com/settings/applications/new), ensuring the application's callback URL is set to `http://<your-dex-issuer>/callback`
-2. Add a GitHub connector to your dex configuration (see the `dexConfig` value in the [values.yaml](./charts/ecosystem/values.yaml) file) as follows:
+2. Add a GitHub connector to your dex configuration (see the `dex` value in the [values.yaml](./charts/ecosystem/values.yaml) file) as follows:
     ```yaml
-    dexConfig:
-      connectors:
-      - type: github
-        id: github
-        name: GitHub
-        config:
-          clientID: $GITHUB_CLIENT_ID
-          clientSecret: $GITHUB_CLIENT_SECRET
-          redirectURI: http://<your-dex-issuer>/callback
+    dex:
+      config:
+        # ... other Dex configuration values
+
+        connectors:
+        - type: github
+          id: github
+          name: GitHub
+          config:
+            clientID: $GITHUB_CLIENT_ID
+            clientSecret: $GITHUB_CLIENT_SECRET
+            redirectURI: <your-dex-issuer-url>/callback
     ```
     where `$GITHUB_CLIENT_ID` and `$GITHUB_CLIENT_SECRET` correspond to the registered OAuth application's client ID and secret.
 

@@ -1,16 +1,24 @@
 #
 # Copyright contributors to the Galasa project
 #
+# SPDX-License-Identifier: EPL-2.0
+#
+
 {{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-webui
+  {{- with .Values.ingress.annotations }}
   annotations:
-    {{- with .Values.ingress.annotations }}
-      {{- toYaml . | indent 4 }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  {{- with .Values.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   rules:
   - host: {{ .Values.externalHostname }}
     http:

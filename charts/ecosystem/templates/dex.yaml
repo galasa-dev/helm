@@ -19,7 +19,6 @@ spec:
     metadata:
       labels:
         app: {{ .Release.Name }}-dex
-
     spec:
       serviceAccountName: galasa
       nodeSelector:
@@ -53,7 +52,6 @@ spec:
           - --telemetry-addr
           - 0.0.0.0:5558
           - /etc/dex/config.yaml
-
         ports:
         - name: http
           containerPort: 5556
@@ -64,7 +62,6 @@ spec:
         - name: telemetry
           containerPort: 5558
           protocol: TCP
-
         livenessProbe:
           httpGet:
             path: /healthz/live
@@ -73,16 +70,11 @@ spec:
           httpGet:
             path: /healthz/ready
             port: telemetry
-
         volumeMounts:
         - name: config
           mountPath: /etc/dex
           readOnly: true
-
       volumes:
       - name: config
-        configMap:
-          name: {{ .Release.Name }}-dex-config
-          items:
-          - key: config.yaml
-            path: config.yaml
+        secret:
+          secretName: {{ .Release.Name }}-dex-config
