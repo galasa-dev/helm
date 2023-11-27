@@ -7,7 +7,7 @@
 #
 # The external host name the Kubernetes NodePorts can be accessed on, can be an IP address if you are not using ingresses
 #
-# If you wish to access your Galasa Ecosystem through ingresses (see the "ingress" value below),
+# If you wish to access your Galasa Ecosystem through ingresses (see the `ingress` value below),
 # this is the host name that will be used and it must not be an IP address
 #
 externalHostname: "example.com"
@@ -89,6 +89,19 @@ ingress:
 # Values to configure the ecosystem's use of Dex
 #
 dex:
+  # `configSecret` contains values as to whether a new Kubernetes Secret containing the Dex configuration
+  # should be created, or if an existing Secret containing should be used.
+  configSecret:
+    # Enables the creation of a Kubernetes Secret using the values provided in `config` if set to true.
+    # If set to false, you must provide a value for `secretName` that corresponds to an existing Secret.
+    create: true
+
+    # The name of the Kubernetes Secret containing the Dex configuration to mount within the Dex deployment.
+    # `secretName` must point to a Secret containing a "config.yaml" key and a valid Dex configuration in YAML format.
+    # If `secretName` is provided and `create` is set to true, then the given name will be ignored and a new Secret
+    # named "<release-name>-dex-config" will be created.
+    secretName: ""
+
   # NodePorts to access Dex services through (Helm will dynamically assign NodePorts in the
   # 30000 to 32767 range if they are left blank).
   nodePorts:
@@ -98,12 +111,12 @@ dex:
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
   # By default, etcd is used as the storage option for the Galasa Ecosystem.
   config:
-    issuer: "http://{{ .Values.externalHostname }}/dex"
+    issuer: "http://example.com/dex"
 
     # Enable Dex's gRPC API for clients to interact with.
     grpc:
       # The address of the exposed gRPC API server. Must be a valid {HOST}:{PORT} combination.
-      addr: "{{ .Values.externalHostname }}:{{ .Values.dex.nodePorts.grpc }}"
+      addr: "example.com:32000"
       reflection: true
 
     # OAuth 2.0 configuration values. By default, Dex has been configured to skip the additional

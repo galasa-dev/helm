@@ -50,9 +50,9 @@ spec:
           - start
         env:
         - name: DEX_ISSUER_URL
-          value: {{ tpl .Values.dex.config.issuer . }}
+          value: {{ .Values.dex.config.issuer }}
         - name: DEX_GRPC_HOSTNAME
-          value: {{ tpl .Values.dex.config.grpc.addr . }}
+          value: {{ .Values.dex.config.grpc.addr }}
         - name: WEBUI_HOST_URL
           value: https://{{ .Values.externalHostname }}
         {{- with (first .Values.dex.config.staticClients) }}

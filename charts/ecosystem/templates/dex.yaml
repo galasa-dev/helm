@@ -77,4 +77,8 @@ spec:
       volumes:
       - name: config
         secret:
+        {{- if .Values.dex.configSecret.create }}
           secretName: {{ .Release.Name }}-dex-config
+        {{- else }}
+          secretName: {{ .Values.dex.configSecret.secretName }}
+        {{- end }}

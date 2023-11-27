@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-
+{{- if .Values.dex.configSecret.create }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -11,7 +11,7 @@ metadata:
 type: Opaque
 stringData:
   config.yaml: |-
-    {{ tpl (.Values.dex.config | toYaml) . | nindent 4 }}
+    {{ .Values.dex.config | toYaml | nindent 4 }}
     {{- if not (hasKey .Values.dex.config "storage") }}
     storage:
       type: etcd
@@ -19,3 +19,4 @@ stringData:
         endpoints:
           - http://{{ .Release.Name }}-etcd:2379
     {{- end }}
+{{- end }}
