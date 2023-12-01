@@ -59,7 +59,7 @@ spec:
         - name: DEX_CLIENT_SECRET
           value: {{ .secret }}
         {{- end }}
-        {{- if .Values.ingress.tls }}
+        {{- if .Values.ingress.caCertSecretName }}
         - name: NODE_EXTRA_CA_CERTS
           value: /etc/ssl/certs/cacerts.pem
         {{- end }}
@@ -78,7 +78,7 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 10
-      {{- if .Values.ingress.tls }}
+      {{- if .Values.ingress.caCertSecretName }}
         volumeMounts:
           - name: cacert-store
             mountPath: /etc/ssl/certs/cacerts.pem
@@ -86,5 +86,5 @@ spec:
       volumes:
         - name: cacert-store
           secret:
-            secretName: {{ .Values.ingress.certSecretName }}
+            secretName: {{ .Values.ingress.caCertSecretName }}
       {{- end }}
