@@ -23,9 +23,9 @@ spec:
       serviceAccountName: galasa
       nodeSelector:
         kubernetes.io/arch: {{ .Values.architecture }}
-        {{- if .Values.nodeSelectors }}
-{{ toYaml .Values.nodeSelectors | indent 8 }}
-        {{- end }}
+      {{- with .Values.nodeSelectors }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       initContainers:
       - name: wait-for-etcd
         image: {{ .Values.kubectlImage }}
@@ -52,6 +52,10 @@ spec:
           - --telemetry-addr
           - 0.0.0.0:5558
           - /etc/dex/config.yaml
+      {{- with .Values.dex.envFrom }}
+        envFrom:
+          {{- toYaml . | nindent 10 }}
+      {{- end }}
         ports:
         - name: http
           containerPort: 5556

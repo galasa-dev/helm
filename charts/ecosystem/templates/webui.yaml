@@ -45,9 +45,6 @@ spec:
       - name: webui
         image: {{ .Values.galasaRegistry }}/galasa-ui:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
-        command:
-          - npm
-          - start
         env:
         - name: DEX_ISSUER_URL
           value: {{ .Values.dex.config.issuer }}
