@@ -3,12 +3,13 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-
+{{- if .Values.dex.configSecret.create }}
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
   name: {{ .Release.Name }}-dex-config
-data:
+type: Opaque
+stringData:
   config.yaml: |-
     {{ .Values.dex.config | toYaml | nindent 4 }}
     {{- if not (hasKey .Values.dex.config "storage") }}
@@ -18,3 +19,4 @@ data:
         endpoints:
           - http://{{ .Release.Name }}-etcd:2379
     {{- end }}
+{{- end }}

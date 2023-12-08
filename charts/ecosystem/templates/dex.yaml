@@ -19,14 +19,13 @@ spec:
     metadata:
       labels:
         app: {{ .Release.Name }}-dex
-
     spec:
       serviceAccountName: galasa
       nodeSelector:
         kubernetes.io/arch: {{ .Values.architecture }}
-        {{- if .Values.nodeSelectors }}
-{{ toYaml .Values.nodeSelectors | indent 8 }}
-        {{- end }}
+      {{- with .Values.nodeSelectors }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       initContainers:
       - name: wait-for-etcd
         image: {{ .Values.kubectlImage }}
@@ -53,7 +52,10 @@ spec:
           - --telemetry-addr
           - 0.0.0.0:5558
           - /etc/dex/config.yaml
-
+      {{- with .Values.dex.envFrom }}
+        envFrom:
+          {{- toYaml . | nindent 10 }}
+      {{- end }}
         ports:
         - name: http
           containerPort: 5556
@@ -64,7 +66,6 @@ spec:
         - name: telemetry
           containerPort: 5558
           protocol: TCP
-
         livenessProbe:
           httpGet:
             path: /healthz/live
@@ -73,16 +74,15 @@ spec:
           httpGet:
             path: /healthz/ready
             port: telemetry
-
         volumeMounts:
         - name: config
           mountPath: /etc/dex
           readOnly: true
-
       volumes:
       - name: config
-        configMap:
-          name: {{ .Release.Name }}-dex-config
-          items:
-          - key: config.yaml
-            path: config.yaml
+        secret:
+        {{- if .Values.dex.configSecret.create }}
+          secretName: {{ .Release.Name }}-dex-config
+        {{- else }}
+          secretName: {{ .Values.dex.configSecret.secretName }}
+        {{- end }}
