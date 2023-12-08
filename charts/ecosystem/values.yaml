@@ -36,7 +36,6 @@ architecture: amd64
 # Any nodeselectors you wish to use to restrict the nodes the pods will run on
 #
 nodeSelectors: {}
-#  tekton: build
 #
 #
 # The storage class to be used for persistent volumes
@@ -102,6 +101,16 @@ dex:
     # named "<release-name>-dex-config" will be created.
     secretName: ""
 
+  # `envFrom` represents a list of additional environment variables mounted from Kubernetes Secrets or ConfigMaps.
+  # If you would like to mount an additional environment variable from a Secret or ConfigMap, provide the name of the
+  # resource in the `envFrom` list. For example:
+  # envFrom:
+  #   - secretRef:
+  #       name: github-oauth-app-secret
+  #   - configMapRef:
+  #       name: my-env-configmap
+  envFrom: []
+
   # NodePorts to access Dex services through (Helm will dynamically assign NodePorts in the
   # 30000 to 32767 range if they are left blank).
   nodePorts:
@@ -136,6 +145,4 @@ dex:
     expiry:
       idTokens: 24h
       refreshTokens:
-        reuseInterval: 24h
-        validIfNotUsedFor: 2160h # 90 days
-        absoluteLifetime: 3960h # 165 days
+        validIfNotUsedFor: 8760h # 1 year
