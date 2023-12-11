@@ -16,33 +16,6 @@ If you would like to install the chart into minikube, ensure you have minikube [
 
 Once minikube is running, follow the instructions in the sections below to install the Galasa Ecosystem chart.
 
-### Dex
-**Note: The ecosystem chart's use of Dex is still under development and is subject to change.**
-
-In a future release, [Dex](https://dexidp.io) will be used to authenticate users attempting to interact with a Galasa Ecosystem.
-
-To configure dex to authenticate through GitHub:
-
-1. Register an OAuth application in [GitHub](https://github.com/settings/applications/new), ensuring the application's callback URL is set to `http://<your-dex-issuer>/callback`
-2. Add a GitHub connector to your dex configuration (see the `dex` value in the [values.yaml](./charts/ecosystem/values.yaml) file) as follows:
-    ```yaml
-    dex:
-      config:
-        # ... other Dex configuration values
-
-        connectors:
-        - type: github
-          id: github
-          name: GitHub
-          config:
-            clientID: $GITHUB_CLIENT_ID
-            clientSecret: $GITHUB_CLIENT_SECRET
-            redirectURI: <your-dex-issuer-url>/callback
-    ```
-    where `$GITHUB_CLIENT_ID` and `$GITHUB_CLIENT_SECRET` correspond to the registered OAuth application's client ID and secret.
-
-For more information on configuring dex, refer to the [Dex documentation](https://dexidp.io/docs).
-
 ### RBAC
 If RBAC is active on your Kubernetes cluster, you will need to get your Kubernetes administrator to replace the [placeholder username](https://github.com/galasa-dev/helm/blob/main/charts/ecosystem/rbac-admin.yaml#L39) in the [rbac-admin.yaml](./charts/ecosystem/rbac-admin.yaml) file with a username corresponding to a user with access to your cluster to assign them the `galasa-admin` role. This role allows assigned users to run the helm install/upgrade/delete commands to interact with the helm chart.
 
@@ -75,13 +48,139 @@ Download the [values.yaml](charts/ecosystem/values.yaml) file and within it:
   2. Set the `externalHostname` value to the DNS hostname or IP address of the Kubernetes node that will be used to access the Galasa NodePort services.
      * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
 
+#### Configuring Ingress
+
+By default, the ecosystem chart enables Ingress to reach services running within a Kubernetes cluster. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/ingress) to learn more about Ingress.
+
 If you are deploying to minikube and are using Ingress to expose services, ensure the NGINX Ingress controller is enabled by running:
 
 ```console
 minikube addons enable ingress
 ```
 
-Having configured your [values.yaml](charts/ecosystem/values.yaml) file, use the following command to install the Galasa Ecosystem chart:
+Assuming your Ingress controller has been set up on your Kubernetes cluster, update the values under the `ingress` section within your values.yaml file as follows to configure the use of Ingress in your ecosystem:
+
+1. Replace the `ingressClassName` value with the name of the IngressClass that is configured in your cluster. By default, `nginx` is used.
+
+2. If you are using HTTPS, add a `tls` configuration within the `ingress` section, specifying the `hosts` list and a `secretName` value corresponding to the name of the Kubernetes Secret that contains your TLS private key and certificate. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) for information for how to set up TLS.
+
+#### Configuring Dex
+**Note: The ecosystem chart's use of Dex is still under development and is subject to change.**
+
+In a future release, [Dex](https://dexidp.io) will be used to authenticate users attempting to interact with a Galasa Ecosystem.
+
+To configure Dex in your ecosystem, update your values.yaml file according to the following steps:
+
+1. Replace the hostname in your `issuer` value with the same hostname given in `externalHostname` and set the URI scheme to either `http` or `https`. For example:
+    
+    ```yaml
+    issuer: http://<your-external-hostname>/dex
+    ```
+
+2. Under the `grpc` value, set the `addr` value to your external hostname, followed by a port matching the `grpc` value provided in `nodePorts`. By default, the port for the Dex's gRPC API is `32000`. For example:
+    
+    ```yaml
+    grpc:
+      addr: <your-external-hostname>:32000
+      reflection: true
+    ```
+
+3. Under the `staticClients` value, replace the example hostname given in the `redirectURIs` list with the value you provided in the `externalHostname`, and set the URI scheme to either `http` or `https`. For example:
+
+    ```yaml
+    staticClients:
+    - id: galasa-webui
+      redirectURIs:
+      - 'http://<your-external-hostname>/auth/callback'
+      name: 'Galasa Ecosystem Web UI'
+      secret: example-webui-client-secret
+    ```
+4. If you would like to supply a client secret for the webui via a Kubernetes Secret, replace the `secret` key in the `staticClients` section with `secretEnv` and supply the name of your Secret as a value within the `envFrom` section. For example, assuming you have a Secret called `my-webui-client-credentials` with a key called `WEBUI_CLIENT_SECRET` that contains a client secret, you would provide the following values:
+    
+    ```yaml
+    dex:
+      envFrom:
+        - secretRef:
+          name: my-webui-client-credentials
+
+      # Other Dex-related values...
+
+      config:
+        # Other Dex configuration values...
+
+        staticClients:
+        - id: galasa-webui
+          redirectURIs:
+          - 'http://<your-external-hostname>/auth/callback'
+          name: 'Galasa Ecosystem Web UI'
+          secretEnv: WEBUI_CLIENT_SECRET
+    ```
+
+5. If desired, update the `expiry` section to configure the expiry of JSON Web Tokens (JWTs) and refresh tokens issued by Dex. By default, JWTs expire one day after being issued and refresh tokens remain valid unless they have not been used for 1 year. See the Dex's documentation on [ID tokens](https://dexidp.io/docs/id-tokens) for information and available expiry settings.
+
+Next, you will need to configure Dex to authenticate via a connector to authenticate with an upstream identity provider like GitHub, Microsoft, or an LDAP server. For a full list of supported connectors, refer to the [Dex documentation](https://dexidp.io/docs/connectors). In this guide, we will configure dex to authenticate through GitHub:
+
+1. Register an OAuth application in [GitHub](https://github.com/settings/applications/new), ensuring the application's callback URL is set to your Dex `issuer` value followed by `/callback` (i.e. `<your-dex-issuer-url>/callback`).
+2. Add a GitHub connector to your Dex configuration, providing the name of your GitHub organisation and any teams that you require users to be part of to be able to use your ecosystem as follows:
+
+    ```yaml
+    dex:
+      config:
+        # Other Dex configuration values...
+
+        connectors:
+        - type: github
+          id: github
+          name: GitHub
+          config:
+            clientID: $GITHUB_CLIENT_ID
+            clientSecret: $GITHUB_CLIENT_SECRET
+            redirectURI: <your-dex-issuer-url>/callback
+            orgs:
+            - name: my-org
+              teams:
+              - my-team
+    ```
+    where `$GITHUB_CLIENT_ID` and `$GITHUB_CLIENT_SECRET` correspond to the registered OAuth application's client ID and secret. Also ensure that the `redirectURI` value is the same value that you provided when setting up your GitHub OAuth application in step 1.
+    
+    If you would like to draw the client ID and secret values of your OAuth application from a Kubernetes Secret, create a Secret by running the following `kubectl` command, ensuring the Secret's keys match those given in the GitHub connector's `clientID` and `clientSecret` values without the leading `$` (i.e. `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in our example):
+    
+    ```bash
+    kubectl create secret generic my-github-oauth-app-credentials \
+    --from-literal=GITHUB_CLIENT_ID="myclientid" \
+    --from-literal=GITHUB_CLIENT_SECRET='myclientsecret'
+    ```
+    
+    Once your Kubernetes Secret has been created, you can supply the name of the Secret using the `envFrom` value in your values.yaml file to mount the Secret as follows:
+
+    ```yaml
+    dex:
+      envFrom:
+        - secretRef:
+          name: my-github-oauth-app-credentials
+      
+      config:
+        # ... other Dex configuration values
+
+        connectors:
+        - type: github
+          id: github
+          name: GitHub
+          config:
+            clientID: $GITHUB_CLIENT_ID
+            clientSecret: $GITHUB_CLIENT_SECRET
+            redirectURI: <your-dex-issuer-url>/callback
+            orgs:
+            - name: my-org
+              teams:
+              - my-team
+    ```
+
+By default, the Galasa Ecosystem Helm chart will create a Kubernetes Secret containing configuration details for Dex. If you would like to apply your own Dex configuration as a Secret, your Dex configuration must be provided in a `config.yaml` key within the Secret and the value of the `config.yaml` key must be a valid Dex configuration.
+
+For more information on configuring dex, refer to the [Dex documentation](https://dexidp.io/docs).
+
+Having configured your [values.yaml](charts/ecosystem/values.yaml) file, use the following command to install the Galasa Ecosystem Helm chart:
 
 ```console
 helm install -f /path/to/values.yaml <release-name> galasa/ecosystem --wait
@@ -95,12 +194,16 @@ You can view the status of the deployed pods at any time by running `kubectl get
 ```console
 NAME                                      READY   STATUS     RESTARTS      AGE
 test-api-7945f959dd-v8tbs                 1/1     Running    0             65s
+test-dex-5dc7fcb55f-lqv6s                 1/1     Running    0             65s
 test-engine-controller-56fb476f45-msj4x   0/1     Init:0/1   0             65s
 test-etcd-0                               1/1     Running    0             65s
 test-metrics-5fd9f687b6-rwcww             0/1     Init:0/1   0             65s
 test-ras-0                                1/1     Running    0             65s
 test-resource-monitor-778c647995-x75z9    0/1     Init:0/1   0             65s
+test-webui-6c896974d8-2k2tk               1/1     Running    0             65s
 ```
+
+### Verifying your Galasa Ecosystem Installation
 
 After the `helm install` command ends with a successful deployment message, you can run the following command to ensure the Ecosystem can be accessed externally to Kubernetes and a simple test engine can be run:
 
@@ -114,6 +217,20 @@ Once the `helm test` command ends and displays a success message, the Ecosystem 
 
 ### Accessing services
 
+#### Using Ingress
+
+When using Ingress, the URL of the Ecosystem bootstrap will be your external hostname, followed by `/api/bootstrap`.
+
+For example, if the external hostname you provided was `example.com` and you have provided values for using TLS, the bootstrap URL would be `https://example.com/api/bootstrap`. This is the URL that you would enter into a galasactl command's `--bootstrap` option to interact with your ecosystem.
+
+If you have enabled Ingress and are deploying to minikube, add an entry to your `/etc/hosts` file like the one shown below, ensuring the IP address matches the output of `minikube ip`.
+
+```console
+192.168.49.2 example.com
+```
+
+#### Using NodePorts
+
 To determine the URL of the Ecosystem bootstrap, issue the command:
 
 ```console
@@ -126,13 +243,7 @@ Look for the `api-external` service and the NodePort associated with the 8080 po
 test-api-external  NodePort  10.107.160.208  <none>  9010:31359/TCP,9011:31422/TCP,8080:30960/TCP  18s
 ```
 
-If the external hostname you provided was `example.com`, the bootstrap URL will be `http://example.com:30960/bootstrap`. You will enter this into the Eclipse plugin preferences, or in a galasactl command's `--bootstrap` option.
-
-If you have enabled ingress and are deploying to minikube, add an entry to your `/etc/hosts` file like the one shown below, ensuring the IP address matches the output of `minikube ip`.
-
-```console
-192.168.49.2 example.com
-```
+If the external hostname you provided was `example.com`, the bootstrap URL will be `http://example.com:30960/bootstrap`. You will enter this in a galasactl command's `--bootstrap` option.
 
 ### Upgrading the Galasa Ecosystem
 
@@ -150,16 +261,12 @@ To install the latest development version of the Galasa Ecosystem chart, clone t
 3. Set the `externalHostname` value to the DNS hostname or IP address of the Kubernetes node that will be used to access the Galasa NodePort services.
    * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
 
-If you are deploying to minikube and are using Ingress to expose services, ensure the NGINX Ingress controller is enabled by running:
+Follow the installation instructions [above](#configuring-ingress) to update the rest of your values.yaml file, including values to configure Ingress and Dex.
 
-```console
-minikube addons enable ingress
-```
-
-Next, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
+Once you have updated your values.yaml file, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
 
 ```console
 helm install <release-name> /path/to/helm/charts/ecosystem --wait
 ```
 
-Once the `helm install` command ends with a successful deployment message, you can follow the installation instructions above to test the deployed ecosystem using `helm test` and determine the bootstrap URL.
+Once the `helm install` command ends with a successful deployment message, you can follow the installation instructions [above](#verifying-your-galasa-ecosystem-installation) to test the deployed ecosystem using `helm test` and determine the bootstrap URL.
