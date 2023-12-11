@@ -54,11 +54,19 @@ spec:
           value: https://{{ .Values.externalHostname }}
         {{- with (first .Values.dex.config.staticClients) }}
         - name: DEX_CLIENT_SECRET
+          {{- if .secretEnv }}
+          value: $({{ .secretEnv }})
+          {{- else }}
           value: {{ .secret }}
+          {{- end }}
         {{- end }}
         {{- if .Values.ingress.caCertSecretName }}
         - name: NODE_EXTRA_CA_CERTS
           value: /etc/ssl/certs/cacerts.pem
+        {{- end }}
+        {{- with .Values.dex.envFrom }}
+        envFrom:
+          {{- toYaml . | nindent 10 }}
         {{- end }}
         ports:
         - containerPort: 8080
