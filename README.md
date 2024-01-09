@@ -48,6 +48,8 @@ Download the [values.yaml](charts/ecosystem/values.yaml) file and within it:
   2. Set the `externalHostname` value to the DNS hostname or IP address of the Kubernetes node that will be used to access the Galasa NodePort services.
      * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
 
+Once you have updated the `galasaVersion` and `externalHostname` values, continue following the instructions below to set up Ingress and Dex for your ecosystem.
+
 #### Configuring Ingress
 
 By default, the ecosystem chart enables Ingress to reach services running within a Kubernetes cluster. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/ingress) to learn more about Ingress.
@@ -72,31 +74,23 @@ In a future release, [Dex](https://dexidp.io) will be used to authenticate users
 To configure Dex in your ecosystem, update your values.yaml file according to the following steps:
 
 1. Replace the hostname in your `issuer` value with the same hostname given in `externalHostname` and set the URI scheme to either `http` or `https`. For example:
-    
+
     ```yaml
     issuer: http://<your-external-hostname>/dex
     ```
 
-2. Under the `grpc` value, set the `addr` value to your external hostname, followed by a port matching the `grpc` value provided in `nodePorts`. By default, the port for the Dex's gRPC API is `32000`. For example:
-    
-    ```yaml
-    grpc:
-      addr: <your-external-hostname>:32000
-      reflection: true
-    ```
-
-3. Under the `staticClients` value, replace the example hostname given in the `redirectURIs` list with the value you provided in the `externalHostname`, and set the URI scheme to either `http` or `https`. For example:
+2. Under the `staticClients` value, replace the example hostname given in the `redirectURIs` list with the value you provided in the `externalHostname`, and set the URI scheme to either `http` or `https`. For example:
 
     ```yaml
     staticClients:
     - id: galasa-webui
       redirectURIs:
-      - 'http://<your-external-hostname>/auth/callback'
+      - 'http://<your-external-hostname>/api/auth/callback'
       name: 'Galasa Ecosystem Web UI'
       secret: example-webui-client-secret
     ```
-4. If you would like to supply a client secret for the webui via a Kubernetes Secret, replace the `secret` key in the `staticClients` section with `secretEnv` and supply the name of your Secret as a value within the `envFrom` section. For example, assuming you have a Secret called `my-webui-client-credentials` with a key called `WEBUI_CLIENT_SECRET` that contains a client secret, you would provide the following values:
-    
+3. If you would like to supply a client secret for the webui via a Kubernetes Secret, replace the `secret` key in the `staticClients` section with `secretEnv` and supply the name of your Secret as a value within the `envFrom` section. For example, assuming you have a Secret called `my-webui-client-credentials` with a key called `WEBUI_CLIENT_SECRET` and a value representing a client secret, you would provide the following values:
+
     ```yaml
     dex:
       envFrom:
@@ -116,7 +110,7 @@ To configure Dex in your ecosystem, update your values.yaml file according to th
           secretEnv: WEBUI_CLIENT_SECRET
     ```
 
-5. If desired, update the `expiry` section to configure the expiry of JSON Web Tokens (JWTs) and refresh tokens issued by Dex. By default, JWTs expire one day after being issued and refresh tokens remain valid unless they have not been used for 1 year. See the Dex's documentation on [ID tokens](https://dexidp.io/docs/id-tokens) for information and available expiry settings.
+4. If desired, update the `expiry` section to configure the expiry of JSON Web Tokens (JWTs) and refresh tokens issued by Dex. By default, JWTs expire one day after being issued and refresh tokens remain valid unless they have not been used for 1 year. See the Dex's documentation on [ID tokens](https://dexidp.io/docs/id-tokens) for information and available expiry settings.
 
 Next, you will need to configure Dex to authenticate via a connector to authenticate with an upstream identity provider like GitHub, Microsoft, or an LDAP server. For a full list of supported connectors, refer to the [Dex documentation](https://dexidp.io/docs/connectors). In this guide, we will configure dex to authenticate through GitHub:
 
@@ -142,15 +136,15 @@ Next, you will need to configure Dex to authenticate via a connector to authenti
               - my-team
     ```
     where `$GITHUB_CLIENT_ID` and `$GITHUB_CLIENT_SECRET` correspond to the registered OAuth application's client ID and secret. Also ensure that the `redirectURI` value is the same value that you provided when setting up your GitHub OAuth application in step 1.
-    
+
     If you would like to draw the client ID and secret values of your OAuth application from a Kubernetes Secret, create a Secret by running the following `kubectl` command, ensuring the Secret's keys match those given in the GitHub connector's `clientID` and `clientSecret` values without the leading `$` (i.e. `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in our example):
-    
+
     ```bash
     kubectl create secret generic my-github-oauth-app-credentials \
     --from-literal=GITHUB_CLIENT_ID="myclientid" \
-    --from-literal=GITHUB_CLIENT_SECRET='myclientsecret'
+    --from-literal=GITHUB_CLIENT_SECRET="myclientsecret"
     ```
-    
+
     Once your Kubernetes Secret has been created, you can supply the name of the Secret using the `envFrom` value in your values.yaml file to mount the Secret as follows:
 
     ```yaml
@@ -158,9 +152,9 @@ Next, you will need to configure Dex to authenticate via a connector to authenti
       envFrom:
         - secretRef:
           name: my-github-oauth-app-credentials
-      
+
       config:
-        # ... other Dex configuration values
+        # Other Dex configuration values...
 
         connectors:
         - type: github
