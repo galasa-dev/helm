@@ -22,5 +22,6 @@ stringData:
       config:
         endpoints:
           - http://{{ .Release.Name }}-etcd:2379
+        namespace: dex.
     {{- end }}
 {{- end }}
