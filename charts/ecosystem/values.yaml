@@ -114,7 +114,6 @@ dex:
   # NodePorts to access Dex services through (Helm will dynamically assign NodePorts in the
   # 30000 to 32767 range if they are left blank).
   nodePorts:
-    grpc: 32000
     http: # blank - dynamically assigned
 
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
