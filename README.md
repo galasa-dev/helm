@@ -110,11 +110,12 @@ To configure Dex in your ecosystem, update your values.yaml file according to th
           secretEnv: WEBUI_CLIENT_SECRET
     ```
 
-4. If desired, update the `expiry` section to configure the expiry of JSON Web Tokens (JWTs) and refresh tokens issued by Dex. By default, JWTs expire one day after being issued and refresh tokens remain valid unless they have not been used for 1 year. See the Dex's documentation on [ID tokens](https://dexidp.io/docs/id-tokens) for information and available expiry settings.
+4. If desired, update the `expiry` section to configure the expiry of JSON Web Tokens (JWTs) and refresh tokens issued by Dex. By default, JWTs expire 24 hours after being issued and refresh tokens remain valid unless they have not been used for one year. See the Dex's documentation on [ID tokens](https://dexidp.io/docs/id-tokens) for information and available expiry settings.
 
-Next, you will need to configure Dex to authenticate via a connector to authenticate with an upstream identity provider like GitHub, Microsoft, or an LDAP server. For a full list of supported connectors, refer to the [Dex documentation](https://dexidp.io/docs/connectors). In this guide, we will configure dex to authenticate through GitHub:
+Next, you will need to configure Dex to authenticate via a connector to authenticate with an upstream identity provider like GitHub, Microsoft, or an LDAP server. For a full list of supported connectors, refer to the [Dex documentation](https://dexidp.io/docs/connectors). In this guide, we will configure Dex to authenticate through GitHub:
 
-1. Register an OAuth application in [GitHub](https://github.com/settings/applications/new), ensuring the application's callback URL is set to your Dex `issuer` value followed by `/callback` (i.e. `<your-dex-issuer-url>/callback`).
+1. Register an OAuth application in [GitHub](https://github.com/settings/applications/new), ensuring the application's callback URL is set to your Dex `issuer` value followed by `/callback`. For example, if your `issuer` value is `https://prod-ecosystem.galasa.dev/dex`, then your callback URL would be `https://prod-ecosystem.galasa.dev/dex/callback`.
+
 2. Add a GitHub connector to your Dex configuration, providing the name of your GitHub organisation and any teams that you require users to be part of to be able to use your ecosystem as follows:
 
     ```yaml
@@ -137,7 +138,7 @@ Next, you will need to configure Dex to authenticate via a connector to authenti
     ```
     where `$GITHUB_CLIENT_ID` and `$GITHUB_CLIENT_SECRET` correspond to the registered OAuth application's client ID and secret. Also ensure that the `redirectURI` value is the same value that you provided when setting up your GitHub OAuth application in step 1.
 
-    If you would like to draw the client ID and secret values of your OAuth application from a Kubernetes Secret, create a Secret by running the following `kubectl` command, ensuring the Secret's keys match those given in the GitHub connector's `clientID` and `clientSecret` values without the leading `$` (i.e. `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in our example):
+    If you would like to pull the client ID and secret values of your OAuth application from a Kubernetes Secret, create a Secret by running the following `kubectl` command, ensuring the Secret's keys match those given in the GitHub connector's `clientID` and `clientSecret` values without the leading `$` (i.e. `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in the following example):
 
     ```bash
     kubectl create secret generic my-github-oauth-app-credentials \
@@ -172,7 +173,7 @@ Next, you will need to configure Dex to authenticate via a connector to authenti
 
 By default, the Galasa Ecosystem Helm chart will create a Kubernetes Secret containing configuration details for Dex. If you would like to apply your own Dex configuration as a Secret, your Dex configuration must be provided in a `config.yaml` key within the Secret and the value of the `config.yaml` key must be a valid Dex configuration.
 
-For more information on configuring dex, refer to the [Dex documentation](https://dexidp.io/docs).
+For more information on configuring Dex, refer to the [Dex documentation](https://dexidp.io/docs).
 
 Having configured your [values.yaml](charts/ecosystem/values.yaml) file, use the following command to install the Galasa Ecosystem Helm chart:
 

@@ -51,6 +51,8 @@ spec:
         - name: GALASA_WEBUI_HOST_URL
           value: {{ empty .Values.ingress.tls | ternary "http" "https" }}://{{ .Values.externalHostname }}
         {{- with (first .Values.dex.config.staticClients) }}
+        - name: GALASA_WEBUI_CLIENT_ID
+          value: {{ .id }}
         - name: GALASA_WEBUI_CLIENT_SECRET
           {{- if .secretEnv }}
           value: $({{ .secretEnv }})
