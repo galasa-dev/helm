@@ -30,7 +30,7 @@ spec:
 {{ toYaml .Values.nodeSelectors | indent 8 }}
         {{- end }}
       initContainers:
-        - name: wait-for-dex
+        - name: wait-for-api
           image: {{ .Values.kubectlImage }}
           imagePullPolicy: {{ .Values.pullPolicy }}
           command:
@@ -38,22 +38,22 @@ spec:
           args:
             - wait
             - pods
-            - -l=app={{ .Release.Name }}-dex
+            - -l=app={{ .Release.Name }}-api
             - --for=condition=Ready
-            - --timeout=180s
+            - --timeout=240s
       containers:
       - name: webui
         image: {{ .Values.galasaRegistry }}/galasa-ui:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         env:
-        - name: DEX_ISSUER_URL
-          value: {{ .Values.dex.config.issuer }}
-        - name: DEX_GRPC_HOSTNAME
-          value: {{ .Values.dex.config.grpc.addr }}
-        - name: WEBUI_HOST_URL
-          value: https://{{ .Values.externalHostname }}
+        - name: GALASA_API_SERVER_URL
+          value: http://{{ .Release.Name }}-api:8080
+        - name: GALASA_WEBUI_HOST_URL
+          value: {{ empty .Values.ingress.tls | ternary "http" "https" }}://{{ .Values.externalHostname }}
         {{- with (first .Values.dex.config.staticClients) }}
-        - name: DEX_CLIENT_SECRET
+        - name: GALASA_WEBUI_CLIENT_ID
+          value: {{ .id }}
+        - name: GALASA_WEBUI_CLIENT_SECRET
           {{- if .secretEnv }}
           value: $({{ .secretEnv }})
           {{- else }}
@@ -62,7 +62,7 @@ spec:
         {{- end }}
         {{- if .Values.ingress.caCertSecretName }}
         - name: NODE_EXTRA_CA_CERTS
-          value: /etc/ssl/certs/cacerts.pem
+          value: /etc/ssl/certs/cacerts/cacerts.pem
         {{- end }}
         {{- with .Values.dex.envFrom }}
         envFrom:
@@ -86,8 +86,7 @@ spec:
       {{- if .Values.ingress.caCertSecretName }}
         volumeMounts:
           - name: cacert-store
-            mountPath: /etc/ssl/certs/cacerts.pem
-            subPath: cacerts.pem
+            mountPath: /etc/ssl/certs/cacerts
       volumes:
         - name: cacert-store
           secret:

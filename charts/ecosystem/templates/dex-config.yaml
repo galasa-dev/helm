@@ -12,11 +12,16 @@ type: Opaque
 stringData:
   config.yaml: |-
     {{ .Values.dex.config | toYaml | nindent 4 }}
+    grpc:
+      addr: "{{ .Release.Name }}-dex:5557"
+      reflection: true
+
     {{- if not (hasKey .Values.dex.config "storage") }}
     storage:
       type: etcd
       config:
         endpoints:
           - http://{{ .Release.Name }}-etcd:2379
+        namespace: dex.
     {{- end }}
 {{- end }}

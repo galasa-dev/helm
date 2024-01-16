@@ -74,7 +74,7 @@ ingress:
   #     - "*.example.com"
   #     secretName: mysecret
   tls: {}
-  
+
   # The name of the Secret containing root and intermediate CA certificates in a single .pem file
   caCertSecretName: ""
 
@@ -114,19 +114,12 @@ dex:
   # NodePorts to access Dex services through (Helm will dynamically assign NodePorts in the
   # 30000 to 32767 range if they are left blank).
   nodePorts:
-    grpc: 32000
     http: # blank - dynamically assigned
 
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
   # By default, etcd is used as the storage option for the Galasa Ecosystem.
   config:
     issuer: "http://example.com/dex"
-
-    # Enable Dex's gRPC API for clients to interact with.
-    grpc:
-      # The address of the exposed gRPC API server. Must be a valid {HOST}:{PORT} combination.
-      addr: "example.com:32000"
-      reflection: true
 
     # OAuth 2.0 configuration values. By default, Dex has been configured to skip the additional
     # access approval screen after logging in to the Galasa Ecosystem.

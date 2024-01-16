@@ -73,6 +73,17 @@ spec:
           - -l=app={{ .Release.Name }}-ras
           - --for=condition=Ready
           - --timeout=90s
+      - name: wait-for-dex
+        image: {{ .Values.kubectlImage }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        command:
+          - kubectl
+        args:
+          - wait
+          - pods
+          - -l=app={{ .Release.Name }}-dex
+          - --for=condition=Ready
+          - --timeout=90s
       {{- if .Values.ingress.caCertSecretName }}
       - name: import-ca-certs
         image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
@@ -87,7 +98,7 @@ spec:
             java_cacerts_file=${JAVA_HOME}/lib/security/cacerts
             certs_dir=/etc/ssl/certs
             cacerts_shared=/cacerts
-            
+
             # Copy the default Java cacerts file into the shared volume
             cp "${java_cacerts_file}" "${cacerts_shared}"
 
@@ -144,6 +155,10 @@ spec:
           value: etcd:http://{{ .Release.Name }}-etcd:2379
         - name: GALASA_DEX_ISSUER
           value: {{ .Values.dex.config.issuer }}
+        - name: GALASA_DEX_GRPC_HOSTNAME
+          value: {{ .Release.Name }}-dex:5557
+        - name: GALASA_EXTERNAL_API_URL
+          value: {{ empty .Values.ingress.tls | ternary "http" "https" }}://{{ .Values.externalHostname }}/api
         ports:
         - containerPort: 9010
           name: metrics
