@@ -8,7 +8,8 @@ name: Release Charts
 on:
   push:
     branches:
-      - released
+      - prerelease
+      - release
 
 jobs:
   release:
@@ -25,6 +26,15 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Run chart-releaser
+        if: (github.ref == 'refs/heads/prerelease')
+        uses: helm/chart-releaser-action@v1.1.0
+        with: 
+          skip_upload: true
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Run chart-releaser
+        if: (github.ref == 'refs/heads/release')
         uses: helm/chart-releaser-action@v1.1.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
