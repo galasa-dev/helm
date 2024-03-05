@@ -29,9 +29,8 @@ jobs:
         if: (github.ref == 'refs/heads/prerelease')
         uses: helm/chart-releaser-action@main
         with: 
-          skip_existing: true
-          skip_packaging: true
-          skip_upload: true
+          skip_existing: true # Skip package upload if release/tag already exists
+          skip_upload: true # Skips upload to index.yaml
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
@@ -39,6 +38,6 @@ jobs:
         if: (github.ref == 'refs/heads/release')
         uses: helm/chart-releaser-action@main
         with:
-          skip_existing: true
+          skip_existing: true # Skip package upload if release/tag already exists
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
