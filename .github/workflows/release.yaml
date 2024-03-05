@@ -27,14 +27,17 @@ jobs:
 
       - name: Run chart-releaser
         if: (github.ref == 'refs/heads/prerelease')
-        uses: helm/chart-releaser-action@v1.6.0
+        uses: helm/chart-releaser-action@main
         with: 
           skip_upload: true
+          skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Run chart-releaser
         if: (github.ref == 'refs/heads/release')
-        uses: helm/chart-releaser-action@v1.6.0
+        uses: helm/chart-releaser-action@main
+        with:
+          skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
