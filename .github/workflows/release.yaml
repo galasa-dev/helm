@@ -29,8 +29,9 @@ jobs:
         if: (github.ref == 'refs/heads/prerelease')
         uses: helm/chart-releaser-action@main
         with: 
-          skip_upload: true
           skip_existing: true
+          skip_packaging: true
+          skip_upload: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
