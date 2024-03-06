@@ -8,7 +8,8 @@ name: Release Charts
 on:
   push:
     branches:
-      - released
+      - prerelease
+      - release
 
 jobs:
   release:
@@ -24,7 +25,19 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.1.0
+      - name: Run chart-releaser - pre-release
+        if: (github.ref == 'refs/heads/prerelease')
+        uses: helm/chart-releaser-action@main
+        with: 
+          skip_existing: true # Skip package upload if release/tag already exists
+          skip_upload: true # Skips upload to index.yaml
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Run chart-releaser - release
+        if: (github.ref == 'refs/heads/release')
+        uses: helm/chart-releaser-action@main
+        with:
+          skip_existing: true # Skip package upload if release/tag already exists
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
