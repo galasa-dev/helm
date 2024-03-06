@@ -25,7 +25,7 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Run chart-releaser
+      - name: Run chart-releaser - pre-release
         if: (github.ref == 'refs/heads/prerelease')
         uses: helm/chart-releaser-action@main
         with: 
@@ -34,7 +34,7 @@ jobs:
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Run chart-releaser
+      - name: Run chart-releaser - release
         if: (github.ref == 'refs/heads/release')
         uses: helm/chart-releaser-action@main
         with:
