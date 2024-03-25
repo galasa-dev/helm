@@ -49,7 +49,6 @@ spec:
           - /bin/bash
           - -ec
           - |
-            source /galasa/set-external-env.sh --hostname {{ .Values.externalHostname }} --prefix {{ .Release.Name }}-
             java -jar boot.jar --obr file:galasa.obr --bootstrap http://{{ .Release.Name }}-api:8080/bootstrap --setupeco
             java -jar boot.jar --obr file:galasa.obr --bootstrap http://{{ .Release.Name }}-api:8080/bootstrap --k8scontroller
         env:

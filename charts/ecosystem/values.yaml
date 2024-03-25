@@ -15,7 +15,7 @@ externalHostname: "example.com"
 # The version of Galasa you want to run with, it is better that you do not use "latest" to ensure
 # all the components are running the same version and a controlled upgrade can be performed
 #
-galasaVersion: "0.29.0"
+galasaVersion: "0.33.0"
 #
 #
 # The container registry the Galasa images can be found in
@@ -62,9 +62,6 @@ kubectlImage: "bitnami/kubectl:1.28"
 # Note: The externalHostname value must be a valid DNS name for ingress to be used.
 #
 ingress:
-  # Enables/disables the use of ingress
-  enabled: true
-
   # The IngressClass to use for ingresses
   ingressClassName: "nginx"
 
@@ -75,7 +72,7 @@ ingress:
   #     secretName: mysecret
   tls: {}
 
-  # The name of the Secret containing root and intermediate CA certificates in a single .pem file
+  # Optional - The name of the Secret containing root and intermediate CA certificates in a single .pem file.
   caCertSecretName: ""
 
   # Annotations to be added to ingresses. For example:
@@ -111,11 +108,6 @@ dex:
   #       name: my-env-configmap
   envFrom: []
 
-  # NodePorts to access Dex services through (Helm will dynamically assign NodePorts in the
-  # 30000 to 32767 range if they are left blank).
-  nodePorts:
-    http: # blank - dynamically assigned
-
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
   # By default, etcd is used as the storage option for the Galasa Ecosystem.
   config:
@@ -138,4 +130,5 @@ dex:
     expiry:
       idTokens: 24h
       refreshTokens:
+        reuseInterval: 8760h # 1 year
         validIfNotUsedFor: 8760h # 1 year
