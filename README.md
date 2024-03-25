@@ -40,25 +40,17 @@ the latest versions of the packages. You can then run `helm search repo galasa` 
 
 Note: The Galasa Ecosystem Helm chart will deploy three persistent volumes. If you need to provide a Kubernetes storage class for these PVs, update the `storageClass` value in your [values.yaml](./charts/ecosystem/values.yaml) file with the name of a valid StorageClass on your cluster.
 
-If you are deploying to minikube, you can use the `standard` storage class created for you by minikube, but this is not required.
-
 Download the [values.yaml](charts/ecosystem/values.yaml) file and within it:
 
   1. Set the `galasaVersion` value to a version of galasa you want to run (see [releases](https://galasa.dev/releases) for released versions). You should not use latest to ensure each pod in the Ecosystem is running at the same level.
-  2. Set the `externalHostname` value to the DNS hostname or IP address of the Kubernetes node that will be used to access the Galasa NodePort services.
+  2. Set the `externalHostname` value to the hostname that will be used to access Galasa services. 
      * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
 
 Once you have updated the `galasaVersion` and `externalHostname` values, continue following the instructions below to set up Ingress and Dex for your ecosystem.
 
 #### Configuring Ingress
 
-By default, the ecosystem chart enables Ingress to reach services running within a Kubernetes cluster. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/ingress) to learn more about Ingress.
-
-If you are deploying to minikube and are using Ingress to expose services, ensure the NGINX Ingress controller is enabled by running:
-
-```console
-minikube addons enable ingress
-```
+The ecosystem chart uses Ingress to reach services running within a Kubernetes cluster. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/ingress) to learn more about Ingress.
 
 Assuming your Ingress controller has been set up on your Kubernetes cluster, update the values under the `ingress` section within your values.yaml file as follows to configure the use of Ingress in your ecosystem:
 
@@ -212,40 +204,17 @@ Once the `helm test` command ends and displays a success message, the Ecosystem 
 
 ### Accessing services
 
-#### Using Ingress
-
-When using Ingress, the URL of the Ecosystem bootstrap will be your external hostname, followed by `/api/bootstrap`.
+Using Ingress, the URL of the Ecosystem bootstrap will be your external hostname followed by `/api/bootstrap`.
 
 For example, if the external hostname you provided was `example.com` and you have provided values for using TLS, the bootstrap URL would be `https://example.com/api/bootstrap`. This is the URL that you would enter into a galasactl command's `--bootstrap` option to interact with your ecosystem.
 
-If you have enabled Ingress and are deploying to minikube, add an entry to your `/etc/hosts` file like the one shown below, ensuring the IP address matches the output of `minikube ip`.
-
-```console
-192.168.49.2 example.com
-```
-
-#### Using NodePorts
-
-To determine the URL of the Ecosystem bootstrap, issue the command:
-
-```console
-kubectl get svc
-```
-
-Look for the `api-external` service and the NodePort associated with the 8080 port. Combine that with the external hostname you provided to form the bootstrap URL. For example, the following snippet shows `30960` to be associated with port 8080:
-
-```console
-test-api-external  NodePort  10.107.160.208  <none>  9010:31359/TCP,9011:31422/TCP,8080:30960/TCP  18s
-```
-
-If the external hostname you provided was `example.com`, the bootstrap URL will be `http://example.com:30960/bootstrap`. You will enter this in a galasactl command's `--bootstrap` option.
-
 ### Upgrading the Galasa Ecosystem
 
-If you want to upgrade the Galasa Ecosystem to use a newer version of Galasa, for example, then you can use the following command:
+If you want to upgrade the Galasa Ecosystem to use a newer version of Galasa, for example, then you can use the following commands:
 
 ```console
-helm upgrade <release-name> galasa/ecosystem --reuse-values --set galasaVersion=0.28.0 --wait
+helm repo update
+helm upgrade <release-name> galasa/ecosystem --reuse-values --set galasaVersion=0.33.0 --wait
 ```
 
 ### Development
@@ -253,10 +222,19 @@ To install the latest development version of the Galasa Ecosystem chart, clone t
 
 1. Set the `galasaVersion` value to `main`
 2. Set the `galasaRegistry` value to `harbor.galasa.dev/galasadev`
-3. Set the `externalHostname` value to the DNS hostname or IP address of the Kubernetes node that will be used to access the Galasa NodePort services.
-   * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
+3. Set the `externalHostname` value to the hostname that will be used to access Galasa services.
+   * When deploying to minikube on Linux/macOS, add an entry to your `/etc/hosts` file like the one shown below, ensuring the IP address matches the output of `minikube ip`.
+      ```console
+      192.168.49.2 example.com
+      ```
 
 Follow the installation instructions [above](#configuring-ingress) to update the rest of your values.yaml file, including values to configure Ingress and Dex.
+
+If you are deploying to minikube, ensure the NGINX Ingress controller is enabled by running:
+
+```console
+minikube addons enable ingress
+```
 
 Once you have updated your values.yaml file, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
 
