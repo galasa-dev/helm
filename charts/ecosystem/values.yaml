@@ -113,6 +113,11 @@ dex:
   config:
     issuer: "http://example.com/dex"
 
+    # Connectors to upstream identity providers that users can authenticate with.
+    # See the [Dex documentation](https://dexidp.io/docs/connectors) for a list
+    # of connectors supported by Dex.
+    connectors: []
+
     # OAuth 2.0 configuration values. By default, Dex has been configured to skip the additional
     # access approval screen after logging in to the Galasa Ecosystem.
     oauth2:
