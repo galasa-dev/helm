@@ -53,12 +53,6 @@ spec:
         {{- with (first .Values.dex.config.staticClients) }}
         - name: GALASA_WEBUI_CLIENT_ID
           value: {{ .id }}
-        - name: GALASA_WEBUI_CLIENT_SECRET
-          {{- if .secretEnv }}
-          value: $({{ .secretEnv }})
-          {{- else }}
-          value: {{ .secret }}
-          {{- end }}
         {{- end }}
         {{- if .Values.ingress.caCertSecretName }}
         - name: NODE_EXTRA_CA_CERTS
