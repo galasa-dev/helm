@@ -28,6 +28,11 @@ galasaRegistry: "icr.io/galasadev"
 galasaBootImage: "galasa-boot-embedded-amd64"
 #
 #
+# The name of the Docker image that launches Galasa's web UI
+#
+galasaWebUiImage: "galasa-ui"
+#
+#
 # The pull policy to be used for the Galasa images, only useful for Galasa development purposes
 #
 pullPolicy: "IfNotPresent"
@@ -134,7 +139,7 @@ dex:
       redirectURIs:
       - 'http://example.com/auth/callback'
       name: 'Galasa Ecosystem Web UI'
-      secret: example-webui-client-secret
+      secret: ""
 
     # Token expiry configuration
     expiry:

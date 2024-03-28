@@ -43,7 +43,7 @@ spec:
             - --timeout=240s
       containers:
       - name: webui
-        image: {{ .Values.galasaRegistry }}/galasa-ui:{{ .Values.galasaVersion }}
+        image: {{ .Values.galasaRegistry }}/{{ .Values.galasaWebUiImage }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         env:
         - name: GALASA_API_SERVER_URL
