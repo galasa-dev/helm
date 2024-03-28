@@ -23,7 +23,7 @@ data:
 # The label for the engine pods and the prefix of the engine names
   engine_label: "{{ .Release.Name }}-k8s-standard-engine"
 #
-  engine_image: "{{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}"
+  engine_image: "{{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}"
   node_arch: "{{ .Values.architecture }}"
 #  node_arch: ""
 #  node_preferred_affinity: "beta.kubernetes.io/arch=s390x"

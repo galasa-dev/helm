@@ -23,12 +23,22 @@ galasaVersion: "0.33.0"
 galasaRegistry: "icr.io/galasadev"
 #
 #
+# The name of the Docker image that contains Galasa's boot.jar file to launch ecosystem services
+#
+galasaBootImage: "galasa-boot-embedded-amd64"
+#
+#
+# The name of the Docker image that launches Galasa's web UI
+#
+galasaWebUiImage: "galasa-ui"
+#
+#
 # The pull policy to be used for the Galasa images, only useful for Galasa development purposes
 #
 pullPolicy: "IfNotPresent"
 #
 #
-# The architecture the pods will be run on, at the moment, only adm64 is supported
+# The architecture the pods will be run on, at the moment, only amd64 is supported
 #
 architecture: amd64
 #
@@ -129,7 +139,7 @@ dex:
       redirectURIs:
       - 'http://example.com/auth/callback'
       name: 'Galasa Ecosystem Web UI'
-      secret: example-webui-client-secret
+      secret: ""
 
     # Token expiry configuration
     expiry:

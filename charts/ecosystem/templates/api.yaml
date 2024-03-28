@@ -41,7 +41,7 @@ spec:
             topologyKey: "kubernetes.io/hostname"
       initContainers:
       - name: init-chown-data
-        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
+        image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command: ["chown", "-v", "1000", "/data"]
         volumeMounts:
@@ -84,44 +84,9 @@ spec:
           - -l=app={{ .Release.Name }}-dex
           - --for=condition=Ready
           - --timeout=90s
-      {{- if .Values.ingress.caCertSecretName }}
-      - name: import-ca-certs
-        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
-        imagePullPolicy: {{ .Values.pullPolicy }}
-        securityContext:
-          allowPrivilegeEscalation: false
-          runAsUser: 0
-        command:
-          - /bin/bash
-          - -ec
-          - |
-            java_cacerts_file=${JAVA_HOME}/lib/security/cacerts
-            certs_dir=/etc/ssl/certs
-            cacerts_shared=/cacerts
-
-            # Copy the default Java cacerts file into the shared volume
-            cp "${java_cacerts_file}" "${cacerts_shared}"
-
-            # Import certificates in .pem format
-            for cert_file in ${certs_dir}/*.pem; do
-              alias_name=$(basename "${cert_file}" .pem)
-              keytool -import \
-                -file "${cert_file}" \
-                -alias "${alias_name}" \
-                -keystore "${cacerts_shared}/cacerts" \
-                -storepass "changeit" \
-                -trustcacerts \
-                -noprompt
-            done
-        volumeMounts:
-          - name: cacert-store
-            mountPath: /etc/ssl/certs
-          - name: cacert-share
-            mountPath: /cacerts
-      {{- end }}
       containers:
       - name: api
-        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
+        image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command: ["java"]
         args:
@@ -176,10 +141,6 @@ spec:
           subPath: dev.galasa.testcatalog.cfg
         - name: data
           mountPath: /galasa/testcatalog
-        {{- if .Values.ingress.caCertSecretName }}
-        - name: cacert-share
-          mountPath: /usr/local/openjdk-11/lib/security
-        {{- end }}
       volumes:
       - name: bootstrap
         configMap:
@@ -190,10 +151,3 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-pvc-testcatalog
-      {{- if .Values.ingress.caCertSecretName }}
-      - name: cacert-store
-        secret:
-          secretName: {{ .Values.ingress.caCertSecretName }}
-      - name: cacert-share
-        emptyDir: {}
-      {{- end }}
