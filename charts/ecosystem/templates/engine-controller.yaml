@@ -43,7 +43,7 @@ spec:
             - --timeout=180s
       containers:
       - name: engine-controller
-        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
+        image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command:
           - /bin/bash

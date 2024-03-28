@@ -41,7 +41,7 @@ spec:
             topologyKey: "kubernetes.io/hostname"
       initContainers:
       - name: init-chown-data
-        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
+        image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command: ["chown", "-v", "1000", "/data"]
         volumeMounts:
@@ -86,7 +86,7 @@ spec:
           - --timeout=90s
       {{- if .Values.ingress.caCertSecretName }}
       - name: import-ca-certs
-        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
+        image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         securityContext:
           allowPrivilegeEscalation: false
@@ -121,7 +121,7 @@ spec:
       {{- end }}
       containers:
       - name: api
-        image: {{ .Values.galasaRegistry }}/galasa-boot-embedded-{{ .Values.architecture }}:{{ .Values.galasaVersion }}
+        image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command: ["java"]
         args:
