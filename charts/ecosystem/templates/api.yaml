@@ -148,6 +148,11 @@ spec:
           value: {{ .Release.Name }}-dex:5557
         - name: GALASA_EXTERNAL_API_URL
           value: {{ empty .Values.ingress.tls | ternary "http" "https" }}://{{ .Values.externalHostname }}/api
+        - name: GALASA_RAS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-couchdb-secret
+              key: GALASA_RAS_TOKEN
         ports:
         - containerPort: 9010
           name: metrics
