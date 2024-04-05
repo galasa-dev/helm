@@ -5,7 +5,7 @@
 #
 
 {{/*
-  Returns the URL scheme of the host serving this ecosystem
+  Returns the URI scheme of the host serving the ecosystem
 */}}
 {{- define "ecosystem.hostScheme" -}}
   {{- empty .Values.ingress.tls | ternary "http" "https"}}
