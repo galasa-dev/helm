@@ -49,18 +49,12 @@ spec:
         - name: GALASA_API_SERVER_URL
           value: http://{{ .Release.Name }}-api:8080
         - name: GALASA_WEBUI_HOST_URL
-          value: {{ empty .Values.ingress.tls | ternary "http" "https" }}://{{ .Values.externalHostname }}
-        {{- with (first .Values.dex.config.staticClients) }}
+          value: {{ include "ecosystem.hostUrl" .}}
         - name: GALASA_WEBUI_CLIENT_ID
-          value: {{ .id }}
-        {{- end }}
+          value: galasa-webui
         {{- if .Values.ingress.caCertSecretName }}
         - name: NODE_EXTRA_CA_CERTS
           value: /etc/ssl/certs/cacerts/cacerts.pem
-        {{- end }}
-        {{- with .Values.dex.envFrom }}
-        envFrom:
-          {{- toYaml . | nindent 10 }}
         {{- end }}
         ports:
         - containerPort: 8080

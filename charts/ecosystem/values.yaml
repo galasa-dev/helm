@@ -166,14 +166,6 @@ dex:
     oauth2:
       skipApprovalScreen: true
 
-    # A list of known clients that authenticate with Dex
-    staticClients:
-    - id: galasa-webui
-      redirectURIs:
-      - 'http://example.com/auth/callback'
-      name: 'Galasa Ecosystem Web UI'
-      secret: ""
-
     # Token expiry configuration
     expiry:
       idTokens: 24h
