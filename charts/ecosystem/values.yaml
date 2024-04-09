@@ -108,7 +108,8 @@ dex:
     # named "<release-name>-dex-config" will be created.
     secretName: ""
 
-  # `envFrom` represents a list of additional environment variables mounted from Kubernetes Secrets or ConfigMaps.
+  # Optional - `envFrom` represents a list of additional environment variables mounted from Kubernetes Secrets or ConfigMaps
+  # into the Dex Deployment.
   # If you would like to mount an additional environment variable from a Secret or ConfigMap, provide the name of the
   # resource in the `envFrom` list. For example:
   # envFrom:
