@@ -108,7 +108,8 @@ dex:
     # named "<release-name>-dex-config" will be created.
     secretName: ""
 
-  # `envFrom` represents a list of additional environment variables mounted from Kubernetes Secrets or ConfigMaps.
+  # Optional - `envFrom` represents a list of additional environment variables mounted from Kubernetes Secrets or ConfigMaps
+  # into the Dex Deployment.
   # If you would like to mount an additional environment variable from a Secret or ConfigMap, provide the name of the
   # resource in the `envFrom` list. For example:
   # envFrom:
@@ -117,6 +118,38 @@ dex:
   #   - configMapRef:
   #       name: my-env-configmap
   envFrom: []
+
+  # Optional - An ordered list of JSON Web Token (JWT) claims to use when Galasa sets the requestor of a test.
+  # The first JWT claim that is matched will be used as the requestor of a test.
+  #
+  # For example, given a JWT that includes the following claims:
+  # {
+  #   "iss": "https://example.com/dex",
+  #   "sub": "my-user-id",
+  #   "aud": "my-client",
+  #   "exp": 1234567890,
+  #   "iat": 1234567890,
+  #   "name": "John Doe",
+  #   "preferred_username": "johndoe"
+  # }
+  #
+  # If the `usernameClaims` value is set to:
+  #
+  # usernameClaims:
+  #   - name
+  #   - preferred_username
+  #   - sub
+  #
+  # then the "name" claim will be matched first, and the value "John Doe" will be taken as the requestor of a test.
+  #
+  # By default, the order that will be applied is as follows:
+  # 1. "preferred_username"
+  # 2. "name"
+  # 3. "sub"
+  #
+  # Different Dex connectors may return different claims within issued JWTs. For details on which JWT claims are
+  # supported by Dex, refer to the [Dex documentation](https://dexidp.io/docs/custom-scopes-claims-clients).
+  usernameClaims: []
 
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
   # By default, etcd is used as the storage option for the Galasa Ecosystem.
