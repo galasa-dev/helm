@@ -49,7 +49,7 @@ spec:
         - name: GALASA_API_SERVER_URL
           value: http://{{ .Release.Name }}-api:8080
         - name: GALASA_WEBUI_HOST_URL
-          value: {{ include "ecosystem.hostUrl" .}}
+          value: {{ include "ecosystem.host.url" . }}
         - name: GALASA_WEBUI_CLIENT_ID
           value: galasa-webui
         {{- if .Values.ingress.caCertSecretName }}

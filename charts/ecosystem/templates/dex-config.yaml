@@ -20,7 +20,7 @@ stringData:
     staticClients:
     - id: galasa-webui
       redirectURIs:
-      - '{{ include "ecosystem.hostUrl" . }}/api/auth/callback'
+      - '{{ include "ecosystem.host.url" . }}/api/auth/callback'
       name: 'Galasa Ecosystem Web UI'
       secret: "{{ randAlphaNum 32 }}"
 
