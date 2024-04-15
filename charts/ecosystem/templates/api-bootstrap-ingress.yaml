@@ -12,7 +12,7 @@ metadata:
     {{- with .Values.ingress.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
-    nginx.ingress.kubernetes.io/rewrite-target: /bootstrap-external
+    nginx.ingress.kubernetes.io/rewrite-target: /bootstrap/external
 spec:
   ingressClassName: {{ .Values.ingress.ingressClassName }}
   {{- with .Values.ingress.tls }}
