@@ -8,7 +8,7 @@
   Returns the URI scheme of the host serving the ecosystem
 */}}
 {{- define "ecosystem.host.scheme" -}}
-  {{- empty .Values.ingress.tls | ternary "http" "https"}}
+  {{- empty .Values.ingress.tls | ternary "http" "https" }}
 {{- end -}}
 
 {{/*
