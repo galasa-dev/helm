@@ -16,6 +16,16 @@ stringData:
       addr: "{{ .Release.Name }}-dex:5557"
       reflection: true
 
+    {{- if not (hasKey .Values.dex.config "staticClients") }}
+    # A list of known clients that authenticate with Dex
+    staticClients:
+    - id: galasa-webui
+      redirectURIs:
+      - '{{ include "ecosystem.host.url" . }}/api/auth/callback'
+      name: 'Galasa Ecosystem Web UI'
+      secret: "{{ randAlphaNum 32 }}"
+    {{- end }}
+
     {{- if not (hasKey .Values.dex.config "storage") }}
     storage:
       type: etcd

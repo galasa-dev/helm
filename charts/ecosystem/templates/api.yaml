@@ -112,7 +112,7 @@ spec:
         - name: GALASA_DEX_GRPC_HOSTNAME
           value: {{ .Release.Name }}-dex:5557
         - name: GALASA_EXTERNAL_API_URL
-          value: {{ empty .Values.ingress.tls | ternary "http" "https" }}://{{ .Values.externalHostname }}/api
+          value: {{ include "ecosystem.host.url" . }}/api
         - name: GALASA_USERNAME_CLAIMS
           value: {{ join "," .Values.dex.usernameClaims | quote }}
         - name: GALASA_RAS_TOKEN

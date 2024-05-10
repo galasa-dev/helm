@@ -59,9 +59,7 @@ Assuming your Ingress controller has been set up on your Kubernetes cluster, upd
 2. If you are using HTTPS, add a `tls` configuration within the `ingress` section, specifying the `hosts` list and a `secretName` value corresponding to the name of the Kubernetes Secret that contains your TLS private key and certificate. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls) for information for how to set up TLS.
 
 #### Configuring Dex
-**Note: The ecosystem chart's use of Dex is still under development and is subject to change.**
-
-In a future release, [Dex](https://dexidp.io) will be used to authenticate users attempting to interact with a Galasa Ecosystem.
+As of Galasa version 0.32.0, [Dex](https://dexidp.io) is used to authenticate users attempting to interact with a Galasa Ecosystem.
 
 To configure Dex in your ecosystem, update your values.yaml file according to the following steps:
 
@@ -71,38 +69,7 @@ To configure Dex in your ecosystem, update your values.yaml file according to th
     issuer: http://<your-external-hostname>/dex
     ```
 
-2. Under the `staticClients` value, replace the example hostname given in the `redirectURIs` list with the value you provided in the `externalHostname`, and set the URI scheme to either `http` or `https`. For example:
-
-    ```yaml
-    staticClients:
-    - id: galasa-webui
-      redirectURIs:
-      - 'http://<your-external-hostname>/api/auth/callback'
-      name: 'Galasa Ecosystem Web UI'
-      secret: example-webui-client-secret
-    ```
-3. If you would like to supply a client secret for the webui via a Kubernetes Secret, replace the `secret` key in the `staticClients` section with `secretEnv` and supply the name of your Secret as a value within the `envFrom` section. For example, assuming you have a Secret called `my-webui-client-credentials` with a key called `WEBUI_CLIENT_SECRET` and a value representing a client secret, you would provide the following values:
-
-    ```yaml
-    dex:
-      envFrom:
-        - secretRef:
-          name: my-webui-client-credentials
-
-      # Other Dex-related values...
-
-      config:
-        # Other Dex configuration values...
-
-        staticClients:
-        - id: galasa-webui
-          redirectURIs:
-          - 'http://<your-external-hostname>/auth/callback'
-          name: 'Galasa Ecosystem Web UI'
-          secretEnv: WEBUI_CLIENT_SECRET
-    ```
-
-4. If desired, update the `expiry` section to configure the expiry of JSON Web Tokens (JWTs) and refresh tokens issued by Dex. By default, JWTs expire 24 hours after being issued and refresh tokens remain valid unless they have not been used for one year. See the Dex's documentation on [ID tokens](https://dexidp.io/docs/id-tokens) for information and available expiry settings.
+2. If desired, update the `expiry` section to configure the expiry of JSON Web Tokens (JWTs) and refresh tokens issued by Dex. By default, JWTs expire 24 hours after being issued and refresh tokens remain valid unless they have not been used for one year. See the Dex's documentation on [ID tokens](https://dexidp.io/docs/id-tokens) for information and available expiry settings.
 
 Next, you will need to configure Dex to authenticate via a connector to authenticate with an upstream identity provider like GitHub, Microsoft, or an LDAP server. For a full list of supported connectors, refer to the [Dex documentation](https://dexidp.io/docs/connectors). In this guide, we will configure Dex to authenticate through GitHub:
 
