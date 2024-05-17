@@ -64,6 +64,8 @@ spec:
           value: etcd:http://{{ .Release.Name }}-etcd:2379
         - name: GALASA_RESULTARCHIVE_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
+        - name: GALASA_AUTH_STORE
+          value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
           value: etcd:http://{{ .Release.Name }}-etcd:2379
         - name: GALASA_RAS_TOKEN
