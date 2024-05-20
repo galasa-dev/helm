@@ -18,7 +18,7 @@ data:
 #
 #
 # The maximum running number of automation engines the Engine Controller will start
-  max_engines: "4"
+  max_engines: "10"
 #
 # The label for the engine pods and the prefix of the engine names
   engine_label: "{{ .Release.Name }}-k8s-standard-engine"
