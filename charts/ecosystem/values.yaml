@@ -25,6 +25,10 @@ galasaRegistry: "icr.io/galasadev"
 #
 galasaBootImage: "galasa-boot-embedded-amd64"
 #
+# The maximum number of automation engines the Engine Controller will start at one time
+#
+maxEngines: "10"
+#
 #
 # The name of the Docker image that launches Galasa's web UI
 #
