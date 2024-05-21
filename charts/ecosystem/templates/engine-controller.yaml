@@ -73,6 +73,11 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
+        - name: GALASA_AUTHSTORE_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-couchdb-secret
+              key: GALASA_RAS_TOKEN
         ports:
         - containerPort: 9010
           name: metrics
