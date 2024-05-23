@@ -121,7 +121,7 @@ dex:
   #       name: my-env-configmap
   envFrom: []
 
-  # Optional - An ordered list of JSON Web Token (JWT) claims to use when Galasa sets the requestor of a test.
+  # An ordered list of JSON Web Token (JWT) claims to use when Galasa sets the requestor of a test.
   # The first JWT claim that is matched will be used as the requestor of a test.
   #
   # For example, given a JWT that includes the following claims:
@@ -151,7 +151,10 @@ dex:
   #
   # Different Dex connectors may return different claims within issued JWTs. For details on which JWT claims are
   # supported by Dex, refer to the [Dex documentation](https://dexidp.io/docs/custom-scopes-claims-clients).
-  usernameClaims: []
+  usernameClaims:
+    - "preferred_username"
+    - "name"
+    - "sub"
 
   # The Dex configuration - See the [Dex documentation](https://dexidp.io/docs) for more information.
   # By default, etcd is used as the storage option for the Galasa Ecosystem.

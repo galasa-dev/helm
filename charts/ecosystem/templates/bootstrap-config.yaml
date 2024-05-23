@@ -10,5 +10,5 @@ metadata:
   name: {{ .Release.Name }}-bootstrap-file
 data:
   bootstrap.properties: |
-    framework.config.store=etcd:http://etcd:2379
-    framework.extra.bundles=dev.galasa.cps.etcd,dev.galasa.ras.couchdb
+    framework.config.store=etcd:http://{{ .Release.Name }}-etcd:2379
+    framework.extra.bundles=dev.galasa.cps.etcd,dev.galasa.ras.couchdb,dev.galasa.auth.couchdb

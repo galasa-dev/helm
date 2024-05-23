@@ -62,7 +62,7 @@ spec:
           - -l=app={{ .Release.Name }}-etcd
           - --for=condition=Ready
           - --timeout=90s
-      - name: wait-for-ras
+      - name: wait-for-couchdb
         image: {{ .Values.kubectlImage }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command:
@@ -70,7 +70,7 @@ spec:
         args:
           - wait
           - pods
-          - -l=app={{ .Release.Name }}-ras
+          - -l=app={{ .Release.Name }}-couchdb
           - --for=condition=Ready
           - --timeout=90s
       - name: wait-for-dex
@@ -105,6 +105,8 @@ spec:
           value: etcd:http://{{ .Release.Name }}-etcd:2379
         - name: GALASA_RESULTARCHIVE_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
+        - name: GALASA_AUTH_STORE
+          value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
           value: etcd:http://{{ .Release.Name }}-etcd:2379
         - name: GALASA_DEX_ISSUER
@@ -116,6 +118,11 @@ spec:
         - name: GALASA_USERNAME_CLAIMS
           value: {{ join "," .Values.dex.usernameClaims | quote }}
         - name: GALASA_RAS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-couchdb-secret
+              key: GALASA_RAS_TOKEN
+        - name: GALASA_AUTHSTORE_TOKEN
           valueFrom:
             secretKeyRef:
               name: {{ .Release.Name }}-couchdb-secret
