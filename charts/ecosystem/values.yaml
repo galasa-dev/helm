@@ -121,7 +121,7 @@ dex:
   #       name: my-env-configmap
   envFrom: []
 
-  # Optional - An ordered list of JSON Web Token (JWT) claims to use when Galasa sets the requestor of a test.
+  # An ordered list of JSON Web Token (JWT) claims to use when Galasa sets the requestor of a test.
   # The first JWT claim that is matched will be used as the requestor of a test.
   #
   # For example, given a JWT that includes the following claims:
