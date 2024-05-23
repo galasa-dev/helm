@@ -7,20 +7,20 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Release.Name }}-couchdb
+  name: {{ .Release.Name }}-ras
   labels:
-    name: {{ .Release.Name }}-couchdb
+    name: {{ .Release.Name }}-ras
 spec:
-  serviceName: {{ .Release.Name }}-couchdb
+  serviceName: {{ .Release.Name }}-ras
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-couchdb
+      app: {{ .Release.Name }}-ras
   template:
     metadata:
-      name: {{ .Release.Name }}-couchdb
+      name: {{ .Release.Name }}-ras
       labels:
-        app: {{ .Release.Name }}-couchdb
+        app: {{ .Release.Name }}-ras
     spec:
       nodeSelector:
         kubernetes.io/arch: {{ .Values.architecture }}

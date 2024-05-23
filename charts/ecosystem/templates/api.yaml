@@ -62,7 +62,7 @@ spec:
           - -l=app={{ .Release.Name }}-etcd
           - --for=condition=Ready
           - --timeout=90s
-      - name: wait-for-couchdb
+      - name: wait-for-ras
         image: {{ .Values.kubectlImage }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command:
@@ -70,7 +70,7 @@ spec:
         args:
           - wait
           - pods
-          - -l=app={{ .Release.Name }}-couchdb
+          - -l=app={{ .Release.Name }}-ras
           - --for=condition=Ready
           - --timeout=90s
       - name: wait-for-dex
