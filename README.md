@@ -152,7 +152,7 @@ test-dex-5dc7fcb55f-lqv6s                 1/1     Running    0             65s
 test-engine-controller-56fb476f45-msj4x   0/1     Init:0/1   0             65s
 test-etcd-0                               1/1     Running    0             65s
 test-metrics-5fd9f687b6-rwcww             0/1     Init:0/1   0             65s
-test-ras-0                                1/1     Running    0             65s
+test-couchdb-0                            1/1     Running    0             65s
 test-resource-monitor-778c647995-x75z9    0/1     Init:0/1   0             65s
 test-webui-6c896974d8-2k2tk               1/1     Running    0             65s
 ```

@@ -17,4 +17,4 @@ spec:
   - port: 4369
     name: erlangport
   selector:
-    app: {{ .Release.Name }}-ras
+    app: {{ .Release.Name }}-couchdb
