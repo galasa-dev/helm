@@ -46,3 +46,9 @@ spec:
         - --validateeco
         - --bootstrap
         - http://{{ .Release.Name }}-api:8080/bootstrap
+        env:
+        - name: GALASA_RAS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-couchdb-secret
+              key: GALASA_RAS_TOKEN
