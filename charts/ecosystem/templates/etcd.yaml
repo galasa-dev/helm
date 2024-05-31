@@ -178,6 +178,9 @@ spec:
                 --initial-cluster ${PEERS} \
                 --initial-cluster-state new \
                 --data-dir /var/run/etcd/default.etcd
+            
+            # Turn on automatic compaction
+            exec etcd --auto-compaction-retention={{ .Values.etcdHistoryRetention }}
   volumeClaimTemplates:
   - metadata:
       name: data
