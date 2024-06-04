@@ -23,7 +23,7 @@ stringData:
       redirectURIs:
       - '{{ include "ecosystem.host.url" . }}/api/auth/callback'
       name: 'Galasa Ecosystem Web UI'
-      secret: "{{ randAlphaNum 32 }}" 
+      secret: "{{ randAlphaNum 32 }}"
     {{- end }}
 
     {{- if not (hasKey .Values.dex.config "storage") }}
