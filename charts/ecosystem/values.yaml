@@ -182,3 +182,5 @@ dex:
       refreshTokens:
         reuseInterval: 8760h # 1 year
         validIfNotUsedFor: 8760h # 1 year
+
+eventStreamsSecretName: "event-streams-token"
