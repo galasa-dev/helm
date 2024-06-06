@@ -75,6 +75,19 @@ dexImage: "ghcr.io/dexidp/dex:v2.38.0"
 kubectlImage: "bitnami/kubectl:1.28"
 #
 #
+# A list of origins that are allowed to receive responses from the Galasa API server.
+# To limit the origins to a set of domains, you can use a wildcard (*) value.
+#
+# For example, to allow all subdomains of example.com, you can use the following value:
+# allowedOrigins:
+#   - "*.example.com"
+#
+# By default, all origins are allowed.
+#
+allowedOrigins:
+  - "*"
+#
+#
 # Values to enable and configure the use of ingress
 # Note: The externalHostname value must be a valid DNS name for ingress to be used.
 #

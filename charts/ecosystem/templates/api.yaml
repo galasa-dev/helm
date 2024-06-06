@@ -117,6 +117,8 @@ spec:
           value: {{ include "ecosystem.host.url" . }}/api
         - name: GALASA_USERNAME_CLAIMS
           value: {{ join "," .Values.dex.usernameClaims | quote }}
+        - name: GALASA_ALLOWED_ORIGINS
+          value: {{ join "," .Values.allowedOrigins | quote }}
         - name: GALASA_RAS_TOKEN
           valueFrom:
             secretKeyRef:
