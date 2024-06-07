@@ -13,7 +13,7 @@ externalHostname: "example.com"
 # The version of Galasa you want to run with, it is better that you do not use "latest" to ensure
 # all the components are running the same version and a controlled upgrade can be performed
 #
-galasaVersion: "0.33.0"
+galasaVersion: "0.34.0"
 #
 #
 # The container registry the Galasa images can be found in
@@ -73,6 +73,19 @@ etcdImage: "quay.io/coreos/etcd:v3.2.25"
 couchdbImage: "couchdb:3.3.3"
 dexImage: "ghcr.io/dexidp/dex:v2.38.0"
 kubectlImage: "bitnami/kubectl:1.28"
+#
+#
+# A list of origins that are allowed to receive responses from the Galasa API server.
+# To limit the origins to a set of domains, you can use a wildcard (*) value.
+#
+# For example, to allow all subdomains of example.com, you can use the following value:
+# allowedOrigins:
+#   - "*.example.com"
+#
+# By default, all origins are allowed.
+#
+allowedOrigins:
+  - "*"
 #
 #
 # Values to enable and configure the use of ingress
