@@ -96,9 +96,9 @@ temp_dir=$BASEDIR/temp/version_bump
 mkdir -p $temp_dir
 
 # Ecosystem Chart.yaml
-cat $BASEDIR/charts/ecosystem/Chart.yaml | sed "s/version: .*/version: \"$component_version\"/1" > $temp_dir/Chart.yaml
+cat $BASEDIR/charts/ecosystem/Chart.yaml | sed "s/version:.*/version: \"$component_version\"/1" > $temp_dir/Chart.yaml
 cp $temp_dir/Chart.yaml $BASEDIR/charts/ecosystem/Chart.yaml
 
 # Ecosystem values.yaml
-cat $BASEDIR/charts/ecosystem/values.yaml | sed "s/galasaVersion: .*/galasaVersion: \"$component_version\"/1" > $temp_dir/values.yaml
+cat $BASEDIR/charts/ecosystem/values.yaml | sed "s/galasaVersion:.*/galasaVersion: \"$component_version\"/1" > $temp_dir/values.yaml
 cp $temp_dir/values.yaml $BASEDIR/charts/ecosystem/values.yaml
