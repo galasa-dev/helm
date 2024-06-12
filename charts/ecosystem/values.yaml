@@ -13,7 +13,7 @@ externalHostname: "example.com"
 # The version of Galasa you want to run with, it is better that you do not use "latest" to ensure
 # all the components are running the same version and a controlled upgrade can be performed
 #
-galasaVersion: "0.34.1"
+galasaVersion: "0.35.0"
 #
 #
 # The container registry the Galasa images can be found in
