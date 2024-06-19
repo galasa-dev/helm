@@ -132,7 +132,7 @@ spec:
         - name: GALASA_EVENT_STREAMS_TOKEN
           valueFrom:
             secretKeyRef:
-              name: {{- if .Values.eventStreamsSecretName }}{{ .Values.eventStreamsSecretName }}{{- else }}{{ .Release.Name }}-event-streams-token{{- end }}
+              name: event-streams-token
               key: GALASA_EVENT_STREAMS_TOKEN
         ports:
         - containerPort: 9010
