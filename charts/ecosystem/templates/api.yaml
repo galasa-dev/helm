@@ -129,6 +129,11 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
+        - name: GALASA_EVENT_STREAMS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{- if .Values.eventStreamsSecretName }}{{ .Values.eventStreamsSecretName }}{{- else }}{{ .Release.Name }}-event-streams-token{{- end }}
+              key: GALASA_EVENT_STREAMS_TOKEN
         ports:
         - containerPort: 9010
           name: metrics
