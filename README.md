@@ -134,6 +134,27 @@ By default, the Galasa Ecosystem Helm chart will create a Kubernetes Secret cont
 
 For more information on configuring Dex, refer to the [Dex documentation](https://dexidp.io/docs).
 
+#### Configuring your Kafka cluster to use the Galasa Kafka extension (Optional)
+
+Galasa now provides a Kafka extension which can publish events from Galasa to topics in a configured Kafka cluster. This is optional and must be explicitly opted into. Please see the [Kafka extension documentation](https://github.com/galasa-dev/extensions/blob/main/galasa-extensions-parent/dev.galasa.events.kafka/README.md) for more details.
+
+If you wish to produce events from Galasa to a Kafka cluster, you must create a service credential token with write access to topics in the cluster, and provide it to your ecosystem Helm chart via a Secret called 'event-streams-token'.
+
+1. Create the 'event-streams-token' Secret in the namespace your ecosystem will be installed in the following format:
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: event-streams-token
+data:
+  GALASA_EVENT_STREAMS_TOKEN: <yourtoken>
+```
+
+When the chart is installed, it will check for existence of the Secret, and provide the token as an environment variable to the Pods that will require it to authenticate to your Kafka cluster.
+
+
+### Installing your Galasa Ecosystem
+
 Having configured your [values.yaml](charts/ecosystem/values.yaml) file, use the following command to install the Galasa Ecosystem Helm chart:
 
 ```console
