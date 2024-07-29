@@ -16,6 +16,12 @@ externalHostname: "example.com"
 galasaVersion: "0.36.0"
 #
 #
+#
+# Name of the service being used
+galasaServiceName: Galasa Service
+#
+#
+#
 # The container registry the Galasa images can be found in
 #
 galasaRegistry: "icr.io/galasadev"
