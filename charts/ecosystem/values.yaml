@@ -27,13 +27,6 @@ galasaBootImage: "galasa-boot-embedded-amd64"
 #
 # The maximum number of automation engines the Engine Controller will start at one time
 #
-#
-#
-# The name of the service being used, defaults to Galasa Service
-galasaServiceName: "Galasa Service"
-#
-#
-#
 maxEngines: "10"
 #
 #
