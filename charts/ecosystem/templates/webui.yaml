@@ -52,6 +52,8 @@ spec:
           value: {{ include "ecosystem.host.url" . }}
         - name: GALASA_WEBUI_CLIENT_ID
           value: galasa-webui
+        - name: NEXT_PUBLIC_GALASA_SERVICE_NAME  # The variable should have a NEXT_PUBLIC prefix to be used on the client side by Next JS
+          value: {{ .Values.galasaServiceName }}
         {{- if .Values.ingress.caCertSecretName }}
         - name: NODE_EXTRA_CA_CERTS
           value: /etc/ssl/certs/cacerts/cacerts.pem
