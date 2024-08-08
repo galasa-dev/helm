@@ -7,12 +7,11 @@ on:
 env:
   NAMESPACE: jaydee029
 
-permissions: write-all
-
 jobs:
     trigger-workflow:
         name: trigger helm workflow
         runs-on: ubuntu-latest
+        permissions: write-all
 
         steps:
         - name: Triggering workflow using Github API call
