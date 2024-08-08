@@ -21,4 +21,7 @@ jobs:
            -H "X-GitHub-Api-Version: 2022-11-28" \
            /repos/${{env.NAMESPACE}}/automation/actions/workflows/build-helm.yaml/dispatches \
            -f "ref=main"
+          
+          env:
+            GH_TOKEN: ${{ github.token }}
 
