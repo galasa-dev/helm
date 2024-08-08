@@ -7,6 +7,8 @@ on:
 env:
   NAMESPACE: jaydee029
 
+permissions: write-all
+
 jobs:
     trigger-workflow:
         name: trigger helm workflow
