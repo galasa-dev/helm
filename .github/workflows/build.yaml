@@ -15,8 +15,11 @@ jobs:
           with:
             owner: jaydee029
             repo: automation
-            github_token: ${{ secrets.GITHUB_TOKEN }}
+            github_token: ${{ github.token }}
+            ref: main
+            wait_interval: 10
             workflow_file_name: build-helm.yaml
+            propagate_failure: true
             trigger_workflow: true
             wait_workflow: true
 
