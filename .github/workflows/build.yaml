@@ -5,7 +5,7 @@ on:
     branches: [main]
   
 env:
-  NAMESPACE: jaydee029
+  NAMESPACE: galasa-dev
 
 jobs:
     trigger-workflow:
