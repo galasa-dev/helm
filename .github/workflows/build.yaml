@@ -18,5 +18,5 @@ jobs:
           run: |
            gh workflow run build-helm.yaml --repo https://github.com/${{env.NAMESPACE}}/automation
           env:
-            GH_TOKEN: ${{ github.token }}
+            GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
 
