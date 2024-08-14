@@ -1,0 +1,22 @@
+name: Trigger Helm workflow in automation repository
+
+on:
+  push:
+    branches: [main]
+  
+env:
+  NAMESPACE: galasa-dev
+
+jobs:
+    trigger-workflow:
+        name: trigger helm workflow
+        runs-on: ubuntu-latest
+        permissions: write-all
+
+        steps:
+        - name: Triggering workflow using Github API call
+          run: |
+           gh workflow run build-helm.yaml --repo https://github.com/${{env.NAMESPACE}}/automation
+          env:
+            GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+
