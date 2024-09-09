@@ -7,9 +7,8 @@ name: Trigger Helm workflow in Automation repository
 
 on:
   workflow_dispatch:
-  # Todo: Uncomment to finish issue 1935.
-  # push:
-  #   branches: [main]
+  push:
+    branches: [main]
 
 jobs:
   trigger-workflow:
