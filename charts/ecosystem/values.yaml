@@ -88,6 +88,21 @@ dexImage: "ghcr.io/dexidp/dex:v2.38.0"
 kubectlImage: "bitnami/kubectl:1.28"
 #
 #
+# Values related to the encryption of Galasa secrets
+#
+encryption:
+  # Optional. The name of an existing Kubernetes Secret that contains
+  # a set of encryption keys in the following YAML format:
+  #
+  # encryption-keys.yaml: |
+  #   encryptionKey: <current-encryption-key>
+  #   fallbackDecryptionKeys:
+  #   - <fallback-key-1>
+  #   - <fallback-key-2>
+  #
+  keysSecretName: ""
+#
+#
 # A list of origins that are allowed to receive responses from the Galasa API server.
 # To limit the origins to a set of domains, you can use a wildcard (*) value.
 #

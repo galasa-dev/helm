@@ -134,6 +134,8 @@ spec:
             secretKeyRef:
               name: event-streams-token
               key: GALASA_EVENT_STREAMS_TOKEN
+        - name: GALASA_ENCRYPTION_KEYS_PATH
+          value: {{ include "ecosystem.encryption.keys.path" . }}
         ports:
         - containerPort: 9010
           name: metrics
@@ -162,6 +164,9 @@ spec:
           subPath: dev.galasa.testcatalog.cfg
         - name: data
           mountPath: /galasa/testcatalog
+        - name: encryption-keys
+          mountPath: {{ include "ecosystem.encryption.keys.directory" . }}
+          readOnly: true
       volumes:
       - name: bootstrap
         configMap:
@@ -172,3 +177,6 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-pvc-testcatalog
+      - name: encryption-keys
+        secret:
+          secretName: {{ include "ecosystem.encryption.keys.secret.name" . }}
