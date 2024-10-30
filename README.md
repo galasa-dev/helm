@@ -205,6 +205,40 @@ helm repo update
 helm upgrade <release-name> galasa/ecosystem --reuse-values --set galasaVersion=0.33.0 --wait
 ```
 
+### Rotating Encryption Keys
+When the Galasa Ecosystem Helm chart is installed, a Kubernetes Secret is created which contains the base64-encoded AES256 encryption keys used to encrypt credentials stored in the Galasa Ecosystem's credentials store.
+
+The encryption keys are stored in the following YAML structure:
+```yaml
+encryptionKey: <base64-encoded-encryption-key>
+fallbackDecryptionKeys:
+- <base64-encoded-encryption-key>
+- <base64-encoded-encryption-key>
+```
+
+The `encryptionKey` key in the YAML entry represents the active base64-encoded AES256 encryption key used to encrypt credentials stored in the Galasa Ecosystem's credentials store.
+
+The `fallbackDecryptionKeys` list represents a list of encryption keys that are no longer in use, and allows for encryption keys to be rotated without losing previous encryption keys. This allows encrypted credentials to be decrypted with a fallback decryption key and then be encrypted using the newly activated encryption key.
+
+To simplify the process of rotating encryption keys and re-encrypting credentials, you can run the [`rotate-encryption-keys.sh`](./rotate-encryption-keys.sh) script via the command-line. This script requires the following command-line utilities to be installed:
+
+- kubectl (v1.30.3 or later)
+- openssl (3.3.2 or later)
+- galasactl (0.38.0 or later)
+
+The following flags can be supplied when running the script:
+- `--release-name <name>` : **Required**. The helm release name provided when installing the ecosystem helm chart (see [Installing your Galasa Ecosystem](#installing-your-galasa-ecosystem))
+- `--namespace <namespace>` : Optional. The Kubernetes namespace where your Galasa Ecosystem is installed
+- `--clear-fallback-keys` : Optional. After rotating the encryption keys, this flag tells the script to remove all fallback decryption keys from the Kubernetes Secret
+
+For example:
+
+```bash
+./rotate-encryption-keys.sh --release-name example --namespace galasa-dev
+```
+
+The `rotate-encryption-keys.sh` script will automatically update the current encryption key with a new one, and then restart your Galasa Ecosystem's API and engine controller pods so that they can pick up the new encryption key. After rotating the encryption keys, the script will re-encrypt the existing secrets in your Galasa Ecosystem using the newly activated encryption key.
+
 ### Development
 To install the latest development version of the Galasa Ecosystem chart, clone this repository and update the following values in your [values.yaml](charts/ecosystem/values.yaml) file:
 
