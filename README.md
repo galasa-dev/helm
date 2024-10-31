@@ -220,6 +220,14 @@ The `encryptionKey` key in the YAML entry represents the active base64-encoded A
 
 The `fallbackDecryptionKeys` list represents a list of encryption keys that are no longer in use, and allows for encryption keys to be rotated without losing previous encryption keys. This allows encrypted credentials to be decrypted with a fallback decryption key and then be encrypted using the newly activated encryption key.
 
+**Before rotating the encryption keys, it is highly recommended to make a backup of the existing credentials stored in your Galasa Ecosystem by running the following command using the Galasa CLI tool:**
+
+```console
+galasactl secrets get --format yaml > /path/to/backup/file.yaml
+```
+
+**where `/path/to/backup/file.yaml` is either an absolute or relative path of your choice to a file where the backup will be stored.**
+
 To simplify the process of rotating encryption keys and re-encrypting credentials, you can run the [`rotate-encryption-keys.sh`](./rotate-encryption-keys.sh) script via the command-line. This script requires the following command-line utilities to be installed:
 
 - kubectl (v1.30.3 or later)
@@ -237,7 +245,9 @@ For example:
 ./rotate-encryption-keys.sh --release-name example --namespace galasa-dev
 ```
 
-The `rotate-encryption-keys.sh` script will automatically update the current encryption key with a new one, and then restart your Galasa Ecosystem's API and engine controller pods so that they can pick up the new encryption key. After rotating the encryption keys, the script will re-encrypt the existing secrets in your Galasa Ecosystem using the newly activated encryption key and then clear the fallback decryption keys list once the existing secrets have been successfully re-encrypted.
+The `rotate-encryption-keys.sh` script will automatically update the current encryption key with a new one, and then restart your Galasa Ecosystem's API and engine controller pods so that they can pick up the new encryption key. After rotating the encryption keys, the script will re-encrypt the existing secrets in your Galasa Ecosystem using the newly activated encryption key.
+
+Once the encryption keys have been rotated and the existing secrets have been re-encrypted, the script will clear the fallback decryption keys list and restart the API and engine controller pods for a final time to keep the Galasa services in sync with the contents of the encryption keys secret.
 
 ### Development
 To install the latest development version of the Galasa Ecosystem chart, clone this repository and update the following values in your [values.yaml](charts/ecosystem/values.yaml) file:
