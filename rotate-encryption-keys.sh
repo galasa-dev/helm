@@ -9,7 +9,7 @@
 #-----------------------------------------------------------------------------------------
 #
 # Objective: Rotates the encryption key currently being used to encrypt secrets in
-# the Galasa service and re-encrypts secrets using the new encryption key
+# the Galasa Ecosystem and re-encrypts secrets using the new encryption key
 #
 # Environment variable overrides:
 # None
@@ -56,7 +56,7 @@ note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" 
 # Functions
 #-----------------------------------------------------------------------------------------
 function usage {
-    h1 "A helper script to rotate Galasa service encryption keys."
+    h1 "A helper script to rotate Galasa ecosystem encryption keys."
     info "The following command-line tools must be installed before running this script:"
     cat << EOF
 kubectl (v1.30.3 or later)
@@ -68,7 +68,8 @@ EOF
 Options are:
 --release-name <name> : Required. The Helm release name provided when the Galasa ecosystem Helm chart was installed.
 --clear-fallback-keys : Optional. If provided, the fallback decryption keys list will be cleared from the Kubernetes Secret containing the Galasa encryption keys.
--n | --namespace <namespace> : Optional. The Kubernetes namespace in which your Galasa service is running. By default, the namespace pointed to by the current Kubernetes context will be used.
+-b | --bootstrap <bootstrap-url> : Optional. The bootstrap URL of the Galasa ecosystem that is being serviced. Not required if the GALASA_BOOTSTRAP environment variable is set and is pointing to the correct bootstrap URL.
+-n | --namespace <namespace> : Optional. The Kubernetes namespace in which your Galasa ecosystem is running. By default, the namespace pointed to by the current Kubernetes context will be used.
 EOF
 }
 
@@ -80,7 +81,7 @@ function check_exit_code {
     error_msg=$2
 
     if [[ "${return_code}" != "0" ]]; then
-        error "${error_msg}"
+        error "${error_msg}. Log file is at ${LOG_FILE}"
         exit 1
     fi
 }
@@ -108,6 +109,20 @@ function check_required_tools_installed {
     success "All required tools are already installed OK"
 }
 
+function check_galasactl_auth {
+    h1 "Logging into the Galasa ecosystem"
+
+    info "Bootstrap URL is ${GALASA_BOOTSTRAP}"
+
+    cmd="galasactl auth login"
+    info "Running command: ${cmd}"
+
+    ${cmd} 2>&1 | tee -a "${LOG_FILE}"
+    rc=$?
+    check_exit_code ${rc} "Failed to log in to the Galasa ecosystem secret. Check that a personal access token has been set and try again. rc=${rc}"
+    success "Logged in to the Galasa ecosystem OK"
+}
+
 function get_existing_encryption_keys {
     h1 "Retrieving encryption keys"
 
@@ -115,12 +130,19 @@ function get_existing_encryption_keys {
     decoded_secret_data=$(kubectl get secret ${ENCRYPTION_SECRET_NAME} \
         ${KUBECTL_NAMESPACE_FLAG} \
         --output jsonpath="{ .data.encryption-keys\.yaml }" | base64 --decode)
+    rc=$?
+    check_exit_code ${rc} "Failed to get encryption keys from ${ENCRYPTION_SECRET_NAME} secret. Check that the value for the --release-name flag matches an existing Helm release and try again. rc=${rc}"
 
     # Extract the current encryption key
     export CURRENT_KEY=$(echo "${decoded_secret_data}" | grep "encryptionKey:" | awk '{print $2}')
+    rc=$?
+    check_exit_code ${rc} "Failed to get current encryption key from ${ENCRYPTION_SECRET_NAME} secret. rc=${rc}"
 
-    # Extract the fallback decryption keys
+    # Extract the fallback decryption keys list
     export FALLBACK_KEYS=$(echo "${decoded_secret_data}" | awk '/^fallbackDecryptionKeys:/,/^$/' | tail -n +2)
+    rc=$?
+    check_exit_code ${rc} "Failed to get fallback keys from ${ENCRYPTION_SECRET_NAME} secret. rc=${rc}"
+
     success "Existing keys retrieved OK"
 }
 
@@ -128,19 +150,22 @@ function rotate_encryption_keys {
     h1 "Rotating encryption keys"
 
     # Create a new AES256 encryption key - this must be 32 characters long for 256-bit keys
-    new_key=$(openssl rand -base64 32)
+    info "Creating new encryption key..."
+    cmd="openssl rand -base64 32"
+
+    info "Running command: ${cmd}"
+    new_key=$(${cmd})
+    rc=$?
+    check_exit_code ${rc} "Failed to create a new encryption key. rc=${rc}"
+    success "Created new encryption key OK"
 
     # Add the existing encryption key to the start of the fallback keys list
     updated_fallback_keys_yaml=$(cat << EOF
 fallbackDecryptionKeys:
 - ${CURRENT_KEY}
+${FALLBACK_KEYS}
 EOF
 )
-    if [[ -n "${FALLBACK_KEYS}" ]]; then
-        while IFS= read -r line; do
-            updated_fallback_keys_yaml+=$'\n'"${line}"
-        done <<< "${FALLBACK_KEYS}"
-    fi
 
     # Update the Kubernetes Secret with the rotated encryption keys
     patch_encryption_keys "${new_key}" "${updated_fallback_keys_yaml}"
@@ -152,18 +177,18 @@ function restart_deployment {
     # $1 the deployment name to wait for
     deployment_name=$1
 
-    kubectl rollout restart deployment ${deployment_name} ${KUBECTL_NAMESPACE_FLAG}
+    kubectl rollout restart deployment ${deployment_name} ${KUBECTL_NAMESPACE_FLAG} 2>&1 | tee -a "${LOG_FILE}"
     rc=$?
-    check_exit_code ${rc} "Failed to issue command to restart the ${deployment_name} deployment. rc=${rc}"
+    check_exit_code ${rc} "Failed to issue command to restart the ${deployment_name} deployment. Check that the value for the --release-name flag matches an existing Helm release and try again. rc=${rc}"
 
     # Wait for the rollout to complete
-    kubectl rollout status deployment "${deployment_name}" ${KUBECTL_NAMESPACE_FLAG} --timeout=3m
+    kubectl rollout status deployment "${deployment_name}" ${KUBECTL_NAMESPACE_FLAG} --timeout=3m 2>&1 | tee -a "${LOG_FILE}"
     rc=$?
     check_exit_code ${rc} "Failed to wait for ${deployment_name} to be restarted. rc=${rc}"
 }
 
 function restart_deployments {
-    h1 "Restarting Galasa service pods to use new encryption keys"
+    h1 "Restarting Galasa ecosystem deployments to use new encryption keys"
 
     info "Restarting API server..."
     restart_deployment "${API_DEPLOYMENT_NAME}"
@@ -173,33 +198,36 @@ function restart_deployments {
     restart_deployment "${ENGINE_CONTROLLER_DEPLOYMENT_NAME}"
     success "Engine controller restarted OK"
 
-    success "Restarted service pods OK"
+    success "Restarted ecosystem deployments OK"
+}
+
+function get_existing_secrets {
+    h1 "Getting existing Galasa Secrets"
+
+    cmd="galasactl-dev secrets get --format yaml"
+    info "Running command: ${cmd}"
+
+    ${cmd} > ${SECRETS_FILE}
+    rc=$?
+    check_exit_code ${rc} "Failed to get secrets from the Galasa ecosystem. rc=${rc}"
+    success "Existing secrets stored at ${SECRETS_FILE}"
 }
 
 function migrate_secrets {
     h1 "Re-encrypting existing Galasa Secrets with new encryption keys"
 
-    info "Getting existing Galasa Secrets..."
-    mkdir -p "${BASEDIR}/temp"
-    temp_secrets_file="${BASEDIR}/temp/secrets.yaml"
-
-    secrets=$(galasactl secrets get --format yaml)
-    rc=$?
-    check_exit_code ${rc} "Failed to get secrets from the Galasa service. rc=${rc}"
-
-    if [[ -z "${secrets}" ]]; then
+    if [[ ! -s "${SECRETS_FILE}" ]]; then
         info "No secrets found to re-encrypt"
         success "OK"
     else
-        echo -n "${secrets}" > "${temp_secrets_file}"
-        success "Existing Galasa Secrets retrieved OK"
-
         info "Re-applying secrets"
-        galasactl resources apply -f "${temp_secrets_file}"
+        cmd="galasactl-dev resources apply -f ${SECRETS_FILE}"
+
+        info "Running command: ${cmd}"
+        ${cmd} 2>&1 | tee -a "${LOG_FILE}"
         rc=$?
-        check_exit_code ${rc} "Failed to re-apply secrets to the Galasa service. rc=${rc}"
+        check_exit_code ${rc} "Failed to re-apply secrets to the Galasa ecosystem. rc=${rc}"
         success "Successfully re-encrypted existing Galasa Secrets"
-        rm "${temp_secrets_file}"
     fi
 }
 
@@ -223,7 +251,7 @@ data:
 EOF
 )
     # Update the Kubernetes Secret
-    echo "${patch}" | kubectl patch secret "${ENCRYPTION_SECRET_NAME}" ${KUBECTL_NAMESPACE_FLAG} --patch-file /dev/stdin
+    echo "${patch}" | kubectl patch secret "${ENCRYPTION_SECRET_NAME}" ${KUBECTL_NAMESPACE_FLAG} --patch-file /dev/stdin 2>&1 | tee -a "${LOG_FILE}"
     rc=$?
     check_exit_code ${rc} "Failed to patch the encryption keys secret. rc=${rc}"
 }
@@ -246,7 +274,6 @@ EOF
 #-----------------------------------------------------------------------------------------
 NAMESPACE=""
 RELEASE_NAME=""
-CLEAR_FALLBACK_KEYS=""
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -256,8 +283,8 @@ while [ "$1" != "" ]; do
         --release-name )        shift
                                 export RELEASE_NAME=$1
                                 ;;
-        --clear-fallback-keys ) shift
-                                export CLEAR_FALLBACK_KEYS="true"
+        -b | --bootstrap )      shift
+                                export GALASA_BOOTSTRAP=$1
                                 ;;
         -h | --help )           usage
                                 exit
@@ -278,6 +305,8 @@ fi
 #-----------------------------------------------------------------------------------------
 # Main program logic
 #-----------------------------------------------------------------------------------------
+set -o pipefail
+
 ENCRYPTION_SECRET_NAME="${RELEASE_NAME}-encryption-secret"
 API_DEPLOYMENT_NAME="${RELEASE_NAME}-api"
 ENGINE_CONTROLLER_DEPLOYMENT_NAME="${RELEASE_NAME}-engine-controller"
@@ -287,13 +316,25 @@ if [[ -n ${NAMESPACE} ]]; then
     KUBECTL_NAMESPACE_FLAG="--namespace ${NAMESPACE}"
 fi
 
+# Create temp directory and log file
+TEMP_DIR="${BASEDIR}/temp"
+mkdir -p "${TEMP_DIR}"
+LOG_FILE="${TEMP_DIR}/rotate-${RELEASE_NAME}-keys.txt"
+> "${LOG_FILE}"
+
+SECRETS_FILE="${TEMP_DIR}/secrets.yaml"
+
+# Before starting the rotation process, check that we have all the tools required
+# and that we can authenticate with the Galasa ecosystem
 check_required_tools_installed
+check_galasactl_auth
+
+get_existing_secrets
 get_existing_encryption_keys
 rotate_encryption_keys
 restart_deployments
 migrate_secrets
 
-if [[ -n "${CLEAR_FALLBACK_KEYS}" ]]; then
-    clear_fallback_keys
-    restart_deployments
-fi
+clear_fallback_keys
+restart_deployments
+success "Successfully rotated encryption keys and re-encrypted secrets!"
