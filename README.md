@@ -229,7 +229,7 @@ To simplify the process of rotating encryption keys and re-encrypting credential
 The following flags can be supplied when running the script:
 - `--release-name <name>` : **Required**. The helm release name provided when installing the ecosystem helm chart (see [Installing your Galasa Ecosystem](#installing-your-galasa-ecosystem))
 - `--namespace <namespace>` : Optional. The Kubernetes namespace where your Galasa Ecosystem is installed
-- `--clear-fallback-keys` : Optional. After rotating the encryption keys, this flag tells the script to remove all fallback decryption keys from the Kubernetes Secret
+- `--bootstrap <bootstrap-url>` : Optional. The bootstrap URL of the Galasa ecosystem that is being serviced. Not required if the GALASA_BOOTSTRAP environment variable is set and is pointing to the correct bootstrap URL. Overrides the existing GALASA_BOOTSTRAP environment variable value if set
 
 For example:
 
@@ -237,7 +237,7 @@ For example:
 ./rotate-encryption-keys.sh --release-name example --namespace galasa-dev
 ```
 
-The `rotate-encryption-keys.sh` script will automatically update the current encryption key with a new one, and then restart your Galasa Ecosystem's API and engine controller pods so that they can pick up the new encryption key. After rotating the encryption keys, the script will re-encrypt the existing secrets in your Galasa Ecosystem using the newly activated encryption key.
+The `rotate-encryption-keys.sh` script will automatically update the current encryption key with a new one, and then restart your Galasa Ecosystem's API and engine controller pods so that they can pick up the new encryption key. After rotating the encryption keys, the script will re-encrypt the existing secrets in your Galasa Ecosystem using the newly activated encryption key and then clear the fallback decryption keys list once the existing secrets have been successfully re-encrypted.
 
 ### Development
 To install the latest development version of the Galasa Ecosystem chart, clone this repository and update the following values in your [values.yaml](charts/ecosystem/values.yaml) file:

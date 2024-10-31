@@ -296,7 +296,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-if [[ -z ${RELEASE_NAME} ]]; then
+if [[ -z "${RELEASE_NAME}" ]]; then
     error "A release name must be provided using the --release-name flag."
     usage
     exit 1
@@ -312,7 +312,7 @@ API_DEPLOYMENT_NAME="${RELEASE_NAME}-api"
 ENGINE_CONTROLLER_DEPLOYMENT_NAME="${RELEASE_NAME}-engine-controller"
 
 KUBECTL_NAMESPACE_FLAG=""
-if [[ -n ${NAMESPACE} ]]; then
+if [[ -n "${NAMESPACE}" ]]; then
     KUBECTL_NAMESPACE_FLAG="--namespace ${NAMESPACE}"
 fi
 
