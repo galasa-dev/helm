@@ -204,7 +204,7 @@ function restart_deployments {
 function get_existing_secrets {
     h1 "Getting existing Galasa Secrets"
 
-    cmd="galasactl-dev secrets get --format yaml"
+    cmd="galasactl secrets get --format yaml"
     info "Running command: ${cmd}"
 
     ${cmd} > ${SECRETS_FILE}
@@ -221,7 +221,7 @@ function migrate_secrets {
         success "OK"
     else
         info "Re-applying secrets"
-        cmd="galasactl-dev resources apply -f ${SECRETS_FILE}"
+        cmd="galasactl resources apply -f ${SECRETS_FILE}"
 
         info "Running command: ${cmd}"
         ${cmd} 2>&1 | tee -a "${LOG_FILE}"
