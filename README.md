@@ -206,7 +206,7 @@ helm upgrade <release-name> galasa/ecosystem --reuse-values --set galasaVersion=
 ```
 
 ### Rotating Encryption Keys
-When the Galasa Ecosystem Helm chart is installed, a Kubernetes Secret is created which contains the base64-encoded AES256 encryption keys used to encrypt credentials stored in the Galasa Ecosystem's credentials store.
+When the Galasa Ecosystem Helm chart is installed, a Kubernetes Secret is created which contains the base64-encoded, 256-bit encryption keys used to encrypt credentials stored in the Galasa Ecosystem's credentials store using AES-256-GCM encryption.
 
 The encryption keys are stored in the following YAML structure:
 ```yaml
@@ -216,9 +216,9 @@ fallbackDecryptionKeys:
 - <base64-encoded-encryption-key>
 ```
 
-The `encryptionKey` key in the YAML entry represents the active base64-encoded AES256 encryption key used to encrypt credentials stored in the Galasa Ecosystem's credentials store.
+The `encryptionKey` key in the YAML entry represents the active base64-encoded, 256-bit encryption key used to encrypt credentials stored in the Galasa Ecosystem's credentials store.
 
-The `fallbackDecryptionKeys` list represents a list of encryption keys that are no longer in use, and allows for encryption keys to be rotated without losing previous encryption keys. This allows encrypted credentials to be decrypted with a fallback decryption key and then be encrypted using the newly activated encryption key.
+The `fallbackDecryptionKeys` list represents a list of base64-encoded encryption keys that are no longer in use, and allows for encryption keys to be rotated without losing previous encryption keys. This allows encrypted credentials to be decrypted with a fallback decryption key and then be encrypted using the newly activated encryption key.
 
 **Before rotating the encryption keys, it is highly recommended to make a backup of the existing credentials stored in your Galasa Ecosystem by running the following command using the Galasa CLI tool:**
 

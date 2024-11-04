@@ -67,7 +67,6 @@ EOF
     cat << EOF
 Options are:
 --release-name <name> : Required. The Helm release name provided when the Galasa ecosystem Helm chart was installed.
---clear-fallback-keys : Optional. If provided, the fallback decryption keys list will be cleared from the Kubernetes Secret containing the Galasa encryption keys.
 -b | --bootstrap <bootstrap-url> : Optional. The bootstrap URL of the Galasa ecosystem that is being serviced. Not required if the GALASA_BOOTSTRAP environment variable is set and is pointing to the correct bootstrap URL.
 -n | --namespace <namespace> : Optional. The Kubernetes namespace in which your Galasa ecosystem is running. By default, the namespace pointed to by the current Kubernetes context will be used.
 EOF
