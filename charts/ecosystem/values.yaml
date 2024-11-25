@@ -13,7 +13,7 @@ externalHostname: "example.com"
 # The version of Galasa you want to run with, it is better that you do not use "latest" to ensure
 # all the components are running the same version and a controlled upgrade can be performed
 #
-galasaVersion: "0.37.0"
+galasaVersion: "0.38.0"
 #
 #
 #
@@ -86,6 +86,21 @@ etcdImage: "quay.io/coreos/etcd:v3.2.25"
 couchdbImage: "couchdb:3.3.3"
 dexImage: "ghcr.io/dexidp/dex:v2.38.0"
 kubectlImage: "bitnami/kubectl:1.28"
+#
+#
+# Values related to the encryption of Galasa secrets
+#
+encryption:
+  # Optional. The name of an existing Kubernetes Secret that contains
+  # a set of encryption keys in the following YAML format:
+  #
+  # encryption-keys.yaml: |
+  #   encryptionKey: <current-encryption-key>
+  #   fallbackDecryptionKeys:
+  #   - <fallback-key-1>
+  #   - <fallback-key-2>
+  #
+  keysSecretName: ""
 #
 #
 # A list of origins that are allowed to receive responses from the Galasa API server.
