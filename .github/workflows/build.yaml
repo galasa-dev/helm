@@ -15,6 +15,12 @@ jobs:
     permissions: write-all
 
     steps:
+      
+    - name: Turn script into an executable
+      run: chmod +x detect-secrets.sh
+    - name: Run the detect secrets script
+      run: ./detect-secrets.sh
+
     - name: Trigger Helm workflow using GitHub CLI call
       run: |
         gh workflow run build-helm.yaml --repo https://github.com/${{ env.NAMESPACE }}/automation
