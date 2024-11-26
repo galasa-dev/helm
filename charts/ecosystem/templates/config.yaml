@@ -35,6 +35,10 @@ data:
 #  engine_memory_limit: "300"
   run_poll: "5"
   run_poll_recheck: "2"
+  galasa_node_preferred_affinity: "{{ .Values.k8s_node_preferred_affinity }}"
+  galasa_node_tolerations: "{{ .Values.k8s_node_tolerations }}"
+
+
 #
 # The name of the Kubernetes Secret that stores the encryption-related keys,
 # so that test pods can decrypt credentials where necessary
