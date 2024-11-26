@@ -55,7 +55,7 @@ galasaWebUiImage: "galasa-ui"
 #
 # Example value: "galasa-engines"
 #
-k8s_node_preferred_affinity: ""
+k8sNodePreferredAffinity: ""
 #
 #
 #
@@ -73,7 +73,7 @@ k8s_node_preferred_affinity: ""
 # "NoSchedule" taint should be tolerated, resulting in the Galasa test pods
 # having exclusive access to run on this node.
 #
-k8s_node_tolerations: ""
+k8sNodeTolerations: ""
 #
 #
 # The pull policy to be used for the Galasa images, only useful for Galasa development purposes
