@@ -11,6 +11,9 @@ on:
       - prerelease
       - release
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
