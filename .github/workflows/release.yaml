@@ -11,6 +11,9 @@ on:
       - prerelease
       - release
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -32,7 +35,7 @@ jobs:
           skip_existing: true # Skip package upload if release/tag already exists
           skip_upload: true # Skips upload to index.yaml
         env:
-          CR_TOKEN: "${{ secrets.GALASA_TEAM_REPO_SCOPE_TOKEN }}"
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Run chart-releaser - release
         if: (github.ref == 'refs/heads/release')
@@ -40,4 +43,4 @@ jobs:
         with:
           skip_existing: true # Skip package upload if release/tag already exists
         env:
-          CR_TOKEN: "${{ secrets.GALASA_TEAM_REPO_SCOPE_TOKEN }}"
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
