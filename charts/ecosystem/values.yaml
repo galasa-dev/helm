@@ -20,7 +20,7 @@ galasaVersion: "0.38.0"
 # Name of the galasa service which will be shown as the title of the web user interface page.
 # Any bookmarks taken by users in their browsers will also receive this name.
 # Making this name distict helps users identify which Galasa service they are using.
-# If they are all called the same thing, users with access to multiple systems may find that 
+# If they are all called the same thing, users with access to multiple systems may find that
 # confusing.
 # It is RECOMMENDED that this value is changed to be unique,
 # For example: Galasa Service XYZ
@@ -46,6 +46,34 @@ maxEngines: "10"
 # The name of the Docker image that launches Galasa's web UI
 #
 galasaWebUiImage: "galasa-ui"
+#
+#
+#
+# Optional. The label of a Kubernetes node that the engine controller should
+# have an affinity for. If possible, the engine controller will schedule
+# Galasa runs on this node.
+#
+# Example value: "galasa-engines"
+#
+k8sNodePreferredAffinity: ""
+#
+#
+#
+# Optional. The definition of a Kubernetes node taint toleration behaviour.
+# You may wish to prevent other workloads from being scheduled on your dedicated
+# Galasa k8s nodes. This can be achieved by tainting the Galasa k8s nodes. If this
+# has been done, you will need to define a toleration for your Galasa pods so that
+# they can schedule on the tainted nodes.
+#
+# The value should define a node label, an operator and a condition.
+#
+# Example value: "galasa-engines=Exists:NoSchedule"
+#
+# In the above example, any node which has the label "galasa-engines" with a
+# "NoSchedule" taint should be tolerated, resulting in the Galasa test pods
+# having exclusive access to run on this node.
+#
+k8sNodeTolerations: ""
 #
 #
 # The pull policy to be used for the Galasa images, only useful for Galasa development purposes

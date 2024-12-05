@@ -36,6 +36,14 @@ data:
   run_poll: "5"
   run_poll_recheck: "2"
 #
+# Label of k8s node that Galasa test pods should be scheduled on preferrentially
+  galasa_node_preferred_affinity: "{{ .Values.k8sNodePreferredAffinity }}"
+#
+# List of node toleration conditions
+  galasa_node_tolerations: "{{ .Values.k8sNodeTolerations }}"
+
+
+#
 # The name of the Kubernetes Secret that stores the encryption-related keys,
 # so that test pods can decrypt credentials where necessary
   encryption_keys_secret_name: {{ include "ecosystem.encryption.keys.secret.name" . }}
