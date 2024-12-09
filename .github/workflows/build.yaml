@@ -3,37 +3,69 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-name: Trigger Helm workflow in Automation repository
+name: Build Helm Chart (ecosystem1)
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
 
+env:
+  NAMESPACE: galasa-dev
+  BRANCH: ${{ github.ref }}
+
 jobs:
-  trigger-workflow:
-    name: Trigger Helm workflow
+  build-helm:
+    # Do not run this workflow for forks.
+    if: ${{ github.repository_owner == 'galasa-dev' }}
+    name: Build Helm chart for ecosystem1
     runs-on: ubuntu-latest
-    permissions: write-all
 
     steps:
-    - name: Trigger Helm workflow using GitHub CLI call
-      run: |
-        gh workflow run build-helm.yaml --repo https://github.com/galasa-dev/automation
-      env:
-        GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+      - name: Checkout Helm repository
+        uses: actions/checkout@v4  
+        with:
+          repository: ${{ env.NAMESPACE }}/helm
+          path: helm
+
+      - name: Checkout Automation repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.NAMESPACE }}/automation
+          path: automation
+
+      - name: Setup helm
+        uses: azure/setup-helm@v4.2.0
+        with:
+          version: '3.13.2' # default is latest (stable)
+        id: install
+
+      - name: Setup kubeconfig secret
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG_PLAN_B_CLUSTER }}" >> $HOME/.kube/config
+
+      - name: Uninstall ecosystem1
+        run: |
+          helm uninstall main-ecosystem --ignore-not-found --namespace=galasa-ecosystem1 --kubeconfig $HOME/.kube/config
+
+      - name: Install ecosystem1
+        run: |
+          helm install main-ecosystem ${{ github.workspace }}/helm/charts/ecosystem --namespace=galasa-ecosystem1 --values ${{ github.workspace }}/automation/infrastructure/galasa-plan-b-lon02/galasa-ecosystem1/helm-values.yaml --kubeconfig $HOME/.kube/config --wait
+
+      - name: Test ecosystem1
+        run: |
+          helm test main-ecosystem --namespace=galasa-ecosystem1 --kubeconfig $HOME/.kube/config
 
   report-failure:
-    name: Report failure in workflow
+    if: ${{ failure() && github.repository_owner == 'galasa-dev' }}
+    name: Report workflow failure into Slack channel
     runs-on: ubuntu-latest
-    needs: trigger-workflow
-    if: failure()
+    needs: build-helm
 
     steps:
-      - name: Report failure in workflow to Slack
+      - name: Report workflow failure into Slack channel
         env: 
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run : |
           docker run --rm -v ${{ github.workspace }}:/var/workspace ghcr.io/galasa-dev/galasabld-ibm:main slackpost workflows --repo "helm" --workflowName "${{ github.workflow }}" --workflowRunNum "${{ github.run_id }}" --ref "${{ env.BRANCH }}" --hook "${{ env.SLACK_WEBHOOK }}"
-
-
