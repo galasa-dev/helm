@@ -131,17 +131,47 @@ encryption:
   keysSecretName: ""
 #
 #
-# A list of origins that are allowed to receive responses from the Galasa API server.
-# To limit the origins to a set of domains, you can use a wildcard (*) value.
+# Values to configure the API server
 #
-# For example, to allow all subdomains of example.com, you can use the following value:
-# allowedOrigins:
-#   - "*.example.com"
-#
-# By default, all origins are allowed.
-#
-allowedOrigins:
-  - "*"
+api:
+  #
+  #
+  # The number of API server replicas to deploy
+  #
+  replicaCount: "1"
+  #
+  #
+  # The maximum number of requests that can be sent to the API server after a refreshed rate limit
+  #
+  globalRequestCapacity: "100000"
+  #
+  #
+  # The rate at which requests can be sent to the API server per second
+  #
+  globalRateLimit: "100000"
+  #
+  #
+  # The maximum number of requests that can be sent to the API server after a refreshed rate limit per IP address
+  #
+  ipRequestCapacity: "50000"
+  #
+  #
+  # The rate at which requests can be sent to the API server per second, per IP address
+  #
+  ipRateLimit: "50000"
+  #
+  #
+  # A list of origins that are allowed to receive responses from the Galasa API server.
+  # To limit the origins to a set of domains, you can use a wildcard (*) value.
+  #
+  # For example, to allow all subdomains of example.com, you can use the following value:
+  # allowedOrigins:
+  #   - "*.example.com"
+  #
+  # By default, all origins are allowed.
+  #
+  allowedOrigins:
+    - "*"
 #
 #
 # Values to enable and configure the use of ingress
