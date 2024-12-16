@@ -133,7 +133,7 @@ encryption:
 #
 # Values to configure the API server
 #
-api:
+apiServer:
   #
   #
   # The number of API server replicas to deploy

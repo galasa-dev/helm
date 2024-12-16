@@ -11,7 +11,7 @@ metadata:
   labels:
     app: {{ .Release.Name }}-api
 spec:
-  replicas: {{ .Values.api.replicaCount }}
+  replicas: {{ .Values.apiServer.replicaCount }}
   strategy:
     type: Recreate
   selector:
@@ -118,15 +118,15 @@ spec:
         - name: GALASA_USERNAME_CLAIMS
           value: {{ join "," .Values.dex.usernameClaims | quote }}
         - name: GALASA_GLOBAL_REQUEST_CAPACITY
-          value: {{ .Values.api.globalRequestCapacity }}
+          value: {{ .Values.apiServer.globalRequestCapacity }}
         - name: GALASA_GLOBAL_RATE_LIMIT
-          value: {{ .Values.api.globalRateLimit }}
+          value: {{ .Values.apiServer.globalRateLimit }}
         - name: GALASA_IP_REQUEST_CAPACITY
-          value: {{ .Values.api.ipRequestCapacity }}
+          value: {{ .Values.apiServer.ipRequestCapacity }}
         - name: GALASA_IP_RATE_LIMIT
-          value: {{ .Values.api.ipRateLimit }}
+          value: {{ .Values.apiServer.ipRateLimit }}
         - name: GALASA_ALLOWED_ORIGINS
-          value: {{ join "," .Values.api.allowedOrigins | quote }}
+          value: {{ join "," .Values.apiServer.allowedOrigins | quote }}
         - name: GALASA_RAS_TOKEN
           valueFrom:
             secretKeyRef:
