@@ -162,7 +162,7 @@ apiServer:
   autoscaling:
     #
     # Enables or disables autoscaling
-    enabled: true
+    enabled: false
     #
     # The minimum number of API server replicas that should be deployed
     minReplicas: 1
@@ -182,11 +182,10 @@ apiServer:
   #
   #
   # The Kubernetes annotations to apply to the Galasa API server's ingress resource alongside the global annotations provided via the `ingress.annotations` value.
-  # By default, a rate limit of 1000 requests from a given IP per second is applied to the API server's ingress, using the nginx IngressClass.
+  # By default, a rate limit of 1000 requests from a given IP per second is applied to the API server's ingress, using the nginx ingress controller.
   #
   ingressAnnotations:
     nginx.ingress.kubernetes.io/limit-rps: "1000"
-  #
   #
   #
   # A list of origins that are allowed to receive responses from the Galasa API server.
@@ -201,8 +200,7 @@ apiServer:
   allowedOrigins:
     - "*"
 #
-#
-# Values to configure all ingresses
+# Values to configure global settings applied to all ingresses
 # Note: The externalHostname value must be a valid DNS name for ingress to be used.
 #
 ingress:
