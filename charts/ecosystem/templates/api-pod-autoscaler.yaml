@@ -1,0 +1,35 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+{{- if .Values.apiServer.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Release.Name }}-api-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Release.Name }}-api
+  minReplicas: {{ .Values.apiServer.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.apiServer.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.apiServer.autoscaling.targetMemoryPercentageUsed }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.apiServer.autoscaling.targetMemoryPercentageUsed }}
+    {{- end }}
+    {{- if .Values.apiServer.autoscaling.targetCPUPercentageUsed }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.apiServer.autoscaling.targetCPUPercentageUsed }}
+    {{- end }}
+{{- end }}

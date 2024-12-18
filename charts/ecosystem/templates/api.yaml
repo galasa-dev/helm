@@ -163,6 +163,9 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 10
+        {{- with .Values.apiServer.resources }}
+        resources: {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
         - name: bootstrap
           mountPath: /bootstrap.properties
