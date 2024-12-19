@@ -11,7 +11,7 @@ metadata:
   labels:
     app: {{ .Release.Name }}-api
 spec:
-  replicas: 1
+  replicas: {{ .Values.apiServer.replicaCount }}
   strategy:
     type: Recreate
   selector:
@@ -118,7 +118,7 @@ spec:
         - name: GALASA_USERNAME_CLAIMS
           value: {{ join "," .Values.dex.usernameClaims | quote }}
         - name: GALASA_ALLOWED_ORIGINS
-          value: {{ join "," .Values.allowedOrigins | quote }}
+          value: {{ join "," .Values.apiServer.allowedOrigins | quote }}
         - name: GALASA_RAS_TOKEN
           valueFrom:
             secretKeyRef:
@@ -155,6 +155,9 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 10
+        {{- with .Values.apiServer.resources }}
+        resources: {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
         - name: bootstrap
           mountPath: /bootstrap.properties
