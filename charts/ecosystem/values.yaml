@@ -119,7 +119,7 @@ kubectlImage: "bitnami/kubectl:1.28"
 # New users logging into the system get a user record created and that user is assigned a role
 # by default. It should be the name of one of the roles on the system.
 # Suggested values are:
-#   "deactivated" - After initial logon, an administrator will need to set their most apropriate role 
+#   "deactivated" - After initial logon, an administrator will need to set their most appropriate role 
 #                   before this new user can access any function within the Galasa service.
 #   "tester"      - After initial logon, the user is classified as a tester, so can launch tests and 
 #                   see test results, but cannot administer the system.
