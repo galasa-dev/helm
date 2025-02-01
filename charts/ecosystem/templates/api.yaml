@@ -111,6 +111,8 @@ spec:
           value: etcd:http://{{ .Release.Name }}-etcd:2379
         - name: GALASA_DEFAULT_USER_ROLE
           value: {{ .Values.galasaDefaultUserRole }}
+        - name: GALASA_OWNER_LOGIN_IDS
+          value: {{ .Values.galasaOwnersLoginIds }}
         - name: GALASA_DEX_ISSUER
           value: {{ .Values.dex.config.issuer }}
         - name: GALASA_DEX_GRPC_HOSTNAME
