@@ -129,6 +129,23 @@ kubectlImage: "bitnami/kubectl:1.28"
 galasaDefaultUserRole: "tester"
 #
 #
+# The list of login ids of the Galasa service owner(s), comma-separated.
+# If a user login id appears in this list, the user will appear to have the 'owner' role, rather than 
+# their normal role.
+#
+# Roles of owner user records cannot be changed. Without changing the configuration at the Kubernetes level.
+# 
+# The users nominated here will always have a role of 'owner'.
+#
+# If the Galasa service owners leave the organisation, or are otherwise unable to administer the system any longer,
+# someone with access to kubernetes can change this value and the user specified will then appear to have the role
+# of owner.
+#
+# Multiple owners can be specified. eg: "user1, user2". All users mentioned will have the 'owner' role until they are 
+# removed from the list.
+galasaOwnersLoginIds: ""
+#
+#
 # Values related to the encryption of Galasa secrets
 #
 encryption:
