@@ -3,7 +3,6 @@
 Galasa provides Helm charts to install various components, the main one being a Galasa Ecosystem.
 
 ## Prerequisites
-**Note: The Galasa Ecosystem chart only supports x86-64 at the moment. It cannot be installed on ARM64-based systems.**
 
 [Helm](https://helm.sh) must be installed to use the charts.  Please refer to
 Helm's [documentation](https://helm.sh/docs) to get started.
@@ -345,26 +344,90 @@ To verify that your secrets can still be read correctly, you can run `galasactl 
 To install the latest development version of the Galasa Ecosystem chart, clone this repository and update the following values in your [values.yaml](charts/ecosystem/values.yaml) file:
 
 1. Set the `galasaVersion` value to `main`
-2. Set the `galasaRegistry` value to `harbor.galasa.dev/galasadev`
-3. Set the `externalHostname` value to the hostname that will be used to access Galasa services.
-   * When deploying to minikube on Linux/macOS, add an entry to your `/etc/hosts` file like the one shown below, ensuring the IP address matches the output of `minikube ip` or `127.0.0.1` if you are using macOS with an M1 CPU:
+2. Set the `galasaRegistry` value to `ghcr.io/galasa-dev`
+3. Set the `galasaBootImage` value to `galasa-boot-embedded`
+4. Set the `galasaWebUiImage` value to `webui`
+5. Optional: Set the `architecture` to your development machine's CPU architecture (`amd64` or `arm64`)
+    * On Linux/macOS, you can find this by running:
+      ```
+      uname -m
+      ```
+6. Set the `externalHostname` value to the hostname that will be used to access Galasa services.
+    * If you are deploying to minikube, see the [minikube](#deploying-to-minikube) instructions below to set this value
+
+#### Deploying to Minikube
+
+The following instructions apply only when installing the Helm chart to a minikube cluster. Only follow the instructions that apply to your operating system.
+
+##### Linux
+1. Ensure the NGINX Ingress controller is enabled by running:
+    
+    ```console
+    minikube addons enable ingress
+    ```
+
+2. Add an entry to your `/etc/hosts` file like the one shown below, ensuring the IP address matches the output of `minikube ip`:
       ```console
+      # Replace 192.168.49.2 with the output of minikube ip
       192.168.49.2 example.com
       ```
-4. If you are deploying to minikube on macOS, run `minikube tunnel` and keep the terminal running this command open in order to access the deployed ingresses
 
-Follow the installation instructions [above](#configuring-ingress) to update the rest of your values.yaml file, including values to configure Ingress and Dex.
+3. Follow the installation instructions [above](#configuring-ingress) to update the rest of your values.yaml file, including values to configure Ingress and Dex.
 
-If you are deploying to minikube, ensure the NGINX Ingress controller is enabled by running:
+4. Once you have updated your values.yaml file, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
 
-```console
-minikube addons enable ingress
-```
+    ```console
+    helm install <release-name> /path/to/helm/charts/ecosystem
+    ```
 
-Once you have updated your values.yaml file, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
+5. Once the `helm install` command ends with a successful deployment message, follow the installation instructions [above](#verifying-your-galasa-ecosystem-installation) to test the deployed ecosystem using `helm test` and determine the bootstrap URL.
 
-```console
-helm install <release-name> /path/to/helm/charts/ecosystem --wait
-```
+##### macOS
+1. Ensure the NGINX Ingress controller is enabled by running:
+    
+    ```console
+    minikube addons enable ingress
+    ```
 
-Once the `helm install` command ends with a successful deployment message, you can follow the installation instructions [above](#verifying-your-galasa-ecosystem-installation) to test the deployed ecosystem using `helm test` and determine the bootstrap URL.
+2. Add an entry to your `/etc/hosts` file as shown below:
+      ```
+      127.0.0.1 example.com
+      ```
+
+3. Add an entry to minikube's CoreDNS ConfigMap so that deployed pods can resolve the external hostname internally:
+
+    1. Open the CoreDNS ConfigMap for editing by running:
+
+        ```
+        kubectl -n kube-system edit configmap coredns
+        ```
+
+    2. Add a new entry under `Corefile` as follows, replacing `example.com` with your `externalHostname` value and `192.168.49.2` with the output of `minikube ip`:
+
+        ```
+        example.com:53 {
+          hosts {
+            192.168.49.2 example.com
+            fallthrough
+          }
+        }
+        ```
+
+    3. Save and exit the editor
+
+    4. Restart minikube's CoreDNS deployment by running:
+        ```
+        kubectl -n kube-system rollout restart deployment coredns
+        ```
+
+4. Follow the installation instructions [above](#configuring-ingress) to update the rest of your values.yaml file, including values to configure Ingress and Dex.
+
+5. Once you have updated your values.yaml file, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
+
+    ```console
+    helm install <release-name> /path/to/helm/charts/ecosystem
+    ```
+
+6. Once the `helm install` command ends with a successful deployment message, run `minikube tunnel` and keep the terminal running this command open in order to access the deployed ingresses
+
+7. Follow the installation instructions [above](#verifying-your-galasa-ecosystem-installation) to test the deployed ecosystem using `helm test` and determine the bootstrap URL.
