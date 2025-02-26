@@ -44,7 +44,6 @@ Download the [values.yaml](charts/ecosystem/values.yaml) file and within it:
 
   1. Set the `galasaVersion` value to a version of galasa you want to run (see [releases](https://galasa.dev/releases) for released versions). You should not use latest to ensure each pod in the Ecosystem is running at the same level.
   2. Set the `externalHostname` value to the hostname that will be used to access Galasa services. 
-     * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
 
 Once you have updated the `galasaVersion` and `externalHostname` values, continue following the instructions below to set up Ingress and Dex for your ecosystem.
 
@@ -348,10 +347,11 @@ To install the latest development version of the Galasa Ecosystem chart, clone t
 1. Set the `galasaVersion` value to `main`
 2. Set the `galasaRegistry` value to `harbor.galasa.dev/galasadev`
 3. Set the `externalHostname` value to the hostname that will be used to access Galasa services.
-   * When deploying to minikube on Linux/macOS, add an entry to your `/etc/hosts` file like the one shown below, ensuring the IP address matches the output of `minikube ip`.
+   * When deploying to minikube on Linux/macOS, add an entry to your `/etc/hosts` file like the one shown below, ensuring the IP address matches the output of `minikube ip` or `127.0.0.1` if you are using macOS with an M1 CPU:
       ```console
       192.168.49.2 example.com
       ```
+4. If you are deploying to minikube on macOS, run `minikube tunnel` and keep the terminal running this command open in order to access the deployed ingresses
 
 Follow the installation instructions [above](#configuring-ingress) to update the rest of your values.yaml file, including values to configure Ingress and Dex.
 
