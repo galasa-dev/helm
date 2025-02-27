@@ -56,14 +56,21 @@ spec:
         - --bootstrap
         - http://{{ .Release.Name }}-api:8080/bootstrap
         env:
+        - name: GALASA_ETCD_USER
+          value: {{ .Values.etcd.user }}
+        - name: GALASA_ETCD_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-etcd-secret
+              key: GALASA_ETCD_PASSWORD
         - name: GALASA_CONFIG_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: {{ .Values.cpsUrl | replace "RELEASE_NAME" .Release.Name }}
         - name: GALASA_DYNAMICSTATUS_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: {{ .Values.dssUrl | replace "RELEASE_NAME" .Release.Name }}
         - name: GALASA_RESULTARCHIVE_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: {{ .Values.credsUrl | replace "RELEASE_NAME" .Release.Name }}
         - name: GALASA_RAS_TOKEN
           valueFrom:
             secretKeyRef:

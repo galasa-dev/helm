@@ -339,3 +339,11 @@ dex:
         validIfNotUsedFor: 8760h # 1 year
 
 eventStreamsSecretName: "event-streams-token"
+
+etcdUser: etcd-user # what should this be?
+
+dssUrl: etcd:http://RELEASE_NAME-etcd:2379 # RELEASE_NAME is replaced with {{ .Release.Name }} when used in templates.
+
+credsUrl: etcd:http://RELEASE_NAME-etcd:2379 # RELEASE_NAME is replaced with {{ .Release.Name }} when used in templates.
+
+cpsUrl: etcd:http://RELEASE_NAME-etcd:2379 # RELEASE_NAME is replaced with {{ .Release.Name }} when used in templates.
