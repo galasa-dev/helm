@@ -504,6 +504,7 @@ To install the latest development version of the Galasa Ecosystem chart:
     - Set the `galasaVersion` value to `main`
     - Set the `galasaRegistry` value to `ghcr.io/galasa-dev`
     - Set the `galasaBootImage` value to `galasa-boot-embedded`
+    - Set the `pullPolicy` value to `Always`
     - Set the `galasaWebUiImage` value to `webui`
     - Optional: Set the `architecture` to your development machine's CPU architecture (`amd64` or `arm64`)
         * On Linux/macOS, you can find this by running:
