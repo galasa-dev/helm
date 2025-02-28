@@ -18,6 +18,7 @@ Helm's [documentation](https://helm.sh/docs) to get started.
 - [Verifying your Galasa Ecosystem Installation](#verifying-your-galasa-ecosystem-installation)
   - [Accessing services](#accessing-services)
 - [Upgrading the Galasa Ecosystem](#upgrading-the-galasa-ecosystem)
+- [Uninstalling the Galasa Ecosystem](#uninstalling-the-galasa-ecosystem)
 - [Rotating Encryption Keys](#rotating-encryption-keys)
   - [Prerequisites](#prerequisites-1)
   - [Automated steps](#automated-steps)
@@ -220,6 +221,14 @@ If you want to upgrade the Galasa Ecosystem to use a newer version of Galasa, fo
 ```console
 helm repo update
 helm upgrade <release-name> galasa/ecosystem --reuse-values --set galasaVersion=0.38.0 --wait
+```
+
+### Uninstalling the Galasa Ecosystem
+
+To uninstall the Galasa Ecosystem, run the following command, replacing `<release-name>` with the release name provided when installing the Ecosystem Helm chart in the [Installing your Galasa Ecosystem](#installing-your-galasa-ecosystem) section:
+
+```console
+helm uninstall <release-name>
 ```
 
 ### Rotating Encryption Keys
