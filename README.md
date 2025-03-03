@@ -8,25 +8,25 @@ Galasa provides Helm charts to install various components, the main one being a 
 Helm's [documentation](https://helm.sh/docs) to get started.
 
 ## Contents
-### [Galasa Ecosystem Chart](#galasa-ecosystem-chart-1)
-- [Kubernetes RBAC setup](#kubernetes-rbac-setup)
-- [Installing the Ecosystem chart on a remote Kubernetes cluster](#installing-the-ecosystem-chart-on-a-remote-kubernetes-cluster)
-  - [Configuring Ingress](#configuring-ingress)
-  - [Configuring Dex](#configuring-dex)
-  - [Configuring your Kafka cluster to use the Galasa Kafka extension (Optional)](#configuring-your-kafka-cluster-to-use-the-galasa-kafka-extension-optional)
-  - [Installing your Galasa Ecosystem](#installing-your-galasa-ecosystem)
-- [Verifying your Galasa Ecosystem Installation](#verifying-your-galasa-ecosystem-installation)
-  - [Accessing services](#accessing-services)
-- [Upgrading the Galasa Ecosystem](#upgrading-the-galasa-ecosystem)
-- [Uninstalling the Galasa Ecosystem](#uninstalling-the-galasa-ecosystem)
-- [Rotating Encryption Keys](#rotating-encryption-keys)
-  - [Prerequisites](#prerequisites-1)
-  - [Automated steps](#automated-steps)
-  - [Manual steps](#manual-steps)
-- [Installing the Ecosystem chart on Minikube](#installing-the-ecosystem-chart-on-minikube)
-    - [Linux](#linux)
-    - [macOS](#macos)
-- [Development](#development)
+- [Galasa Ecosystem Chart](#galasa-ecosystem-chart)
+  - [Kubernetes RBAC setup](#kubernetes-rbac-setup)
+  - [Installing the Ecosystem chart on a remote Kubernetes cluster](#installing-the-ecosystem-chart-on-a-remote-kubernetes-cluster)
+    - [Configuring Ingress](#configuring-ingress)
+    - [Configuring Dex](#configuring-dex)
+    - [Configuring your Kafka cluster to use the Galasa Kafka extension (Optional)](#configuring-your-kafka-cluster-to-use-the-galasa-kafka-extension-optional)
+    - [Installing your Galasa Ecosystem](#installing-your-galasa-ecosystem)
+  - [Verifying your Galasa Ecosystem Installation](#verifying-your-galasa-ecosystem-installation)
+    - [Accessing services](#accessing-services)
+  - [Upgrading the Galasa Ecosystem](#upgrading-the-galasa-ecosystem)
+  - [Uninstalling the Galasa Ecosystem](#uninstalling-the-galasa-ecosystem)
+  - [Rotating Encryption Keys](#rotating-encryption-keys)
+    - [Prerequisites](#prerequisites-1)
+    - [Automated steps](#automated-steps)
+    - [Manual steps](#manual-steps)
+  - [Installing the Ecosystem chart on Minikube](#installing-the-ecosystem-chart-on-minikube)
+      - [Linux](#linux)
+      - [macOS](#macos)
+  - [Development](#development)
 
 ## Galasa Ecosystem chart
 ### Kubernetes RBAC setup
@@ -206,7 +206,19 @@ helm test <release-name>
 
 where `<release-name>` is the name that you gave the ecosystem during installation.
 
-Once the `helm test` command ends and displays a success message, the Ecosystem has been set up correctly and is ready to be used.
+Once the `helm test` command ends and displays a success message like the one below, the Ecosystem has been set up correctly and is ready to be used:
+
+```console
+NAME: my-galasa
+LAST DEPLOYED: Mon Mar  3 11:37:34 2025
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE:     my-galasa-validate
+Last Started:   Mon Mar  3 11:44:24 2025
+Last Completed: Mon Mar  3 11:45:45 2025
+Phase:          Succeeded
+```
 
 #### Accessing services
 
@@ -501,9 +513,84 @@ Once minikube is running, follow the instructions below to install the Galasa Ec
     helm install <release-name> /path/to/helm/charts/ecosystem
     ```
 
-6. Once the `helm install` command ends with a successful deployment message, run `minikube tunnel` and keep the terminal running this command open in order to access the deployed ingresses.
+    A successful deployment message similar to the message below should be displayed:
 
-7. Follow the instructions in the [Verifying your Galasa Ecosystem Installation](#verifying-your-galasa-ecosystem-installation) section to test the deployed ecosystem using `helm test` and determine the bootstrap URL.
+    ```console
+    NAME: my-galasa-release
+    LAST DEPLOYED: Mon Mar  3 10:41:33 2025
+    NAMESPACE: default
+    STATUS: deployed
+    REVISION: 1
+    ```
+
+6. Wait for the deployed pods to enter the "Ready" state, which may take a few minutes. The pods can be monitored by running:
+
+    ```console
+    kubectl get pods
+    ```
+
+    This should eventually display output similar to the following when all of the deployed pods are in the "Ready" state:
+
+    ```console
+    NAME                                          READY   STATUS    RESTARTS   AGE
+    minikube-api-6d68b579df-g2cbj                 1/1     Running   0          2m
+    minikube-api-6d68b579df-swsq5                 1/1     Running   0          2m
+    minikube-dex-77bcc795b9-4zgfx                 1/1     Running   0          2m
+    minikube-engine-controller-5b69c6d7c9-99jk7   1/1     Running   0          2m
+    minikube-etcd-0                               1/1     Running   0          2m
+    minikube-metrics-6fbb5bc5cb-qhjz4             1/1     Running   0          2m
+    minikube-ras-0                                1/1     Running   0          2m
+    minikube-resource-monitor-c968986b9-mvgcg     1/1     Running   0          2m
+    minikube-webui-7f54c46f9d-cwbs5               1/1     Running   0          2m
+    ```
+
+7. Once the deployed pods are all in the "Ready" state, run `minikube tunnel` and keep the terminal running this command open in order to access the deployed ingresses.
+
+8. Follow the instructions in the [Verifying your Galasa Ecosystem Installation](#verifying-your-galasa-ecosystem-installation) section to test the deployed ecosystem using `helm test` and determine the bootstrap URL. This may take a few minutes. You can monitor the status of the validation pod by running:
+
+    ```console
+    kubectl get pods
+    ```
+
+    The validation pod named `<release-name>-validate-xxx` should appear in the output, where `<release-name>` corresponds to the release name you provided when the Helm chart was installed and `xxx` corresponds to a random ID given to the pod:
+
+    ```console
+    NAME                                          READY   STATUS    RESTARTS   AGE
+    minikube-api-6d68b579df-bvkxl                 1/1     Running   0          7m41s
+    minikube-api-6d68b579df-pw5q7                 1/1     Running   0          7m41s
+    minikube-dex-77bcc795b9-lncj5                 1/1     Running   0          7m41s
+    minikube-engine-controller-5b69c6d7c9-4qnhc   1/1     Running   0          7m41s
+    minikube-etcd-0                               1/1     Running   0          7m41s
+    minikube-k8s-standard-engine-u6               1/1     Running   0          16s
+    minikube-metrics-6fbb5bc5cb-dgfsr             1/1     Running   0          7m41s
+    minikube-ras-0                                1/1     Running   0          7m41s
+    minikube-resource-monitor-c968986b9-xg9cx     1/1     Running   0          7m41s
+    minikube-validate-zwbh9                       1/1     Running   0          51s
+    minikube-webui-7f54c46f9d-v25lw               1/1     Running   0          7m41s
+    ```
+
+    When the validation pod is finished, the following success message should appear in the terminal running the `helm test` command:
+
+    ```console
+    NAME: minikube
+    LAST DEPLOYED: Mon Mar  3 11:37:34 2025
+    NAMESPACE: default
+    STATUS: deployed
+    REVISION: 1
+    TEST SUITE:     minikube-validate
+    Last Started:   Mon Mar  3 11:44:24 2025
+    Last Completed: Mon Mar  3 11:45:45 2025
+    Phase:          Succeeded
+    ```
+
+If the pods fail to enter the "Ready" state and you need to make adjustments to the `values.yaml` file, you can either:
+  - Modify your Helm values and upgrade your existing installation by running the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`):
+
+      ```console
+      helm upgrade <release-name> /path/to/helm/charts/ecosystem
+      ```
+
+  - Create a fresh installation of the Helm chart by uninstalling the existing installation using the instructions in the [Uninstalling the Galasa Ecosystem](#uninstalling-the-galasa-ecosystem) section, modifying your `values.yaml`, and re-installing the Helm chart as shown in step 5.
 
 ### Development
 To install the latest development version of the Galasa Ecosystem chart:
