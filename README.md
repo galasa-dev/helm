@@ -401,7 +401,7 @@ Once minikube is running, follow the instructions below to install the Galasa Ec
       192.168.49.2 example.com
       ```
 
-3. Follow the installation instructions [above](#configuring-ingress) to update the rest of your values.yaml file, including values to configure Ingress and Dex.
+3. Follow the instructions in the [Configuring Ingress](#configuring-ingress) and [Configuring Dex](#configuring-dex) sections to update the rest of your values.yaml file.
 
 4. Once you have updated your values.yaml file, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
 
@@ -409,7 +409,38 @@ Once minikube is running, follow the instructions below to install the Galasa Ec
     helm install <release-name> /path/to/helm/charts/ecosystem
     ```
 
-5. Once the `helm install` command ends with a successful deployment message, follow the installation instructions [above](#verifying-your-galasa-ecosystem-installation) to test the deployed ecosystem using `helm test` and determine the bootstrap URL.
+    A successful deployment message similar to the message below should be displayed:
+
+    ```console
+    NAME: my-galasa-release
+    LAST DEPLOYED: Mon Mar  3 10:41:33 2025
+    NAMESPACE: default
+    STATUS: deployed
+    REVISION: 1
+    ```
+
+5. Wait for the deployed pods to enter the "Ready" state, which may take a few minutes. The pods can be monitored by running:
+
+    ```console
+    kubectl get pods
+    ```
+
+    This should eventually display output similar to the following when all of the deployed pods are in the "Ready" state:
+
+    ```console
+    NAME                                          READY   STATUS    RESTARTS   AGE
+    minikube-api-6d68b579df-g2cbj                 1/1     Running   0          2m
+    minikube-api-6d68b579df-swsq5                 1/1     Running   0          2m
+    minikube-dex-77bcc795b9-4zgfx                 1/1     Running   0          2m
+    minikube-engine-controller-5b69c6d7c9-99jk7   1/1     Running   0          2m
+    minikube-etcd-0                               1/1     Running   0          2m
+    minikube-metrics-6fbb5bc5cb-qhjz4             1/1     Running   0          2m
+    minikube-ras-0                                1/1     Running   0          2m
+    minikube-resource-monitor-c968986b9-mvgcg     1/1     Running   0          2m
+    minikube-webui-7f54c46f9d-cwbs5               1/1     Running   0          2m
+    ```
+
+6. Once the deployed pods are all in the "Ready" state, follow the instructions in the [Verifying your Galasa Ecosystem Installation](#verifying-your-galasa-ecosystem-installation) section to test the deployed ecosystem using `helm test` and determine the bootstrap URL.
 
 #### macOS
 1. Ensure the NGINX Ingress controller is enabled by running:
