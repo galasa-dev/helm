@@ -3,20 +3,33 @@
 Galasa provides Helm charts to install various components, the main one being a Galasa Ecosystem.
 
 ## Prerequisites
-**Note: The Galasa Ecosystem chart only supports x86-64 at the moment. It cannot be installed on ARM64-based systems.**
 
 [Helm](https://helm.sh) must be installed to use the charts.  Please refer to
 Helm's [documentation](https://helm.sh/docs) to get started.
 
+## Contents
+- [Galasa Ecosystem Chart](#galasa-ecosystem-chart)
+  - [Kubernetes RBAC setup](#kubernetes-rbac-setup)
+  - [Installing the Ecosystem chart on a remote Kubernetes cluster](#installing-the-ecosystem-chart-on-a-remote-kubernetes-cluster)
+    - [Configuring Ingress](#configuring-ingress)
+    - [Configuring Dex](#configuring-dex)
+    - [Configuring your Kafka cluster to use the Galasa Kafka extension (Optional)](#configuring-your-kafka-cluster-to-use-the-galasa-kafka-extension-optional)
+    - [Installing your Galasa Ecosystem](#installing-your-galasa-ecosystem)
+  - [Verifying your Galasa Ecosystem Installation](#verifying-your-galasa-ecosystem-installation)
+    - [Accessing services](#accessing-services)
+  - [Upgrading the Galasa Ecosystem](#upgrading-the-galasa-ecosystem)
+  - [Uninstalling the Galasa Ecosystem](#uninstalling-the-galasa-ecosystem)
+  - [Rotating Encryption Keys](#rotating-encryption-keys)
+    - [Prerequisites](#prerequisites-1)
+    - [Automated steps](#automated-steps)
+    - [Manual steps](#manual-steps)
+  - [Installing the Ecosystem chart on Minikube](#installing-the-ecosystem-chart-on-minikube)
+      - [Linux](#linux)
+      - [macOS](#macos)
+  - [Development](#development)
+
 ## Galasa Ecosystem chart
-### Minikube
-It is highly discouraged to use minikube for production purposes since it only provides a single Kubernetes node and will not scale well in demanding situations. Only use minikube for development and testing purposes.
-
-If you would like to install the chart into minikube, ensure you have minikube [installed](https://minikube.sigs.k8s.io/docs/start/) and that it is running with `minikube status`. If minikube is not running, start it by running `minikube start`.
-
-Once minikube is running, follow the instructions in the sections below to install the Galasa Ecosystem chart.
-
-### RBAC
+### Kubernetes RBAC setup
 If RBAC is active on your Kubernetes cluster, you will need to get your Kubernetes administrator to replace the [placeholder username](https://github.com/galasa-dev/helm/blob/main/charts/ecosystem/rbac-admin.yaml#L39) in the [rbac-admin.yaml](./charts/ecosystem/rbac-admin.yaml) file with a username corresponding to a user with access to your cluster to assign them the `galasa-admin` role. This role allows assigned users to run the helm install/upgrade/delete commands to interact with the helm chart.
 
 If multiple users require admin privileges, multiple groups, users, or ServiceAccounts can be assigned the `galasa-admin` role by extending the [subjects](https://github.com/galasa-dev/helm/blob/main/charts/ecosystem/rbac-admin.yaml#L36) list (see [Using RBAC Authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac) for more information).
@@ -28,7 +41,7 @@ For chart version 0.23.0 and prior, you will need to apply [rbac.yaml](./charts/
 kubectl apply -f https://raw.githubusercontent.com/galasa-dev/helm/ecosystem-0.23.0/charts/ecosystem/rbac.yaml
 ```
 
-### Installation
+### Installing the Ecosystem chart on a remote Kubernetes cluster
 First, add the galasa repository as follows:
 
 ```console
@@ -44,7 +57,6 @@ Download the [values.yaml](charts/ecosystem/values.yaml) file and within it:
 
   1. Set the `galasaVersion` value to a version of galasa you want to run (see [releases](https://galasa.dev/releases) for released versions). You should not use latest to ensure each pod in the Ecosystem is running at the same level.
   2. Set the `externalHostname` value to the hostname that will be used to access Galasa services. 
-     * If you are deploying to minikube, the cluster's IP address can be retrieved by running `minikube ip`.
 
 Once you have updated the `galasaVersion` and `externalHostname` values, continue following the instructions below to set up Ingress and Dex for your ecosystem.
 
@@ -73,9 +85,15 @@ To configure Dex in your ecosystem, update your values.yaml file according to th
 
 Next, you will need to configure Dex to authenticate via a connector to authenticate with an upstream identity provider like GitHub, Microsoft, or an LDAP server. For a full list of supported connectors, refer to the [Dex documentation](https://dexidp.io/docs/connectors). In this guide, we will configure Dex to authenticate through GitHub:
 
-1. Register an OAuth application in [GitHub](https://github.com/settings/applications/new), ensuring the application's callback URL is set to your Dex `issuer` value followed by `/callback`. For example, if your `issuer` value is `https://prod-ecosystem.galasa.dev/dex`, then your callback URL would be `https://prod-ecosystem.galasa.dev/dex/callback`.
+1. Register an OAuth application in [GitHub](https://github.com/settings/applications/new), ensuring the application's callback URL is set to your Dex `issuer` value followed by `/callback`. For example, if your `issuer` value is `https://example.com/dex`, then your callback URL would be `https://example.com/dex/callback`. The application's homepage URL should be set to your external hostname. See below for an example OAuth app configuration, where `example.com` is being used as the `externalHostname` value:
 
-2. Add a GitHub connector to your Dex configuration, providing the name of your GitHub organisation and any teams that you require users to be part of to be able to use your ecosystem as follows:
+    ![Example GitHub OAuth app settings](./docs/images/example-github-oauth-settings.png)
+
+2. Generate a new client secret for the OAuth application by pressing the "Generate a new client secret" button, then copy both the client ID and the generated client secret:
+
+    ![Example GitHub OAuth app details](./docs/images/example-github-oauth-client-details.png)
+
+4. Add a GitHub connector to your Dex configuration, providing the name of your GitHub organisation and any teams that you require users to be part of to be able to use your ecosystem as follows:
 
     ```yaml
     dex:
@@ -153,7 +171,7 @@ data:
 When the chart is installed, it will check for existence of the Secret, and provide the token as an environment variable to the Pods that will require it to authenticate to your Kafka cluster.
 
 
-### Installing your Galasa Ecosystem
+#### Installing your Galasa Ecosystem
 
 Having configured your [values.yaml](charts/ecosystem/values.yaml) file, use the following command to install the Galasa Ecosystem Helm chart:
 
@@ -188,9 +206,21 @@ helm test <release-name>
 
 where `<release-name>` is the name that you gave the ecosystem during installation.
 
-Once the `helm test` command ends and displays a success message, the Ecosystem has been set up correctly and is ready to be used.
+Once the `helm test` command ends and displays a success message like the one below, the Ecosystem has been set up correctly and is ready to be used:
 
-### Accessing services
+```console
+NAME: my-galasa
+LAST DEPLOYED: Mon Mar  3 11:37:34 2025
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE:     my-galasa-validate
+Last Started:   Mon Mar  3 11:44:24 2025
+Last Completed: Mon Mar  3 11:45:45 2025
+Phase:          Succeeded
+```
+
+#### Accessing services
 
 Using Ingress, the URL of the Ecosystem bootstrap will be your external hostname followed by `/api/bootstrap`.
 
@@ -203,6 +233,14 @@ If you want to upgrade the Galasa Ecosystem to use a newer version of Galasa, fo
 ```console
 helm repo update
 helm upgrade <release-name> galasa/ecosystem --reuse-values --set galasaVersion=0.38.0 --wait
+```
+
+### Uninstalling the Galasa Ecosystem
+
+To uninstall the Galasa Ecosystem, run the following command, replacing `<release-name>` with the release name provided when installing the Ecosystem Helm chart in the [Installing your Galasa Ecosystem](#installing-your-galasa-ecosystem) section:
+
+```console
+helm uninstall <release-name>
 ```
 
 ### Rotating Encryption Keys
@@ -342,29 +380,271 @@ Your Galasa Ecosystem will now use the newly generated encryption key to encrypt
 
 To verify that your secrets can still be read correctly, you can run `galasactl secrets get --format yaml` again and compare the YAML output with the content of YAML file that you applied in step 10. If the output is the same, then the secrets have been re-encrypted successfully.
 
-### Development
-To install the latest development version of the Galasa Ecosystem chart, clone this repository and update the following values in your [values.yaml](charts/ecosystem/values.yaml) file:
+### Installing the Ecosystem chart on Minikube
 
-1. Set the `galasaVersion` value to `main`
-2. Set the `galasaRegistry` value to `harbor.galasa.dev/galasadev`
-3. Set the `externalHostname` value to the hostname that will be used to access Galasa services.
-   * When deploying to minikube on Linux/macOS, add an entry to your `/etc/hosts` file like the one shown below, ensuring the IP address matches the output of `minikube ip`.
+It is highly discouraged to use minikube for production purposes since it only provides a single Kubernetes node and will not scale well in demanding situations. Only use minikube for development and testing purposes.
+
+If you would like to install the chart into minikube, ensure you have minikube [installed](https://minikube.sigs.k8s.io/docs/start/) and that it is running with `minikube status`. If minikube is not running, start it by running `minikube start`.
+
+Once minikube is running, follow the instructions below to install the Galasa Ecosystem chart. Only follow the instructions that apply to your operating system.
+
+#### Linux
+1. Ensure the NGINX Ingress controller is enabled by running:
+    
+    ```console
+    minikube addons enable ingress
+    ```
+
+2. Add an entry to your `/etc/hosts` file like the one shown below, ensuring the IP address matches the output of `minikube ip` and (optionally) replacing `example.com` with any hostname that you would like to access your Galasa service on locally:
       ```console
+      # Replace 192.168.49.2 with the output of minikube ip
       192.168.49.2 example.com
       ```
 
-Follow the installation instructions [above](#configuring-ingress) to update the rest of your values.yaml file, including values to configure Ingress and Dex.
+3. Follow the instructions in the [Configuring Ingress](#configuring-ingress) and [Configuring Dex](#configuring-dex) sections to update the rest of your values.yaml file.
 
-If you are deploying to minikube, ensure the NGINX Ingress controller is enabled by running:
+4. Once you have updated your values.yaml file, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
 
-```console
-minikube addons enable ingress
-```
+    ```console
+    helm install <release-name> /path/to/helm/charts/ecosystem
+    ```
 
-Once you have updated your values.yaml file, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
+    A successful deployment message similar to the message below should be displayed:
 
-```console
-helm install <release-name> /path/to/helm/charts/ecosystem --wait
-```
+    ```console
+    NAME: my-galasa-release
+    LAST DEPLOYED: Mon Mar  3 10:41:33 2025
+    NAMESPACE: default
+    STATUS: deployed
+    REVISION: 1
+    ```
 
-Once the `helm install` command ends with a successful deployment message, you can follow the installation instructions [above](#verifying-your-galasa-ecosystem-installation) to test the deployed ecosystem using `helm test` and determine the bootstrap URL.
+5. Wait for the deployed pods to enter the "Ready" state, which may take a few minutes. The pods can be monitored by running:
+
+    ```console
+    kubectl get pods
+    ```
+
+    This should eventually display output similar to the following when all of the deployed pods are in the "Ready" state:
+
+    ```console
+    NAME                                          READY   STATUS    RESTARTS   AGE
+    minikube-api-6d68b579df-g2cbj                 1/1     Running   0          2m
+    minikube-api-6d68b579df-swsq5                 1/1     Running   0          2m
+    minikube-dex-77bcc795b9-4zgfx                 1/1     Running   0          2m
+    minikube-engine-controller-5b69c6d7c9-99jk7   1/1     Running   0          2m
+    minikube-etcd-0                               1/1     Running   0          2m
+    minikube-metrics-6fbb5bc5cb-qhjz4             1/1     Running   0          2m
+    minikube-ras-0                                1/1     Running   0          2m
+    minikube-resource-monitor-c968986b9-mvgcg     1/1     Running   0          2m
+    minikube-webui-7f54c46f9d-cwbs5               1/1     Running   0          2m
+    ```
+
+6. Once the deployed pods are all in the "Ready" state, follow the instructions in the [Verifying your Galasa Ecosystem Installation](#verifying-your-galasa-ecosystem-installation) section to test the deployed ecosystem using `helm test` and determine the bootstrap URL.
+
+#### macOS
+1. Ensure the NGINX Ingress controller is enabled by running:
+    
+    ```console
+    minikube addons enable ingress
+    ```
+
+2. Add an entry to your `/etc/hosts` file as shown below, (optionally) replacing `example.com` with any hostname that you would like to access your Galasa service on locally:
+
+      ```
+      127.0.0.1 example.com
+      ```
+
+3. Add an entry to minikube's CoreDNS ConfigMap so that deployed pods can resolve the external hostname internally:
+    1. Run `minikube ip` and take a note of the displayed IP address as it will be used in the following steps:
+
+        ```
+        > minikube ip
+        192.168.49.2
+        ```
+
+    1. Open the CoreDNS ConfigMap for editing by running:
+
+        ```
+        kubectl -n kube-system edit configmap coredns
+        ```
+
+    2. Add a new entry under `Corefile` as follows, replacing `192.168.49.2` with the output of `minikube ip` from step 1 and  (optionally) replacing `example.com` with your hostname value:
+
+        ```
+        example.com:53 {
+          hosts {
+            192.168.49.2 example.com
+            fallthrough
+          }
+        }
+        ```
+
+        The ConfigMap should now look like this:
+        
+        ```yaml
+        apiVersion: v1
+        data:
+          Corefile: |
+            .:53 {
+                log
+                errors
+                health {
+                  lameduck 5s
+                }
+                ready
+                kubernetes cluster.local in-addr.arpa ip6.arpa {
+                  pods insecure
+                  fallthrough in-addr.arpa ip6.arpa
+                  ttl 30
+                }
+                prometheus :9153
+                hosts {
+                  192.168.5.2 host.minikube.internal
+                  fallthrough
+                }
+                forward . /etc/resolv.conf {
+                  max_concurrent 1000
+                }
+                cache 30 {
+                  disable success cluster.local
+                  disable denial cluster.local
+                }
+                loop
+                reload
+                loadbalance
+            }
+            example.com:53 {
+                hosts {
+                    192.168.49.2 example.com
+                    fallthrough
+                }
+            }
+        kind: ConfigMap
+        metadata:
+          creationTimestamp: "2025-02-26T13:56:33Z"
+          name: coredns
+          namespace: kube-system
+          resourceVersion: "7613"
+          uid: 04f54d19-68ce-4828-8365-5a35a266a0cd
+        ```
+
+    3. Save and exit the editor
+
+    4. Restart minikube's CoreDNS deployment by running:
+        ```
+        kubectl -n kube-system rollout restart deployment coredns
+        ```
+
+4. Follow the instructions in the [Configuring Ingress](#configuring-ingress) and [Configuring Dex](#configuring-dex) sections to update the rest of your values.yaml file.
+
+5. Once you have updated your values.yaml file, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`).
+
+    ```console
+    helm install <release-name> /path/to/helm/charts/ecosystem
+    ```
+
+    A successful deployment message similar to the message below should be displayed:
+
+    ```console
+    NAME: my-galasa-release
+    LAST DEPLOYED: Mon Mar  3 10:41:33 2025
+    NAMESPACE: default
+    STATUS: deployed
+    REVISION: 1
+    ```
+
+6. Wait for the deployed pods to enter the "Ready" state, which may take a few minutes. The pods can be monitored by running:
+
+    ```console
+    kubectl get pods
+    ```
+
+    This should eventually display output similar to the following when all of the deployed pods are in the "Ready" state:
+
+    ```console
+    NAME                                          READY   STATUS    RESTARTS   AGE
+    minikube-api-6d68b579df-g2cbj                 1/1     Running   0          2m
+    minikube-api-6d68b579df-swsq5                 1/1     Running   0          2m
+    minikube-dex-77bcc795b9-4zgfx                 1/1     Running   0          2m
+    minikube-engine-controller-5b69c6d7c9-99jk7   1/1     Running   0          2m
+    minikube-etcd-0                               1/1     Running   0          2m
+    minikube-metrics-6fbb5bc5cb-qhjz4             1/1     Running   0          2m
+    minikube-ras-0                                1/1     Running   0          2m
+    minikube-resource-monitor-c968986b9-mvgcg     1/1     Running   0          2m
+    minikube-webui-7f54c46f9d-cwbs5               1/1     Running   0          2m
+    ```
+
+7. Once the deployed pods are all in the "Ready" state, run `minikube tunnel` and keep the terminal running this command open in order to access the deployed ingresses.
+
+8. Follow the instructions in the [Verifying your Galasa Ecosystem Installation](#verifying-your-galasa-ecosystem-installation) section to test the deployed ecosystem using `helm test` and determine the bootstrap URL. This may take a few minutes. You can monitor the status of the validation pod by running:
+
+    ```console
+    kubectl get pods
+    ```
+
+    The validation pod named `<release-name>-validate-xxx` should appear in the output, where `<release-name>` corresponds to the release name you provided when the Helm chart was installed and `xxx` corresponds to a random ID given to the pod:
+
+    ```console
+    NAME                                          READY   STATUS    RESTARTS   AGE
+    minikube-api-6d68b579df-bvkxl                 1/1     Running   0          7m41s
+    minikube-api-6d68b579df-pw5q7                 1/1     Running   0          7m41s
+    minikube-dex-77bcc795b9-lncj5                 1/1     Running   0          7m41s
+    minikube-engine-controller-5b69c6d7c9-4qnhc   1/1     Running   0          7m41s
+    minikube-etcd-0                               1/1     Running   0          7m41s
+    minikube-k8s-standard-engine-u6               1/1     Running   0          16s
+    minikube-metrics-6fbb5bc5cb-dgfsr             1/1     Running   0          7m41s
+    minikube-ras-0                                1/1     Running   0          7m41s
+    minikube-resource-monitor-c968986b9-xg9cx     1/1     Running   0          7m41s
+    minikube-validate-zwbh9                       1/1     Running   0          51s
+    minikube-webui-7f54c46f9d-v25lw               1/1     Running   0          7m41s
+    ```
+
+    When the validation pod is finished, the following success message should appear in the terminal running the `helm test` command:
+
+    ```console
+    NAME: minikube
+    LAST DEPLOYED: Mon Mar  3 11:37:34 2025
+    NAMESPACE: default
+    STATUS: deployed
+    REVISION: 1
+    TEST SUITE:     minikube-validate
+    Last Started:   Mon Mar  3 11:44:24 2025
+    Last Completed: Mon Mar  3 11:45:45 2025
+    Phase:          Succeeded
+    ```
+
+If the pods fail to enter the "Ready" state and you need to make adjustments to the `values.yaml` file, you can either:
+  - Modify your Helm values and upgrade your existing installation by running the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`):
+
+      ```console
+      helm upgrade <release-name> /path/to/helm/charts/ecosystem
+      ```
+
+  - Create a fresh installation of the Helm chart by uninstalling the existing installation using the instructions in the [Uninstalling the Galasa Ecosystem](#uninstalling-the-galasa-ecosystem) section, modifying your `values.yaml`, and re-installing the Helm chart as shown in step 5.
+
+### Development
+To install the latest development version of the Galasa Ecosystem chart:
+
+1. Clone this repository
+2. Update the following values in your [values.yaml](charts/ecosystem/values.yaml) file:
+    - Set the `galasaVersion` value to `main`
+    - Set the `galasaRegistry` value to `ghcr.io/galasa-dev`
+    - Set the `galasaBootImage` value to `galasa-boot-embedded`
+    - Set the `pullPolicy` value to `Always`
+    - Set the `galasaWebUiImage` value to `webui`
+    - Optional: Set the `architecture` to your development machine's CPU architecture (`amd64` or `arm64`)
+        * On Linux/macOS, you can find this by running:
+
+          ```
+          uname -m
+          ```
+
+    - Set the `externalHostname` value to the hostname that will  be used to access Galasa services.
+        * If you are deploying to minikube, see the [minikube](#deploying-to-minikube) instructions to set this value
+3. Follow the instructions in the [Configuring Ingress](#configuring-ingress) and [Configuring Dex](#configuring-dex) sections to update the rest of your values.yaml file.
+4. Once you have updated your values.yaml file, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`):
+
+    ```console
+    helm install <release-name> /path/to/helm/charts/ecosystem
+    ```

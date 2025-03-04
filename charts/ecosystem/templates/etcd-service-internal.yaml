@@ -10,13 +10,14 @@ metadata:
   name: {{ .Release.Name }}-etcd
   labels:
     app: {{ .Release.Name }}-etcd
-  annotations:
-    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
+  publishNotReadyAddresses: true
   ports:
-  - port: 2379
-    name: etcd-client
-  - port: 2380
-    name: etcd-peer
+  - name: etcd-client
+    port: 2379
+  - name: etcd-server
+    port: 2380
+  - name: etcd-metrics
+    port: 8080
   selector:
     app: {{ .Release.Name }}-etcd
