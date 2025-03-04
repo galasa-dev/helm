@@ -58,23 +58,28 @@ spec:
               fieldPath: metadata.namespace
         - name: CONFIG
           value: {{ .Release.Name }}-config
-        - name: GALASA_ETCD_USER
-          value: {{ .Values.etcd.user }}
-        - name: GALASA_ETCD_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Release.Name }}-etcd-secret
-              key: GALASA_ETCD_PASSWORD
         - name: GALASA_CONFIG_STORE
-          value: {{ .Values.cpsUrl | replace "RELEASE_NAME" .Release.Name }}
+          value: {{- if contains "RELEASE_NAME" .Values.cpsUrl }}
+            {{ .Values.cpsUrl | replace "RELEASE_NAME" .Release.Name }}
+          {{- else }}
+            {{ .Values.cpsUrl }}
+          {{- end }}
         - name: GALASA_DYNAMICSTATUS_STORE
-          value: {{ .Values.dssUrl | replace "RELEASE_NAME" .Release.Name }}
+          value: {{- if contains "RELEASE_NAME" .Values.dssUrl }}
+            {{ .Values.dssUrl | replace "RELEASE_NAME" .Release.Name }}
+          {{- else }}
+            {{ .Values.dssUrl }}
+          {{- end }}
         - name: GALASA_RESULTARCHIVE_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_AUTH_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
-          value: {{ .Values.credsUrl | replace "RELEASE_NAME" .Release.Name }}
+          value: {{- if contains "RELEASE_NAME" .Values.credsUrl }}
+            {{ .Values.credsUrl | replace "RELEASE_NAME" .Release.Name }}
+          {{- else }}
+            {{ .Values.credsUrl }}
+          {{- end }}
         - name: GALASA_RAS_TOKEN
           valueFrom:
             secretKeyRef:
