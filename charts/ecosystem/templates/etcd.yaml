@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-
+# This StatefulSet definition is based on the example provided in https://etcd.io/docs/v3.5/op-guide/kubernetes/
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -12,7 +12,21 @@ metadata:
     app: {{ .Release.Name }}-etcd
 spec:
   serviceName: {{ .Release.Name }}-etcd
+  ##
+  ## If you are increasing the replica count of an existing cluster, you should
+  ## also update the --initial-cluster-state flag as noted further down in the
+  ## container configuration.
   replicas: 1
+  ##
+  ## For initialization, the etcd pods must be available to eachother before
+  ## they are "ready" for traffic. The "Parallel" policy makes this possible.
+  podManagementPolicy: Parallel
+  ##
+  ## To ensure availability of the etcd cluster, the rolling update strategy
+  ## is used. For availability, there must be at least 51% of the etcd nodes
+  ## online at any given time.
+  updateStrategy:
+    type: RollingUpdate
   selector:
     matchLabels:
       app: {{ .Release.Name }}-etcd
@@ -21,6 +35,8 @@ spec:
       name: {{ .Release.Name }}-etcd
       labels:
         app: {{ .Release.Name }}-etcd
+      annotations:
+        serviceName: {{ .Release.Name }}-etcd
     spec:
       nodeSelector:
         kubernetes.io/arch: {{ .Values.architecture }}
@@ -32,155 +48,71 @@ spec:
         image: {{ .Values.etcdImage }}
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 2379
-          name: client
-        - containerPort: 2380
-          name: peer
+        - name: etcd-client
+          containerPort: 2379
+        - name: etcd-server
+          containerPort: 2380
+        - name: etcd-metrics
+          containerPort: 8080
         env:
-        - name: INITIAL_CLUSTER_SIZE
-          value: "1"
-        - name: SET_NAME
-          value: {{ .Release.Name }}-etcd
+        - name: K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+             fieldPath: metadata.namespace
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+             fieldPath: metadata.name
+        - name: SERVICE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['serviceName']
+        - name: ETCDCTL_ENDPOINTS
+          value: $(HOSTNAME).$(SERVICE_NAME):2379
+        - name: URI_SCHEME
+          value: "http"
+        command:
+        - /usr/local/bin/etcd
+        args:
+        ##
+        ## Configure the name of the etcd server.
+        - --name=$(HOSTNAME)
+        ##
+        ## Configure etcd to use the persistent storage configured below.
+        - --data-dir=/var/run/etcd/default.etcd
+        ##
+        - --listen-peer-urls=$(URI_SCHEME)://0.0.0.0:2380
+        - --listen-client-urls=$(URI_SCHEME)://0.0.0.0:2379
+        - --advertise-client-urls=$(URI_SCHEME)://$(HOSTNAME).$(SERVICE_NAME):2379
+        ##
+        ## This must be set to "new" for initial cluster bootstrapping. To scale
+        ## the cluster up, this should be changed to "existing" when the replica
+        ## count is increased. If set incorrectly, etcd makes an attempt to
+        ## start but fail safely.
+        - --initial-cluster-state=new
+        ##
+        ## Token used for cluster initialization. The recommendation for this is
+        ## to use a unique token for every cluster. This is parameterized
+        ## to be unique to the namespace, but if you are deploying multiple etcd
+        ## clusters in the same namespace, you should do something extra to
+        ## ensure uniqueness amongst clusters.
+        - --initial-cluster-token=etcd-$(K8S_NAMESPACE)
+        ##
+        ## The initial cluster flag needs to be updated to match the number of
+        ## replicas configured. When combined, these are a little hard to read.
+        ## Here is what a single parameterized peer looks like:
+        ##   etcd-0=$(URI_SCHEME)://etcd-0.$(SERVICE_NAME):2380
+        - --initial-cluster=$(HOSTNAME)=$(URI_SCHEME)://$(HOSTNAME).$(SERVICE_NAME):2380
+        ##
+        - --initial-advertise-peer-urls=$(URI_SCHEME)://$(HOSTNAME).$(SERVICE_NAME):2380
+        - --listen-metrics-urls=http://0.0.0.0:8080
+        ##
+        ## Turn on automatic compaction to periodically clean up property revisions
+        - --auto-compaction-mode=periodic
+        - --auto-compaction-retention={{ .Values.etcdHistoryRetention }}
         volumeMounts:
         - name: data
           mountPath: /var/run/etcd
-        lifecycle:
-          preStop:
-            exec:
-              command:
-                - "/bin/sh"
-                - "-ec"
-                - |
-                  EPS=""
-                  for i in $(seq 0 $((${INITIAL_CLUSTER_SIZE} - 1))); do
-                      EPS="${EPS}${EPS:+,}http://${SET_NAME}-${i}.${SET_NAME}:2379"
-                  done
-
-                  HOSTNAME=$(hostname)
-
-                  member_hash() {
-                      etcdctl member list | grep http://${HOSTNAME}.${SET_NAME}:2380 | cut -d':' -f1 | cut -d'[' -f1
-                  }
-
-                  SET_ID=${HOSTNAME##*[^0-9]}
-
-                  if [ "${SET_ID}" -ge ${INITIAL_CLUSTER_SIZE} ]; then
-                      echo "Removing ${HOSTNAME} from etcd cluster"
-                      ETCDCTL_ENDPOINT=${EPS} etcdctl member remove $(member_hash)
-                      if [ $? -eq 0 ]; then
-                          # Remove everything otherwise the cluster will no longer scale-up
-                          rm -rf /var/run/etcd/*
-                      fi
-                  fi
-        command:
-          - "/bin/sh"
-          - "-ec"
-          - |
-            HOSTNAME=$(hostname)
-
-            # store member id into PVC for later member replacement
-            collect_member() {
-                while ! etcdctl member list &>/dev/null; do sleep 1; done
-                etcdctl member list | grep http://${HOSTNAME}.${SET_NAME}:2380 | cut -d':' -f1 | cut -d'[' -f1 > /var/run/etcd/member_id
-                exit 0
-            }
-
-            eps() {
-                EPS=""
-                for i in $(seq 0 $((${INITIAL_CLUSTER_SIZE} - 1))); do
-                    EPS="${EPS}${EPS:+,}http://${SET_NAME}-${i}.${SET_NAME}:2379"
-                done
-                echo ${EPS}
-            }
-
-            member_hash() {
-                etcdctl member list | grep http://${HOSTNAME}.${SET_NAME}:2380 | cut -d':' -f1 | cut -d'[' -f1
-            }
-
-            # we should wait for other pods to be up before trying to join
-            # otherwise we got "no such host" errors when trying to resolve other members
-            for i in $(seq 0 $((${INITIAL_CLUSTER_SIZE} - 1))); do
-                while true; do
-                    echo "Waiting for ${SET_NAME}-${i}.${SET_NAME} to come up"
-                    ping -W 1 -c 1 ${SET_NAME}-${i}.${SET_NAME} > /dev/null && break
-                    sleep 1s
-                done
-            done
-
-            # re-joining after failure?
-            if [ -e /var/run/etcd/default.etcd ]; then
-                echo "Re-joining etcd member"
-                member_id=$(cat /var/run/etcd/member_id)
-
-                # re-join member
-                ETCDCTL_ENDPOINT=$(eps) etcdctl member update ${member_id} http://${HOSTNAME}.${SET_NAME}:2380 | true
-                exec etcd --name ${HOSTNAME} \
-                    --listen-peer-urls http://0.0.0.0:2380 \
-                    --listen-client-urls http://0.0.0.0:2379\
-                    --advertise-client-urls http://${HOSTNAME}.${SET_NAME}:2379 \
-                    --data-dir /var/run/etcd/default.etcd
-            fi
-
-            # etcd-SET_ID
-            SET_ID=${HOSTNAME##*[^0-9]}
-
-            # adding a new member to existing cluster (assuming all initial pods are available)
-            if [ "${SET_ID}" -ge ${INITIAL_CLUSTER_SIZE} ]; then
-                export ETCDCTL_ENDPOINT=$(eps)
-
-                # member already added?
-                MEMBER_HASH=$(member_hash)
-                if [ -n "${MEMBER_HASH}" ]; then
-                    # the member hash exists but for some reason etcd failed
-                    # as the datadir has not be created, we can remove the member
-                    # and retrieve new hash
-                    etcdctl member remove ${MEMBER_HASH}
-                fi
-
-                echo "Adding new member"
-                etcdctl member add ${HOSTNAME} http://${HOSTNAME}.${SET_NAME}:2380 | grep "^ETCD_" > /var/run/etcd/new_member_envs
-
-                if [ $? -ne 0 ]; then
-                    echo "Exiting"
-                    rm -f /var/run/etcd/new_member_envs
-                    exit 1
-                fi
-
-                cat /var/run/etcd/new_member_envs
-                source /var/run/etcd/new_member_envs
-
-                collect_member &
-
-                exec etcd --name ${HOSTNAME} \
-                    --listen-peer-urls http://0.0.0.0:2380 \
-                    --listen-client-urls http://0.0.0.0:2379 \
-                    --advertise-client-urls http://${HOSTNAME}.${SET_NAME}:2379 \
-                    --data-dir /var/run/etcd/default.etcd \
-                    --initial-advertise-peer-urls http://${HOSTNAME}.${SET_NAME}:2380 \
-                    --initial-cluster ${ETCD_INITIAL_CLUSTER} \
-                    --initial-cluster-state ${ETCD_INITIAL_CLUSTER_STATE}
-            fi
-
-            PEERS=""
-            for i in $(seq 0 $((${INITIAL_CLUSTER_SIZE} - 1))); do
-                PEERS="${PEERS}${PEERS:+,}${SET_NAME}-${i}=http://${SET_NAME}-${i}.${SET_NAME}:2380"
-            done
-
-            collect_member &
-
-            # join member
-            exec etcd --name ${HOSTNAME} \
-                --initial-advertise-peer-urls http://${HOSTNAME}.${SET_NAME}:2380 \
-                --listen-peer-urls http://0.0.0.0:2380 \
-                --listen-client-urls http://0.0.0.0:2379 \
-                --advertise-client-urls http://${HOSTNAME}.${SET_NAME}:2379 \
-                --initial-cluster-token etcd-cluster-1 \
-                --initial-cluster ${PEERS} \
-                --initial-cluster-state new \
-                --data-dir /var/run/etcd/default.etcd
-            
-            # Turn on automatic compaction
-            exec etcd --auto-compaction-retention={{ .Values.etcdHistoryRetention }}
   volumeClaimTemplates:
   - metadata:
       name: data
