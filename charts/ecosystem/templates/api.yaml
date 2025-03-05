@@ -100,15 +100,27 @@ spec:
         - file:/bootstrap.properties
         env:
         - name: GALASA_CONFIG_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: {{- if contains "RELEASE_NAME" .Values.cpsUrl }}
+            {{ .Values.cpsUrl | replace "RELEASE_NAME" .Release.Name }}
+          {{- else }}
+            {{ .Values.cpsUrl }}
+          {{- end }}
         - name: GALASA_DYNAMICSTATUS_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: {{- if contains "RELEASE_NAME" .Values.dssUrl }}
+            {{ .Values.dssUrl | replace "RELEASE_NAME" .Release.Name }}
+          {{- else }}
+            {{ .Values.dssUrl }}
+          {{- end }}
         - name: GALASA_RESULTARCHIVE_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_AUTH_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: {{- if contains "RELEASE_NAME" .Values.credsUrl }}
+            {{ .Values.credsUrl | replace "RELEASE_NAME" .Release.Name }}
+          {{- else }}
+            {{ .Values.credsUrl }}
+          {{- end }}
         - name: GALASA_DEFAULT_USER_ROLE
           value: {{ .Values.galasaDefaultUserRole }}
         - name: GALASA_OWNER_LOGIN_IDS
