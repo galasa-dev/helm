@@ -38,3 +38,24 @@
 {{- define "ecosystem.encryption.keys.secret.name" -}}
   {{- empty .Values.encryption.keysSecretName | ternary (printf "%s-encryption-secret" .Release.Name) (.Values.encryption.keysSecretName) }}
 {{- end -}}
+
+{{/*
+  Returns the ETCD URL for the Configuration Property Store
+*/}}
+{{- define "cps.url" -}}
+  {{- contains "RELEASE_NAME" .Values.cpsUrl | ternary (.Values.cpsUrl | replace "RELEASE_NAME" .Release.Name) (.Values.cpsUrl) }}
+{{- end -}}
+
+{{/*
+  Returns the ETCD URL for the Dynamic Status Store
+*/}}
+{{- define "dss.url" -}}
+  {{- contains "RELEASE_NAME" .Values.dssUrl | ternary (.Values.dssUrl | replace "RELEASE_NAME" .Release.Name) (.Values.dssUrl) }}
+{{- end -}}
+
+{{/*
+  Returns the ETCD URL for the Credentials Store
+*/}}
+{{- define "creds.url" -}}
+  {{- contains "RELEASE_NAME" .Values.credsUrl | ternary (.Values.credsUrl | replace "RELEASE_NAME" .Release.Name) (.Values.credsUrl) }}
+{{- end -}}

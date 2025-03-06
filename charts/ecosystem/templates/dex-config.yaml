@@ -31,7 +31,7 @@ stringData:
       type: etcd
       config:
         endpoints:
-          -{{- if contains "RELEASE_NAME" .Values.cpsUrl }} {{ .Values.cpsUrl | replace "RELEASE_NAME" .Release.Name }}{{- else }} {{ .Values.cpsUrl }}{{- end }}
+          - {{ include "cps.url" . }}
         namespace: dex.
     {{- end }}
 {{- end }}

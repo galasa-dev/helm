@@ -60,25 +60,13 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: GALASA_CONFIG_STORE
-          value: {{- if contains "RELEASE_NAME" .Values.cpsUrl }}
-            etcd:{{ .Values.cpsUrl | replace "RELEASE_NAME" .Release.Name }}
-          {{- else }}
-            etcd:{{ .Values.cpsUrl }}
-          {{- end }}
+          value: etcd:{{ include "cps.url" . }}
         - name: GALASA_DYNAMICSTATUS_STORE
-          value: {{- if contains "RELEASE_NAME" .Values.dssUrl }}
-            etcd:{{ .Values.dssUrl | replace "RELEASE_NAME" .Release.Name }}
-          {{- else }}
-            etcd:{{ .Values.dssUrl }}
-          {{- end }}
+          value: etcd:{{ include "dss.url" . }}
         - name: GALASA_RESULTARCHIVE_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
-          value: {{- if contains "RELEASE_NAME" .Values.credsUrl }}
-            etcd:{{ .Values.credsUrl | replace "RELEASE_NAME" .Release.Name }}
-          {{- else }}
-            etcd:{{ .Values.credsUrl }}
-          {{- end }}
+          value: etcd:{{ include "creds.url" . }}
         - name: GALASA_RAS_TOKEN
           valueFrom:
             secretKeyRef:
