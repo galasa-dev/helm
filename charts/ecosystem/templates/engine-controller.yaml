@@ -60,15 +60,15 @@ spec:
           value: {{ .Release.Name }}-config
         - name: GALASA_CONFIG_STORE
           value: {{- if contains "RELEASE_NAME" .Values.cpsUrl }}
-            {{ .Values.cpsUrl | replace "RELEASE_NAME" .Release.Name }}
+            etcd:{{ .Values.cpsUrl | replace "RELEASE_NAME" .Release.Name }}
           {{- else }}
-            {{ .Values.cpsUrl }}
+            etcd:{{ .Values.cpsUrl }}
           {{- end }}
         - name: GALASA_DYNAMICSTATUS_STORE
           value: {{- if contains "RELEASE_NAME" .Values.dssUrl }}
-            {{ .Values.dssUrl | replace "RELEASE_NAME" .Release.Name }}
+            etcd:{{ .Values.dssUrl | replace "RELEASE_NAME" .Release.Name }}
           {{- else }}
-            {{ .Values.dssUrl }}
+            etcd:{{ .Values.dssUrl }}
           {{- end }}
         - name: GALASA_RESULTARCHIVE_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
@@ -76,9 +76,9 @@ spec:
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
           value: {{- if contains "RELEASE_NAME" .Values.credsUrl }}
-            {{ .Values.credsUrl | replace "RELEASE_NAME" .Release.Name }}
+            etcd:{{ .Values.credsUrl | replace "RELEASE_NAME" .Release.Name }}
           {{- else }}
-            {{ .Values.credsUrl }}
+            etcd:{{ .Values.credsUrl }}
           {{- end }}
         - name: GALASA_RAS_TOKEN
           valueFrom:

@@ -10,6 +10,6 @@ metadata:
   name: {{ .Release.Name }}-bootstrap-file
 data:
   bootstrap.properties: |
-    framework.config.store=etcd:http://{{ .Release.Name }}-etcd:2379
+    framework.config.store={{- if contains "RELEASE_NAME" .Values.cpsUrl }}etcd:{{ .Values.cpsUrl | replace "RELEASE_NAME" .Release.Name }}{{- else }}etcd:{{ .Values.cpsUrl }}{{- end }}
     framework.extra.bundles=dev.galasa.cps.etcd,dev.galasa.ras.couchdb,dev.galasa.events.kafka
     api.extra.bundles=dev.galasa.auth.couchdb
