@@ -337,5 +337,26 @@ dex:
       refreshTokens:
         reuseInterval: 8760h # 1 year
         validIfNotUsedFor: 8760h # 1 year
-
+#
+# The name of the Kubernetes Secret that Galasa will look for in your Galasa service's
+# namespace to authenticate to a configured Kafka cluster, if you optionally wish to
+# publish events from Galasa to a Kafka cluster. When this chart is installed, it
+# will check for the existence of the Secret, and if it exists, will provide the
+# token as an environment variable to Pods that need to authenticate to a Kafka cluster.
+# If the Secret doesn't exist, one will be generated.
+#
 eventStreamsSecretName: "event-streams-token"
+#
+# The values below allow the location of the ETCD stores, DSS, CREDS, and CPS,
+# to be configurable. There is a separate URL for each store as you may want to
+# use the default store location for CPS and CREDS, but not for DSS, for example.
+#
+# If using the defaults below, RELEASE_NAME is replaced with {{ .Release.Name }}
+# when used in templates. If you override these default values with your own store
+# location, you do not have to include the release name in your store's URL.
+# 
+# The "etcd:" prefix is appended in the templates so it should not be included here.
+#
+dssUrl: http://RELEASE_NAME-etcd:2379
+credsUrl: http://RELEASE_NAME-etcd:2379
+cpsUrl: http://RELEASE_NAME-etcd:2379

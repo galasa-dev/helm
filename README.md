@@ -4,8 +4,7 @@ Galasa provides Helm charts to install various components, the main one being a 
 
 ## Prerequisites
 
-[Helm](https://helm.sh) must be installed to use the charts.  Please refer to
-Helm's [documentation](https://helm.sh/docs) to get started.
+[Helm](https://helm.sh) must be installed to use the charts.  Please refer to Helm's [documentation](https://helm.sh/docs) to get started.
 
 ## Contents
 - [Galasa Ecosystem Chart](#galasa-ecosystem-chart)
@@ -89,11 +88,11 @@ Next, you will need to configure Dex to authenticate via a connector to authenti
 
     ![Example GitHub OAuth app settings](./docs/images/example-github-oauth-settings.png)
 
-2. Generate a new client secret for the OAuth application by pressing the "Generate a new client secret" button, then copy both the client ID and the generated client secret:
+2. Generate a new client secret for the OAuth application by pressing the "Generate a new client secret" button, then copy both the client ID and the generated client secret, as you will need them in the next step:
 
     ![Example GitHub OAuth app details](./docs/images/example-github-oauth-client-details.png)
 
-4. Add a GitHub connector to your Dex configuration, providing the name of your GitHub organisation and any teams that you require users to be part of to be able to use your ecosystem as follows:
+4. Add a GitHub connector to your Dex configuration using the example below:
 
     ```yaml
     dex:
@@ -108,14 +107,18 @@ Next, you will need to configure Dex to authenticate via a connector to authenti
             clientID: $GITHUB_CLIENT_ID
             clientSecret: $GITHUB_CLIENT_SECRET
             redirectURI: <your-dex-issuer-url>/callback
+            # Only add the section below if users need to be part of a certain GitHub organisation and team to use your ecosystem...
             orgs:
             - name: my-org
               teams:
               - my-team
     ```
-    where `$GITHUB_CLIENT_ID` and `$GITHUB_CLIENT_SECRET` correspond to the registered OAuth application's client ID and secret. Also ensure that the `redirectURI` value is the same value that you provided when setting up your GitHub OAuth application in step 1.
 
-    If you would like to pull the client ID and secret values of your OAuth application from a Kubernetes Secret, create a Secret by running the following `kubectl` command, ensuring the Secret's keys match those given in the GitHub connector's `clientID` and `clientSecret` values without the leading `$` (i.e. `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in the following example):
+    i. `$GITHUB_CLIENT_ID` and `$GITHUB_CLIENT_SECRET` correspond to the registered OAuth application's client ID and secret. Also ensure that the `redirectURI` value is the same value that you provided when setting up your GitHub OAuth application in step 1.
+
+    ii. Optionally, you can provide the name of your GitHub organisation and any teams that you require users to be part of to be able to use your ecosystem, which is unlikely if using Minikube for development/test purposes.
+    
+    iii. If you would like to pull the client ID and secret values of your OAuth application from a Kubernetes Secret, create a Secret by running the following `kubectl` command, ensuring the Secret's keys match those given in the GitHub connector's `clientID` and `clientSecret` values without the leading `$` (i.e. `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in the following example):
 
     ```bash
     kubectl create secret generic my-github-oauth-app-credentials \

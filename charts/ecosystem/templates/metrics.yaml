@@ -57,13 +57,13 @@ spec:
         - http://{{ .Release.Name }}-api:8080/bootstrap
         env:
         - name: GALASA_CONFIG_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: etcd:{{ include "cps.url" . }}
         - name: GALASA_DYNAMICSTATUS_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: etcd:{{ include "dss.url" . }}
         - name: GALASA_RESULTARCHIVE_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: etcd:{{ include "creds.url" . }}
         - name: GALASA_RAS_TOKEN
           valueFrom:
             secretKeyRef:
