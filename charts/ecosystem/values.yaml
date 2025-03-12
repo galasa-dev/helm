@@ -77,7 +77,9 @@ k8sNodeTolerations: ""
 #
 #
 # The pull policy to be used for the Galasa images, only useful for Galasa development purposes
-#
+# Values: 
+# "Always" - used by Galasa development
+# "IfNotPresent" - normal running user.
 pullPolicy: "IfNotPresent"
 #
 #
@@ -182,8 +184,16 @@ apiServer:
   #   limits:
   #     cpu: "3"
   #     memory: "1024Mi"
-  #
-  resources: {}
+  # 
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "500Mi"
+    limits:
+      cpu: "900m"
+      memory: "800Mi"
+
   #
   #
   # Values to configure autoscaling for the API server. Important: Resource requests must be defined via the `resources` value in order
@@ -281,6 +291,8 @@ dex:
   #       name: my-env-configmap
   envFrom: []
 
+
+
   # An ordered list of JSON Web Token (JWT) claims to use when Galasa sets the requestor of a test.
   # The first JWT claim that is matched will be used as the requestor of a test.
   #
@@ -338,4 +350,113 @@ dex:
         reuseInterval: 8760h # 1 year
         validIfNotUsedFor: 8760h # 1 year
 
+  # Best practice is to set memory limits for each pod. 
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "400m"
+      memory: "300Mi"
+    limits:
+      cpu: "600m"
+      memory: "500Mi"
+
 eventStreamsSecretName: "event-streams-token"
+
+# The etcd pod houses the configuration property store, credentials store and the dynamic storage service.
+etcd:
+  # Best practice is to set memory limits for each pod. 
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "400m"
+      memory: "1000Mi"
+    limits:
+      cpu: "600m"
+      memory: "1500Mi"
+
+# The webui pod houses the web user interface.
+webui:
+  # Best practice is to set memory limits for each pod. 
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "400Mi"
+
+# The engine controller receives requests to start tests, and starts pods in which 
+# the tests run.
+enginecontroller: 
+  # Best practice is to set memory limits for each pod. 
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
+
+# The resource monitor is a component which monitors for failed/dead tests
+# and cleans up resources as required.
+resourcemonitor:
+  # Best practice is to set memory limits for each pod. 
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
+
+# The couchdb component stores run history and records, user records and other
+# persistent storage objects.
+couchdb:
+  # Best practice is to set memory limits for each pod. 
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "400m"
+      memory: "300Mi"
+    limits:
+      cpu: "600m"
+      memory: "500Mi"
+
+# The metrics component gathers metrics from other components in the system.
+metrics:
+  # Best practice is to set memory limits for each pod. 
+  # This section sets some limits which Dex should be happy working within.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
+
+# Best practice is to set memory limits for each pod.
+# We constrain all pods to request at least this much memory, and use no more than this maximum memory.
+# The values here must be consistent with all the other memory constraints above.
+namespaceLimits:
+  #
+  # No pod in this namespace can request a higher maximum than this:
+  maxMemory: 1500Mi
+  #
+  # No pod in this namespace can request a lower amount than this:
+  minMemory: 150Mi
+  #
+  # When a pod in this namespace doesn't specify how much memoru it needs, it implicitly gets limited to this much.
+  defaultMemory: 600Mi
+  #
+  # When a pod in this namespace doesn't specify how much memory it needs, it implicitly asks for this much.
+  defaultRequestMemory: 600Mi

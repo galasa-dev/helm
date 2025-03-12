@@ -45,6 +45,11 @@ spec:
       - name: metrics
         image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
+        ## 
+        ## Provide some guidance to kubernetes on how much memory/cpu this container needs.
+        {{- with .Values.metrics.resources }}
+        resources: {{- toYaml . | nindent 10 }}
+        {{- end }}
         command: ["java"]
         args: 
         - -jar

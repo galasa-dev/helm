@@ -31,6 +31,11 @@ spec:
       - name: couchdb
         image: {{ .Values.couchdbImage }}
         imagePullPolicy: IfNotPresent
+        ## 
+        ## Provide some guidance to kubernetes on how much memory/cpu this container needs.
+        {{- with .Values.couchdb.resources }}
+        resources: {{- toYaml . | nindent 10 }}
+        {{- end }}
         env:
         - name: COUCHDB_USER
           valueFrom:

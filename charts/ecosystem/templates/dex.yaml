@@ -41,6 +41,11 @@ spec:
       containers:
       - image: {{ .Values.dexImage }}
         imagePullPolicy: {{ .Values.pullPolicy }}
+        ## 
+        ## Provide some guidance to kubernetes on how much memory/cpu this container needs.
+        {{- with .Values.dex.resources }}
+        resources: {{- toYaml . | nindent 10 }}
+        {{- end }}
         name: dex
         args:
           - dex

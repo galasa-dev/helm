@@ -45,6 +45,11 @@ spec:
       - name: webui
         image: {{ .Values.galasaRegistry }}/{{ .Values.galasaWebUiImage }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
+        ## 
+        ## Provide some guidance to kubernetes on how much memory/cpu this container needs.
+        {{- with .Values.webui.resources }}
+        resources: {{- toYaml . | nindent 10 }}
+        {{- end }}
         env:
         - name: GALASA_API_SERVER_URL
           value: http://{{ .Release.Name }}-api:8080
@@ -75,6 +80,7 @@ spec:
         volumeMounts:
           - name: cacert-store
             mountPath: /etc/ssl/certs/cacerts
+
       volumes:
         - name: cacert-store
           secret:

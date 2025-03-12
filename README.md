@@ -8,25 +8,28 @@ Galasa provides Helm charts to install various components, the main one being a 
 Helm's [documentation](https://helm.sh/docs) to get started.
 
 ## Contents
-- [Galasa Ecosystem Chart](#galasa-ecosystem-chart)
-  - [Kubernetes RBAC setup](#kubernetes-rbac-setup)
-  - [Installing the Ecosystem chart on a remote Kubernetes cluster](#installing-the-ecosystem-chart-on-a-remote-kubernetes-cluster)
-    - [Configuring Ingress](#configuring-ingress)
-    - [Configuring Dex](#configuring-dex)
-    - [Configuring your Kafka cluster to use the Galasa Kafka extension (Optional)](#configuring-your-kafka-cluster-to-use-the-galasa-kafka-extension-optional)
-    - [Installing your Galasa Ecosystem](#installing-your-galasa-ecosystem)
-  - [Verifying your Galasa Ecosystem Installation](#verifying-your-galasa-ecosystem-installation)
-    - [Accessing services](#accessing-services)
-  - [Upgrading the Galasa Ecosystem](#upgrading-the-galasa-ecosystem)
-  - [Uninstalling the Galasa Ecosystem](#uninstalling-the-galasa-ecosystem)
-  - [Rotating Encryption Keys](#rotating-encryption-keys)
-    - [Prerequisites](#prerequisites-1)
-    - [Automated steps](#automated-steps)
-    - [Manual steps](#manual-steps)
-  - [Installing the Ecosystem chart on Minikube](#installing-the-ecosystem-chart-on-minikube)
+- [Introduction](#introduction)
+  - [Prerequisites](#prerequisites)
+  - [Contents](#contents)
+  - [Galasa Ecosystem chart](#galasa-ecosystem-chart)
+    - [Kubernetes RBAC setup](#kubernetes-rbac-setup)
+    - [Installing the Ecosystem chart on a remote Kubernetes cluster](#installing-the-ecosystem-chart-on-a-remote-kubernetes-cluster)
+      - [Configuring Ingress](#configuring-ingress)
+      - [Configuring Dex](#configuring-dex)
+      - [Configuring your Kafka cluster to use the Galasa Kafka extension (Optional)](#configuring-your-kafka-cluster-to-use-the-galasa-kafka-extension-optional)
+      - [Installing your Galasa Ecosystem](#installing-your-galasa-ecosystem)
+    - [Verifying your Galasa Ecosystem Installation](#verifying-your-galasa-ecosystem-installation)
+      - [Accessing services](#accessing-services)
+    - [Upgrading the Galasa Ecosystem](#upgrading-the-galasa-ecosystem)
+    - [Uninstalling the Galasa Ecosystem](#uninstalling-the-galasa-ecosystem)
+    - [Rotating Encryption Keys](#rotating-encryption-keys)
+      - [Prerequisites](#prerequisites-1)
+      - [Automated steps](#automated-steps)
+      - [Manual steps](#manual-steps)
+    - [Installing the Ecosystem chart on Minikube](#installing-the-ecosystem-chart-on-minikube)
       - [Linux](#linux)
       - [macOS](#macos)
-  - [Development](#development)
+    - [Development](#development)
 
 ## Galasa Ecosystem chart
 ### Kubernetes RBAC setup
@@ -646,5 +649,5 @@ To install the latest development version of the Galasa Ecosystem chart:
 4. Once you have updated your values.yaml file, run the following command, providing the path to the [`ecosystem`](./charts/ecosystem) directory in this repository (e.g. `~/helm/charts/ecosystem`):
 
     ```console
-    helm install <release-name> /path/to/helm/charts/ecosystem
+    helm install [-f {path-to-my-values-file}] <release-name> /path/to/helm/charts/ecosystem
     ```

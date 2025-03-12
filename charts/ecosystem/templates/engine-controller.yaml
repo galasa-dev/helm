@@ -44,6 +44,11 @@ spec:
       containers:
       - name: engine-controller
         image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
+        ## 
+        ## Provide some guidance to kubernetes on how much memory/cpu this container needs.
+        {{- with .Values.enginecontroller.resources }}
+        resources: {{- toYaml . | nindent 10 }}
+        {{- end }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command:
           - /bin/bash

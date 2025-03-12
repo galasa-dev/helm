@@ -47,6 +47,11 @@ spec:
       - name: etcd
         image: {{ .Values.etcdImage }}
         imagePullPolicy: IfNotPresent
+        ## 
+        ## Provide some guidance to kubernetes on how much memory/cpu this container needs.
+        {{- with .Values.etcd.resources }}
+        resources: {{- toYaml . | nindent 10 }}
+        {{- end }}
         ports:
         - name: etcd-client
           containerPort: 2379
