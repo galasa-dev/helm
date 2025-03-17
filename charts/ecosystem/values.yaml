@@ -360,3 +360,21 @@ eventStreamsSecretName: "event-streams-token"
 dssUrl: http://RELEASE_NAME-etcd:2379
 credsUrl: http://RELEASE_NAME-etcd:2379
 cpsUrl: http://RELEASE_NAME-etcd:2379
+#
+#
+# cleanupMonitor represents the values required to configure a custom resource cleanup
+# monitor for use by the Galasa service, so that resources provisioned by managers that
+# are not publicly available in the Galasa open source offering can be cleaned up.
+#
+cleanupMonitor:
+  #
+  # The name of the stream in which the custom resource cleanup bundles can be located.
+  stream: ""
+  #
+  # A list of regex patterns to be used in identifying which bundles to load as part of
+  # the custom resource cleanup monitor.
+  includes: []
+  #
+  # A list of regex patterns to be used in identifying which bundles should not be loaded
+  # as part of the custom resource cleanup monitor.
+  excludes: []
