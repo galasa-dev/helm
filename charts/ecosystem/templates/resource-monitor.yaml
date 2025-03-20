@@ -9,6 +9,7 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-resource-monitor
   labels:
+    galasa-monitor: system
     app: {{ .Release.Name }}-resource-monitor
 spec:
   replicas: 1
