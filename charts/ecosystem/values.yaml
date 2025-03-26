@@ -368,13 +368,13 @@ cpsUrl: http://RELEASE_NAME-etcd:2379
 #
 cleanupMonitor:
   #
-  # The name of the stream in which the custom resource cleanup bundles can be located.
+  # The name of the stream in which custom resource cleanup providers can be located.
   stream: ""
   #
-  # A list of regex patterns to be used in identifying which bundles to load as part of
-  # the custom resource cleanup monitor.
+  # A list of regex patterns to be used in identifying which resource cleanup providers
+  # to load as part of the custom resource cleanup monitor.
   includes: []
   #
-  # A list of regex patterns to be used in identifying which bundles should not be loaded
-  # as part of the custom resource cleanup monitor.
+  # A list of regex patterns to be used in identifying which resource cleanup providers
+  # should not be loaded as part of the custom resource cleanup monitor.
   excludes: []
