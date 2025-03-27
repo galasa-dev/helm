@@ -371,10 +371,30 @@ cleanupMonitor:
   # The name of the stream in which custom resource cleanup providers can be located.
   stream: ""
   #
-  # A list of regex patterns to be used in identifying which resource cleanup providers
+  # A list of glob patterns to be used in identifying which resource cleanup providers
   # to load as part of the custom resource cleanup monitor.
+  #
+  # Supported glob patterns include the following special characters: 
+  # '*' (wildcard) Matches zero or more characters
+  # '?' matches exactly one character
+  #
+  # For example, the pattern 'dev.galasa*' will match any monitor that includes 'dev.galasa' as its prefix,
+  # so a class like 'dev.galasa.core.CoreResourceMonitorClass' will be matched.
+  #
+  # A pattern like '*MyResourceMonitorClass' will match any monitor that ends with 'MyResourceMonitorClass',
+  # such as 'my.company.monitors.MyResourceMonitorClass'.
   includes: []
   #
-  # A list of regex patterns to be used in identifying which resource cleanup providers
+  # A list of glob patterns to be used in identifying which resource cleanup providers
   # should not be loaded as part of the custom resource cleanup monitor.
+  #
+  # Supported glob patterns include the following special characters: 
+  # '*' (wildcard) Matches zero or more characters
+  # '?' matches exactly one character
+  #
+  # For example, the pattern '*' will match any monitor, so a class like 'dev.galasa.core.CoreResourceMonitorClass'
+  # will be matched.
+  #
+  # A pattern like '*MyResourceMonitorClass' will match any monitor that ends with 'MyResourceMonitorClass',
+  # such as 'my.company.monitors.MyResourceMonitorClass'.
   excludes: []

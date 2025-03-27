@@ -73,12 +73,12 @@ spec:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
         {{- if .Values.cleanupMonitor.stream }}
-        - name: GALASA_CLEANUP_MONITOR_STREAM
+        - name: GALASA_MONITOR_STREAM
           value: "{{ .Values.cleanupMonitor.stream }}"
         {{- end }}
-        - name: GALASA_MONITOR_INCLUDES_REGEXES
+        - name: GALASA_MONITOR_INCLUDES_GLOB_PATTERNS
           value: "{{ join "," .Values.cleanupMonitor.includes }}"
-        - name: GALASA_MONITOR_EXCLUDES_REGEXES
+        - name: GALASA_MONITOR_EXCLUDES_GLOB_PATTERNS
           value: "{{ join "," .Values.cleanupMonitor.excludes }}"
         ports:
         - containerPort: 9010

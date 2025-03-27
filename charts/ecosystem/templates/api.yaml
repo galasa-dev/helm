@@ -99,6 +99,8 @@ spec:
         - --bootstrap
         - file:/bootstrap.properties
         env:
+        # The Kubernetes namespace that the Galasa service is running within is passed into the API server
+        # so that the API server can query Kubernetes for monitor deployments in the /monitors REST APIs
         - name: NAMESPACE
           valueFrom:
             fieldRef:

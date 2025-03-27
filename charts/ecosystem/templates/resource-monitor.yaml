@@ -73,7 +73,7 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
-        - name: GALASA_MONITOR_INCLUDES_REGEXES
+        - name: GALASA_MONITOR_INCLUDES_GLOB_PATTERNS
           value: "dev.galasa.*"
         ports:
         - containerPort: 9010
