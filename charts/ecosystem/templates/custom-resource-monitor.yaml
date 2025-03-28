@@ -3,26 +3,25 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-resource-monitor
+  name: {{ .Release.Name }}-custom-resource-monitor
   labels:
-    galasa-monitor: system
-    app: {{ .Release.Name }}-resource-monitor
+    galasa-monitor: custom
+    app: {{ .Release.Name }}-custom-resource-monitor
 spec:
-  replicas: 1
+  replicas: 0
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-resource-monitor
+      app: {{ .Release.Name }}-custom-resource-monitor
   template:
     metadata:
-      name: {{ .Release.Name }}-resource-monitor
+      name: {{ .Release.Name }}-custom-resource-monitor
       labels:
-        app: {{ .Release.Name }}-resource-monitor
+        app: {{ .Release.Name }}-custom-resource-monitor
     spec:
       serviceAccountName: galasa
       nodeSelector:
@@ -73,8 +72,14 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
+        {{- if .Values.cleanupMonitor.stream }}
+        - name: GALASA_MONITOR_STREAM
+          value: "{{ .Values.cleanupMonitor.stream }}"
+        {{- end }}
         - name: GALASA_MONITOR_INCLUDES_GLOB_PATTERNS
-          value: "dev.galasa.*"
+          value: "{{ join "," .Values.cleanupMonitor.includes }}"
+        - name: GALASA_MONITOR_EXCLUDES_GLOB_PATTERNS
+          value: "{{ join "," .Values.cleanupMonitor.excludes }}"
         ports:
         - containerPort: 9010
           name: metrics
