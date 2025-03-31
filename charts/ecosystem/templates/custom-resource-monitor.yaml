@@ -3,25 +3,25 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-metrics
+  name: {{ .Release.Name }}-custom-resource-monitor
   labels:
-    app: {{ .Release.Name }}-metrics
+    galasa-monitor: custom
+    app: {{ .Release.Name }}-custom-resource-monitor
 spec:
-  replicas: 1
+  replicas: 0
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-metrics
+      app: {{ .Release.Name }}-custom-resource-monitor
   template:
     metadata:
-      name: {{ .Release.Name }}-metrics
+      name: {{ .Release.Name }}-custom-resource-monitor
       labels:
-        app: {{ .Release.Name }}-metrics
+        app: {{ .Release.Name }}-custom-resource-monitor
     spec:
       serviceAccountName: galasa
       nodeSelector:
@@ -42,25 +42,23 @@ spec:
             - --for=condition=Ready
             - --timeout=180s
       containers:
-      - name: metrics
+      - name: resource-monitor
         image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
         imagePullPolicy: {{ .Values.pullPolicy }}
-        ## 
-        ## Provide some guidance to kubernetes on how much memory/cpu this container needs.
-        {{- with .Values.metrics.resources }}
-        resources: {{- toYaml . | nindent 10 }}
-        {{- end }}
         command: ["java"]
         args: 
         - -jar
         - boot.jar
         - --obr
         - file:galasa.obr
-        - --metricserver
-        - --trace
+        - --resourcemanagement
         - --bootstrap
         - http://{{ .Release.Name }}-api:8080/bootstrap
         env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         - name: GALASA_CONFIG_STORE
           value: etcd:{{ include "cps.url" . }}
         - name: GALASA_DYNAMICSTATUS_STORE
@@ -74,6 +72,14 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
+        {{- if .Values.cleanupMonitor.stream }}
+        - name: GALASA_MONITOR_STREAM
+          value: "{{ .Values.cleanupMonitor.stream }}"
+        {{- end }}
+        - name: GALASA_MONITOR_INCLUDES_GLOB_PATTERNS
+          value: "{{ join "," .Values.cleanupMonitor.includes }}"
+        - name: GALASA_MONITOR_EXCLUDES_GLOB_PATTERNS
+          value: "{{ join "," .Values.cleanupMonitor.excludes }}"
         ports:
         - containerPort: 9010
           name: metrics
@@ -84,10 +90,10 @@ spec:
             path: /
             port: 9011
           initialDelaySeconds: 5
-          periodSeconds: 60
+          periodSeconds: 30
         readinessProbe:
           httpGet:
-            path: /metrics
-            port: 9010
+            path: /
+            port: 9011
           initialDelaySeconds: 5
           periodSeconds: 10

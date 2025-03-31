@@ -9,6 +9,7 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-resource-monitor
   labels:
+    galasa-monitor: system
     app: {{ .Release.Name }}-resource-monitor
 spec:
   replicas: 1
@@ -65,18 +66,20 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: GALASA_CONFIG_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: etcd:{{ include "cps.url" . }}
         - name: GALASA_DYNAMICSTATUS_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: etcd:{{ include "dss.url" . }}
         - name: GALASA_RESULTARCHIVE_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: etcd:{{ include "creds.url" . }}
         - name: GALASA_RAS_TOKEN
           valueFrom:
             secretKeyRef:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
+        - name: GALASA_MONITOR_INCLUDES_GLOB_PATTERNS
+          value: "dev.galasa.*"
         ports:
         - containerPort: 9010
           name: metrics

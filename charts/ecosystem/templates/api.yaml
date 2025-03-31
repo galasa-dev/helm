@@ -102,16 +102,22 @@ spec:
         - --bootstrap
         - file:/bootstrap.properties
         env:
+        # The Kubernetes namespace that the Galasa service is running within is passed into the API server
+        # so that the API server can query Kubernetes for monitor deployments in the /monitors REST APIs
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         - name: GALASA_CONFIG_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: etcd:{{ include "cps.url" . }}
         - name: GALASA_DYNAMICSTATUS_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: etcd:{{ include "dss.url" . }}
         - name: GALASA_RESULTARCHIVE_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_AUTH_STORE
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
-          value: etcd:http://{{ .Release.Name }}-etcd:2379
+          value: etcd:{{ include "creds.url" . }}
         - name: GALASA_DEFAULT_USER_ROLE
           value: {{ .Values.galasaDefaultUserRole }}
         - name: GALASA_OWNER_LOGIN_IDS

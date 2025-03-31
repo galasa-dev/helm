@@ -31,7 +31,7 @@ stringData:
       type: etcd
       config:
         endpoints:
-          - http://{{ .Release.Name }}-etcd:2379
+          - {{ include "cps.url" . }}
         namespace: dex.
     {{- end }}
 {{- end }}
