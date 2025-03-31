@@ -30,9 +30,24 @@ data:
 #  node_preferred_affinity: ""
 #  scheduled_requestors: ""
 #  engine_capabilities: ""
-#  engine_memory: "200"
-#  engine_memory_request: "300"
-#  engine_memory_limit: "300"
+
+
+  # Best practice is to set resource (memory and CPU) limits for each pod.
+  # So not too many pods get allocated to the same node, which may run slowly or run out of memory.
+  # So we need to set several things:
+  # How much memory the java heap needs. This is typically 50-100 mb less than the minimum memory we request for the pod. Integer. Units of 'Mi'.
+  engine_memory_heap: "{{- .Values.testPod.memory.heap -}}"
+  # The minimum memory we expect to use. This is what we ask kubernetes for when the pod starts. Integer. Units of 'Mi'.
+  engine_memory_request: "{{- .Values.testPod.memory.min -}}"
+  # The maximum memory we expect a test pod to use. This is a limit we set for the pod. Exceeding this limit will cause the pod to be killed. Integer. Units of 'Mi'.
+  engine_memory_limit: "{{- .Values.testPod.memory.max -}}"
+
+  # The amount of CPU each test pods should get as a minimum. Integer. Units of 'm'. A value of 0 means we don't set the minimum.
+  engine_cpu_request: "{{- .Values.testPod.cpu.min -}}"
+  # The amount of CPU each test pod is allowed to consume were it to be available. Integer. Units of 'm' A value of 0 means we don't set the limit.
+  engine_cpu_limit: "{{- .Values.testPod.cpu.max -}}"
+
+
   run_poll: "5"
   run_poll_recheck: "2"
 #

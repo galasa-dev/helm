@@ -445,18 +445,22 @@ metrics:
       memory: "500Mi"
 
 # Best practice is to set memory limits for each pod.
-# We constrain all pods to request at least this much memory, and use no more than this maximum memory.
-# The values here must be consistent with all the other memory constraints above.
-namespaceLimits:
-  #
-  # No pod in this namespace can request a higher maximum than this:
-  maxMemory: 1500Mi
-  #
-  # No pod in this namespace can request a lower amount than this:
-  minMemory: 150Mi
-  #
-  # When a pod in this namespace doesn't specify how much memoru it needs, it implicitly gets limited to this much.
-  defaultMemory: 600Mi
-  #
-  # When a pod in this namespace doesn't specify how much memory it needs, it implicitly asks for this much.
-  defaultRequestMemory: 600Mi
+# So we need to set 4 things:
+# - The amount of cpu and memory requested for the pod immediately
+# - The amount of CPU and memory that the pod can grow to use
+# - The value that the MAX_HEAP env var should be set to for the JVM when it starts inside the pod
+# These values are placed in the config map which is loaded into settings in the engine controller, which
+# uses them to launch pods.
+testPod:
+  memory:
+    # All values are integers, in units of 'Mi'
+    heap: 350
+    min: 400
+    max: 800
+  cpu:
+    # All values are integers, in units of 'm'
+    # A value of 0 indicates no CPU minimum should be set.
+    min: 600
+    # A value of 0 indicates no CPU maximum should be set.
+    max: 1000
+
