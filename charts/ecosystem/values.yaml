@@ -416,9 +416,9 @@ resourceMonitor:
   # For example, the pattern 'dev.galasa*' will match any provider that includes 'dev.galasa' as its prefix,
   # so a class like 'dev.galasa.core.CoreResourceMonitorClass' will be matched.
   #
-  # By default, all of the providers matching 'dev.galasa*' are included.
+  # By default, all of the providers matching 'dev.galasa.*' are included.
   includes:
-    - 'dev.galasa*'
+    - 'dev.galasa.*'
   #
   # A list of glob patterns to be used in identifying which resource cleanup providers
   # should not be loaded.
