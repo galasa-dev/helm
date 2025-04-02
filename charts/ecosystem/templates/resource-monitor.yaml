@@ -48,9 +48,9 @@ spec:
         imagePullPolicy: {{ .Values.pullPolicy }}
         ## 
         ## Provide some guidance to kubernetes on how much memory/cpu this container needs.
-        {{- if .Values.resourcemonitor }}
-        {{- if .Values.resourcemonitor.resources }}
-        {{- with .Values.resourcemonitor.resources }}
+        {{- if .Values.resourceMonitor }}
+        {{- if .Values.resourceMonitor.resources }}
+        {{- with .Values.resourceMonitor.resources }}
         resources: {{- toYaml . | nindent 10 }}
         {{- end }}
         {{- end }}
@@ -83,7 +83,9 @@ spec:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
         - name: GALASA_MONITOR_INCLUDES_GLOB_PATTERNS
-          value: "dev.galasa.*"
+          value: "{{ join "," .Values.resourceMonitor.includes }}"
+        - name: GALASA_MONITOR_EXCLUDES_GLOB_PATTERNS
+          value: "{{ join "," .Values.resourceMonitor.excludes }}"
         ports:
         - containerPort: 9010
           name: metrics
