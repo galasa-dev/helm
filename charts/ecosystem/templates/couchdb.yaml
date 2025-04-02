@@ -33,8 +33,12 @@ spec:
         imagePullPolicy: IfNotPresent
         ## 
         ## Provide some guidance to kubernetes on how much memory/cpu this container needs.
+        {{- if .Values.couchdb }}
+        {{- if .Values.couchdb.resources }}
         {{- with .Values.couchdb.resources }}
         resources: {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
         {{- end }}
         env:
         - name: COUCHDB_USER

@@ -186,6 +186,7 @@ apiServer:
   #     memory: "1024Mi"
   #
   # This default is suitable for a lightly loaded Galasa service:
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
   resources:
     requests:
       cpu: "600m"
@@ -350,6 +351,7 @@ dex:
 
   # Best practice is to set memory limits for each pod.
   # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
@@ -421,10 +423,23 @@ cleanupMonitor:
   # such as 'my.company.monitors.MyResourceMonitorClass'.
   excludes: []
 
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
+
 # The etcd pod houses the configuration property store, credentials store and the dynamic storage service.
 etcd:
   # Best practice is to set memory limits for each pod.
   # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
@@ -438,6 +453,7 @@ etcd:
 webui:
   # Best practice is to set memory limits for each pod.
   # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
@@ -452,20 +468,7 @@ webui:
 enginecontroller:
   # Best practice is to set memory limits for each pod.
   # This section sets some limits which Dex should be happy working within.
-  # This default is suitable for a lightly loaded Galasa service:
-  resources:
-    requests:
-      cpu: "600m"
-      memory: "300Mi"
-    limits:
-      cpu: "800m"
-      memory: "500Mi"
-
-# The resource monitor is a component which monitors for failed/dead tests
-# and cleans up resources as required.
-resourcemonitor:
-  # Best practice is to set memory limits for each pod.
-  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
@@ -480,6 +483,7 @@ resourcemonitor:
 couchdb:
   # Best practice is to set memory limits for each pod.
   # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
@@ -493,6 +497,7 @@ couchdb:
 metrics:
   # Best practice is to set memory limits for each pod.
   # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:

@@ -87,8 +87,12 @@ spec:
       containers:
       - name: api
         image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
+        {{- if  .Values.apiServer }}
+        {{- if  .Values.apiServer.resources }}
         {{- with .Values.apiServer.resources }}
         resources: {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
         {{- end }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command: ["java"]
