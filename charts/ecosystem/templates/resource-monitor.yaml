@@ -74,7 +74,9 @@ spec:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
         - name: GALASA_MONITOR_INCLUDES_GLOB_PATTERNS
-          value: "dev.galasa.*"
+          value: "{{ join "," .Values.resourceMonitor.includes }}"
+        - name: GALASA_MONITOR_EXCLUDES_GLOB_PATTERNS
+          value: "{{ join "," .Values.resourceMonitor.excludes }}"
         ports:
         - containerPort: 9010
           name: metrics
