@@ -77,7 +77,9 @@ k8sNodeTolerations: ""
 #
 #
 # The pull policy to be used for the Galasa images, only useful for Galasa development purposes
-#
+# Values:
+# "Always" - used by Galasa development
+# "IfNotPresent" - normal running user.
 pullPolicy: "IfNotPresent"
 #
 #
@@ -115,13 +117,13 @@ couchdbImage: "couchdb:3.3.3"
 dexImage: "ghcr.io/dexidp/dex:v2.38.0"
 kubectlImage: "bitnami/kubectl:1.28"
 #
-#  
+#
 # New users logging into the system get a user record created and that user is assigned a role
 # by default. It should be the name of one of the roles on the system.
 # Suggested values are:
-#   "deactivated" - After initial logon, an administrator will need to set their most appropriate role 
+#   "deactivated" - After initial logon, an administrator will need to set their most appropriate role
 #                   before this new user can access any function within the Galasa service.
-#   "tester"      - After initial logon, the user is classified as a tester, so can launch tests and 
+#   "tester"      - After initial logon, the user is classified as a tester, so can launch tests and
 #                   see test results, but cannot administer the system.
 #   "admin"       - A user with access to all the functionality provided by Galasa.
 #                   We recommend only using this setting if you want every user to be an administrator
@@ -130,18 +132,18 @@ galasaDefaultUserRole: "tester"
 #
 #
 # The list of login ids of the Galasa service owner(s), comma-separated.
-# If a user login id appears in this list, the user will appear to have the 'owner' role, rather than 
+# If a user login id appears in this list, the user will appear to have the 'owner' role, rather than
 # their normal role.
 #
 # Roles of owner user records cannot be changed. Without changing the configuration at the Kubernetes level.
-# 
+#
 # The users nominated here will always have a role of 'owner'.
 #
 # If the Galasa service owners leave the organisation, or are otherwise unable to administer the system any longer,
 # someone with access to kubernetes can change this value and the user specified will then appear to have the role
 # of owner.
 #
-# Multiple owners can be specified. eg: "user1, user2". All users mentioned will have the 'owner' role until they are 
+# Multiple owners can be specified. eg: "user1, user2". All users mentioned will have the 'owner' role until they are
 # removed from the list.
 galasaOwnersLoginIds: ""
 #
@@ -183,7 +185,16 @@ apiServer:
   #     cpu: "3"
   #     memory: "1024Mi"
   #
-  resources: {}
+  # This default is suitable for a lightly loaded Galasa service:
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "500Mi"
+    limits:
+      cpu: "900m"
+      memory: "800Mi"
+
   #
   #
   # Values to configure autoscaling for the API server. Important: Resource requests must be defined via the `resources` value in order
@@ -337,6 +348,19 @@ dex:
       refreshTokens:
         reuseInterval: 8760h # 1 year
         validIfNotUsedFor: 8760h # 1 year
+
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "400m"
+      memory: "300Mi"
+    limits:
+      cpu: "600m"
+      memory: "500Mi"
+
 #
 # The name of the Kubernetes Secret that Galasa will look for in your Galasa service's
 # namespace to authenticate to a configured Kafka cluster, if you optionally wish to
@@ -354,7 +378,7 @@ eventStreamsSecretName: "event-streams-token"
 # If using the defaults below, RELEASE_NAME is replaced with {{ .Release.Name }}
 # when used in templates. If you override these default values with your own store
 # location, you do not have to include the release name in your store's URL.
-# 
+#
 # The "etcd:" prefix is appended in the templates so it should not be included here.
 #
 dssUrl: http://RELEASE_NAME-etcd:2379
@@ -374,7 +398,7 @@ cleanupMonitor:
   # A list of glob patterns to be used in identifying which resource cleanup providers
   # to load as part of the custom resource cleanup monitor.
   #
-  # Supported glob patterns include the following special characters: 
+  # Supported glob patterns include the following special characters:
   # '*' (wildcard) Matches zero or more characters
   # '?' matches exactly one character
   #
@@ -388,7 +412,7 @@ cleanupMonitor:
   # A list of glob patterns to be used in identifying which resource cleanup providers
   # should not be loaded as part of the custom resource cleanup monitor.
   #
-  # Supported glob patterns include the following special characters: 
+  # Supported glob patterns include the following special characters:
   # '*' (wildcard) Matches zero or more characters
   # '?' matches exactly one character
   #
@@ -398,6 +422,110 @@ cleanupMonitor:
   # A pattern like '*MyResourceMonitorClass' will match any monitor that ends with 'MyResourceMonitorClass',
   # such as 'my.company.monitors.MyResourceMonitorClass'.
   excludes: []
+
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
+
+# The etcd pod houses the configuration property store, credentials store and the dynamic storage service.
+etcd:
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "400m"
+      memory: "1000Mi"
+    limits:
+      cpu: "600m"
+      memory: "1500Mi"
+
+# The webui pod houses the web user interface.
+webui:
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "400Mi"
+
+# The engine controller receives requests to start tests, and starts pods in which
+# the tests run.
+enginecontroller:
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
+
+# The couchdb component stores run history and records, user records and other
+# persistent storage objects.
+couchdb:
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "400m"
+      memory: "300Mi"
+    limits:
+      cpu: "600m"
+      memory: "500Mi"
+
+# The metrics component gathers metrics from other components in the system.
+metrics:
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
+
+# Best practice is to set memory limits for each pod.
+# So we need to set 4 things:
+# - The amount of cpu and memory requested for the pod immediately
+# - The amount of CPU and memory that the pod can grow to use
+# - The value that the MAX_HEAP env var should be set to for the JVM when it starts inside the pod
+# These values are placed in the config map which is loaded into settings in the engine controller, which
+# uses them to launch pods.
+testPod:
+  memory:
+    # All values are integers, in units of 'Mi'
+    heap: 350
+    min: 400
+    max: 800
+  cpu:
+    # All values are integers, in units of 'm'
+    # A value of 0 indicates no CPU minimum should be set.
+    min: 600
+    # A value of 0 indicates no CPU maximum should be set.
+    max: 1000
 #
 #
 # resourceMonitor represents the values used to configure the system resource cleanup 
@@ -432,3 +560,15 @@ resourceMonitor:
   #
   # By default, no providers are excluded.
   excludes: []
+
+  # Best practice is to set memory limits for each pod.
+  # This section sets some limits which Dex should be happy working within.
+  # Omitting this resources: section will cause no memory or cpi limits to be set.
+  # This default is suitable for a lightly loaded Galasa service:
+  resources:
+    requests:
+      cpu: "600m"
+      memory: "300Mi"
+    limits:
+      cpu: "800m"
+      memory: "500Mi"
