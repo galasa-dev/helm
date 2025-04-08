@@ -189,10 +189,8 @@ apiServer:
   # Omitting this resources: section will cause no memory or cpi limits to be set.
   resources:
     requests:
-      cpu: "600m"
       memory: "500Mi"
     limits:
-      cpu: "900m"
       memory: "800Mi"
 
   #
@@ -355,10 +353,8 @@ dex:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "400m"
       memory: "300Mi"
     limits:
-      cpu: "600m"
       memory: "500Mi"
 
 #
@@ -429,10 +425,8 @@ cleanupMonitor:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "600m"
       memory: "300Mi"
     limits:
-      cpu: "800m"
       memory: "500Mi"
 
 # The etcd pod houses the configuration property store, credentials store and the dynamic storage service.
@@ -443,10 +437,8 @@ etcd:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "400m"
       memory: "1000Mi"
     limits:
-      cpu: "600m"
       memory: "1500Mi"
 
 # The webui pod houses the web user interface.
@@ -457,10 +449,8 @@ webui:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "600m"
       memory: "300Mi"
     limits:
-      cpu: "800m"
       memory: "400Mi"
 
 # The engine controller receives requests to start tests, and starts pods in which
@@ -472,10 +462,8 @@ enginecontroller:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "600m"
       memory: "300Mi"
     limits:
-      cpu: "800m"
       memory: "500Mi"
 
 # The couchdb component stores run history and records, user records and other
@@ -487,10 +475,8 @@ couchdb:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "400m"
       memory: "300Mi"
     limits:
-      cpu: "600m"
       memory: "500Mi"
 
 # The metrics component gathers metrics from other components in the system.
@@ -501,10 +487,8 @@ metrics:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "600m"
       memory: "300Mi"
     limits:
-      cpu: "800m"
       memory: "500Mi"
 
 # Best practice is to set memory limits for each pod.
@@ -523,9 +507,9 @@ testPod:
   cpu:
     # All values are integers, in units of 'm'
     # A value of 0 indicates no CPU minimum should be set.
-    min: 600
+    min: 0
     # A value of 0 indicates no CPU maximum should be set.
-    max: 1000
+    max: 0
 #
 #
 # resourceMonitor represents the values used to configure the system resource cleanup 
@@ -567,8 +551,6 @@ resourceMonitor:
   # This default is suitable for a lightly loaded Galasa service:
   resources:
     requests:
-      cpu: "600m"
       memory: "300Mi"
     limits:
-      cpu: "800m"
       memory: "500Mi"
