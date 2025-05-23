@@ -44,11 +44,20 @@ spec:
         - --obr
         - file:galasa.obr
         - --validateeco
-        - --bootstrap
-        - http://{{ .Release.Name }}-api:8080/bootstrap
+        - --no-bootstrap
         env:
         - name: GALASA_RAS_TOKEN
           valueFrom:
             secretKeyRef:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
+        - name: GALASA_EXTRA_BUNDLES
+          value: {{ include "framework.extra.bundles" . }}
+        - name: GALASA_CONFIG_STORE
+          value: etcd:{{ include "cps.url" . }}
+        - name: GALASA_DYNAMICSTATUS_STORE
+          value: etcd:{{ include "dss.url" . }}
+        - name: GALASA_RESULTARCHIVE_STORE
+          value: couchdb:http://{{ .Release.Name }}-couchdb:5984
+        - name: GALASA_CREDENTIALS_STORE
+          value: etcd:{{ include "creds.url" . }}

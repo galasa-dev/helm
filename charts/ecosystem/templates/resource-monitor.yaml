@@ -62,13 +62,14 @@ spec:
         - --obr
         - file:galasa.obr
         - --resourcemanagement
-        - --bootstrap
-        - http://{{ .Release.Name }}-api:8080/bootstrap
+        - --no-bootstrap
         env:
         - name: NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: GALASA_EXTRA_BUNDLES
+          value: {{ include "framework.extra.bundles" . }}
         - name: GALASA_CONFIG_STORE
           value: etcd:{{ include "cps.url" . }}
         - name: GALASA_DYNAMICSTATUS_STORE

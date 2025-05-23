@@ -59,3 +59,10 @@
 {{- define "creds.url" -}}
   {{- contains "RELEASE_NAME" .Values.credsUrl | ternary (.Values.credsUrl | replace "RELEASE_NAME" .Release.Name) (.Values.credsUrl) }}
 {{- end -}}
+
+{{/*
+  Returns the extra bundles to load when starting the framework
+*/}}
+{{- define "framework.extra.bundles" -}}
+  {{- print "dev.galasa.cps.etcd,dev.galasa.ras.couchdb,dev.galasa.events.kafka" }}
+{{- end -}}
