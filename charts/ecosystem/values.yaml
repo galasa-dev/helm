@@ -43,6 +43,11 @@ galasaBootImage: "galasa-boot-embedded-amd64"
 maxEngines: "10"
 #
 #
+# The number of milliseconds that the test pod scheduler should delay between successive launches of test pods
+#
+kubeLaunchIntervalMillisecs: 1000
+#
+#
 # The name of the Docker image that launches Galasa's web UI
 #
 galasaWebUiImage: "galasa-ui"
