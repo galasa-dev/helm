@@ -47,7 +47,8 @@ data:
   # The amount of CPU each test pod is allowed to consume were it to be available. Integer. Units of 'm' A value of 0 means we don't set the limit.
   engine_cpu_limit: "{{- .Values.testPod.cpu.max | default 1000 -}}"
 
-
+  # The amount of time in milliseconds to wait before the test pod scheduler launches another test pod
+  kube_launch_interval_milliseconds: "{{ .Values.kubeLaunchIntervalMillisecs | default 1000 }}"
   run_poll: "5"
   run_poll_recheck: "2"
 #
