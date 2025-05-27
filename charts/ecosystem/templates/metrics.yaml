@@ -29,18 +29,6 @@ spec:
         {{- if .Values.nodeSelectors }}
 {{ toYaml .Values.nodeSelectors | indent 8 }}
         {{- end }}
-      initContainers:
-        - name: wait-for-api
-          image: {{ .Values.kubectlImage }}
-          imagePullPolicy: {{ .Values.pullPolicy }}
-          command:
-            - kubectl
-          args:
-            - wait
-            - pods
-            - -l=app={{ .Release.Name }}-api
-            - --for=condition=Ready
-            - --timeout=180s
       containers:
       - name: metrics
         image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
