@@ -62,7 +62,6 @@ spec:
         - --obr
         - file:galasa.obr
         - --resourcemanagement
-        - --no-bootstrap
         env:
         - name: NAMESPACE
           valueFrom:

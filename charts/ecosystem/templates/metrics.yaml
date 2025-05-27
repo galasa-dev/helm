@@ -62,7 +62,6 @@ spec:
         - file:galasa.obr
         - --metricserver
         - --trace
-        - --no-bootstrap
         env:
         - name: GALASA_EXTRA_BUNDLES
           value: {{ include "framework.extra.bundles" . }}

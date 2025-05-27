@@ -44,7 +44,6 @@ spec:
         - --obr
         - file:galasa.obr
         - --validateeco
-        - --no-bootstrap
         env:
         - name: GALASA_RAS_TOKEN
           valueFrom:

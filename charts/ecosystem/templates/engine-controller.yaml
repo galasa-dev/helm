@@ -58,8 +58,8 @@ spec:
           - /bin/bash
           - -ec
           - |
-            java -jar boot.jar --obr file:galasa.obr --no-bootstrap --setupeco
-            java -jar boot.jar --obr file:galasa.obr --no-bootstrap --k8scontroller
+            java -jar boot.jar --obr file:galasa.obr --setupeco
+            java -jar boot.jar --obr file:galasa.obr --k8scontroller
         env:
         - name: NAMESPACE
           valueFrom:
