@@ -29,18 +29,6 @@ spec:
         {{- if .Values.nodeSelectors }}
 {{ toYaml .Values.nodeSelectors | indent 8 }}
         {{- end }}
-      initContainers:
-        - name: wait-for-api
-          image: {{ .Values.kubectlImage }}
-          imagePullPolicy: {{ .Values.pullPolicy }}
-          command:
-            - kubectl
-          args:
-            - wait
-            - pods
-            - -l=app={{ .Release.Name }}-api
-            - --for=condition=Ready
-            - --timeout=180s
       containers:
       - name: engine-controller
         image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
@@ -58,8 +46,8 @@ spec:
           - /bin/bash
           - -ec
           - |
-            java -jar boot.jar --obr file:galasa.obr --bootstrap http://{{ .Release.Name }}-api:8080/bootstrap --setupeco
-            java -jar boot.jar --obr file:galasa.obr --bootstrap http://{{ .Release.Name }}-api:8080/bootstrap --k8scontroller
+            java -jar boot.jar --obr file:galasa.obr --setupeco
+            java -jar boot.jar --obr file:galasa.obr --k8scontroller
         env:
         - name: NAMESPACE
           valueFrom:
@@ -67,6 +55,8 @@ spec:
               fieldPath: metadata.namespace
         - name: CONFIG
           value: {{ .Release.Name }}-config
+        - name: GALASA_EXTRA_BUNDLES
+          value: {{ include "framework.extra.bundles" . }}
         - name: GALASA_CONFIG_STORE
           value: etcd:{{ include "cps.url" . }}
         - name: GALASA_DYNAMICSTATUS_STORE
