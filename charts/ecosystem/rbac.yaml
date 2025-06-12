@@ -44,18 +44,15 @@ subjects:
   name: galasa
 
 ---
-#
 # Create a ServiceAccount that Galasa test pods will use to run as
-#
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: galasa-test-pod
+
 ---
-#
 # Create a Role that will be assigned to test pods that only has the permissions
 # required for test pods to run
-#
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -64,11 +61,10 @@ rules:
 - apiGroups: [""]
   resources: ["pods"]
   verbs: ["list"]
+
 ---
-#
 # Create a RoleBinding to associate the `galasa-test-pod` ServiceAccount with the
 # `galasa-test-pod-role` Role
-#
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
