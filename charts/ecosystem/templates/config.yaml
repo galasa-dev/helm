@@ -11,7 +11,11 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-config
 data:
-#
+  # The name of the Galasa service as provided in the `helm install` command
+  galasa_service_name: "{{ .Release.Name }}"
+
+  # The kubectl image that test pods will use to wait for other pods in the Galasa service to be ready
+  kubectl_image: "{{ .Values.kubectlImage }}"
 #
 # The maximum running number of automation engines the Engine Controller will start
   max_engines: "{{ .Values.maxEngines }}"
