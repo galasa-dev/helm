@@ -87,6 +87,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        # The name of the Kubernetes ServiceAccount that tests pods will use to run as
+        # This value matches up with the ServiceAccount defined in rbac-test-pod.yaml
+        - name: GALASA_TEST_POD_SERVICE_ACCOUNT_NAME
+          value: galasa-test-pod
         - name: CONFIG
           value: {{ .Release.Name }}-config
         - name: GALASA_EXTRA_BUNDLES
