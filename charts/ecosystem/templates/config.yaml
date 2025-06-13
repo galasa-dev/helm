@@ -12,7 +12,7 @@ metadata:
   name: {{ .Release.Name }}-config
 data:
   # The name of the Galasa service as provided in the `helm install` command
-  galasa_service_name: "{{ .Release.Name }}"
+  galasa_install_name: "{{ .Release.Name }}"
 
   # The kubectl image that test pods will use to wait for other pods in the Galasa service to be ready
   kubectl_image: "{{ .Values.kubectlImage }}"
