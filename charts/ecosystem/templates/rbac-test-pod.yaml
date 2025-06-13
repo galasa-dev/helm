@@ -1,0 +1,39 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# This defines a 'galasa-test-pod' ServiceAccount intended for test pods to use with limited permissions
+# to prevent tests from abusing the deployed Galasa service and other pods in the namespace.
+# 
+{{- if not (lookup "v1" "ServiceAccount" .Release.Namespace "galasa-test-pod") }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: galasa-test-pod
+
+---
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: galasa-test-pod-role
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["list"]
+
+---
+
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: galasa-test-pod-rolebinding
+roleRef:
+  kind: Role
+  name: galasa-test-pod-role
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: galasa-test-pod
+{{- end }}
