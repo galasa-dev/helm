@@ -13,7 +13,7 @@ externalHostname: "example.com"
 # The version of Galasa you want to run with, it is better that you do not use "latest" to ensure
 # all the components are running the same version and a controlled upgrade can be performed
 #
-galasaVersion: "0.42.0"
+galasaVersion: "0.43.0"
 #
 #
 #
