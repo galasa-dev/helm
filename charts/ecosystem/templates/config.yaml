@@ -45,9 +45,9 @@ data:
 
   # The amount of time in milliseconds to wait before the test pod scheduler launches another test pod
   kube_launch_interval_milliseconds: "{{ .Values.kubeLaunchIntervalMillisecs | default 1000 }}"
-  
+
   # Maximum number a run will re-try to create a test pod.
-  max_test_pod_retry_limit: "{{- .Values.enginecontroller:.maxTestPodRetryLimit | default 5 -}}"
+  max_test_pod_retry_limit: "{{ .Values.enginecontroller.maxTestPodRetryLimit | default 5 }}"
 
   # The time between scheduling a bunch of queued tests in fresh test pods, and when we look again for more test pods to queue.
   # Unit is seconds. Defaults to 60 seconds if not set.
