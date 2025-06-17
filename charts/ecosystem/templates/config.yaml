@@ -45,7 +45,16 @@ data:
 
   # The amount of time in milliseconds to wait before the test pod scheduler launches another test pod
   kube_launch_interval_milliseconds: "{{ .Values.kubeLaunchIntervalMillisecs | default 1000 }}"
+  
+  # Maximum number a run will re-try to create a test pod.
+  max_test_pod_retry_limit: "{{- .Values.enginecontroller:.maxTestPodRetryLimit | default 5 -}}"
+
+  # The time between scheduling a bunch of queued tests in fresh test pods, and when we look again for more test pods to queue.
+  # Unit is seconds. Defaults to 60 seconds if not set.
   run_poll: "5"
+
+  # >> Not used. Please ignore. <<
+  # Was used in the docker controller to space out requests to launch new docker pods. Unit is seconds.
   run_poll_recheck: "2"
 #
 # Label of k8s node that Galasa test pods should be scheduled on preferrentially
@@ -53,7 +62,6 @@ data:
 #
 # List of node toleration conditions
   galasa_node_tolerations: "{{ .Values.k8sNodeTolerations }}"
-
 
 #
 # The name of the Kubernetes Secret that stores the encryption-related keys,

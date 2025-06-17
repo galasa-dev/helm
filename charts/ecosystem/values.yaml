@@ -461,6 +461,9 @@ webui:
 # The engine controller receives requests to start tests, and starts pods in which
 # the tests run.
 enginecontroller:
+  # Maximum number a run will re-try to create a test pod.
+  maxTestPodRetryLimit: 5
+
   # Best practice is to set memory limits for each pod.
   # This section sets some limits which Dex should be happy working within.
   # Omitting this resources: section will cause no memory or cpi limits to be set.
@@ -506,7 +509,7 @@ metrics:
 testPod:
   memory:
     # All values are integers, in units of 'Mi'
-    heap: 350
+    heap: 750
     min: 400
     max: 800
   cpu:
