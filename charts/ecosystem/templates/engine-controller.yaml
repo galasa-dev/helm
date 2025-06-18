@@ -83,6 +83,8 @@ spec:
             java -jar boot.jar --obr file:galasa.obr --setupeco
             java -jar boot.jar --obr file:galasa.obr --k8scontroller
         env:
+        - name: GALASA_INSTALL_NAME
+          value: {{ .Release.Name }}
         - name: NAMESPACE
           valueFrom:
             fieldRef:
