@@ -562,3 +562,16 @@ resourceMonitor:
       memory: "300Mi"
     limits:
       memory: "500Mi"
+#
+#
+#
+# Optional. Sets the maximum message size in bytes allowed for a single gRPC frame.
+# This will be used by the KVClient that is set up to interact with the etcd3 cluster.
+# 
+# The default value for this is 4194304.
+# 
+# The maximum value this can be set to is 2147483647.
+#
+# Example value: "4194304"
+#
+maxgRPCMessageSize: ""

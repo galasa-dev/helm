@@ -77,6 +77,8 @@ spec:
           value: "{{ join "," .Values.cleanupMonitor.includes }}"
         - name: GALASA_MONITOR_EXCLUDES_GLOB_PATTERNS
           value: "{{ join "," .Values.cleanupMonitor.excludes }}"
+        - name: MAX_GRPC_MESSAGE_SIZE
+          value: {{ include "max.grpc.message.size" . }}
         ports:
         - containerPort: 9010
           name: metrics
