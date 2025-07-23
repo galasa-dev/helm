@@ -464,6 +464,10 @@ enginecontroller:
   # Maximum number a run will re-try to create a test pod.
   maxTestPodRetryLimit: 5
 
+  # The amount of time in seconds the engine controller will wait before
+  # an interrupted run's test pod is deleted from the Kubernetes namespace
+  testPodInterruptTimeoutSecs: 300
+
   # Best practice is to set memory limits for each pod.
   # This section sets some limits which Dex should be happy working within.
   # Omitting this resources: section will cause no memory or cpi limits to be set.

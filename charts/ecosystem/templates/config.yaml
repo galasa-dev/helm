@@ -49,6 +49,9 @@ data:
   # Maximum number a run will re-try to create a test pod.
   max_test_pod_retry_limit: "{{ .Values.enginecontroller.maxTestPodRetryLimit | default 5 }}"
 
+  # The amount of time in seconds the engine controller will wait before it deletes an interrupted run's test pod
+  test_pod_interrupt_timeout_secs: "{{ .Values.enginecontroller.testPodInterruptTimeoutSecs | default 300 }}"
+
   # The time between scheduling a bunch of queued tests in fresh test pods, and when we look again for more test pods to queue.
   # Unit is seconds. Defaults to 60 seconds if not set.
   run_poll: "5"
