@@ -13,8 +13,12 @@
 {{- $serviceAccount := (lookup "v1" "ServiceAccount" .Release.Namespace "galasa") }}
 {{- $isServiceAccountOwnedByHelm := false }}
 
-{{- if (and $serviceAccount $serviceAccount.metadata.labels) }}
+{{- if $serviceAccount }}
+{{- if $serviceAccount.metadata }}
+{{- if $serviceAccount.metadata.labels }}
 {{- $isServiceAccountOwnedByHelm = (eq (index $serviceAccount.metadata.labels "app.kubernetes.io/instance") .Release.Name) }}
+{{- end }}
+{{- end }}
 {{- end }}
 
 {{- if or (not $serviceAccount) $isServiceAccountOwnedByHelm }}
