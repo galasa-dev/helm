@@ -3,12 +3,23 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
+# Creates the "galasa" ServiceAccount and associated Role and RoleBinding if the ServiceAccount doesn't already exist,
+# or if the ServiceAccount was set up by Helm.
+#
+# When a "helm upgrade" is issued, Helm applies any changes to the YAML templates. Having the additional check to make
+# sure that the ServiceAccount was created by Helm means that this template will not be rendered as an empty template,
+# which would otherwise cause Helm to delete these resources.
+#
+{{- $serviceAccount := (lookup "v1" "ServiceAccount" .Release.Namespace "galasa") }}
+{{- $isServiceAccountOwnedByHelm := (and $serviceAccount (eq (index $serviceAccount.metadata.labels "app.kubernetes.io/instance") .Release.Name)) }}
 
-{{- if not (lookup "v1" "ServiceAccount" .Release.Namespace "galasa") }}
+{{- if or (not $serviceAccount) $isServiceAccountOwnedByHelm }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: galasa
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
 
 ---
 
