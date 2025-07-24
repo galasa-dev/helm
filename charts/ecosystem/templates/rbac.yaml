@@ -11,7 +11,11 @@
 # which would otherwise cause Helm to delete these resources.
 #
 {{- $serviceAccount := (lookup "v1" "ServiceAccount" .Release.Namespace "galasa") }}
-{{- $isServiceAccountOwnedByHelm := (and $serviceAccount (eq (index $serviceAccount.metadata.labels "app.kubernetes.io/instance") .Release.Name)) }}
+{{- $isServiceAccountOwnedByHelm := false }}
+
+{{- if (and $serviceAccount $serviceAccount.metadata.labels) }}
+{{- $isServiceAccountOwnedByHelm = (eq (index $serviceAccount.metadata.labels "app.kubernetes.io/instance") .Release.Name) }}
+{{- end }}
 
 {{- if or (not $serviceAccount) $isServiceAccountOwnedByHelm }}
 apiVersion: v1
