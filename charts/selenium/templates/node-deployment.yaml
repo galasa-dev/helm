@@ -1,0 +1,74 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.node.type }}-node
+  labels:
+    app: {{ .Release.Name }}-{{ .Values.node.type }}-node
+spec:
+  replicas: {{ .Values.node.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-{{ .Values.node.type }}-node
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-{{ .Values.node.type }}-node
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountName | default "default" }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Values.node.type }}
+          image: "{{ .Values.node.image.repository }}:{{ .Values.node.image.tag }}"
+          imagePullPolicy: "{{ .Values.node.image.pullPolicy }}"
+          ports:
+            - containerPort: 4444
+              name: webdriver
+              protocol: TCP
+            - containerPort: 5900
+              name: vnc
+              protocol: TCP
+            - containerPort: 7900
+              name: novnc
+              protocol: TCP
+          env:
+            - name: SE_EVENT_BUS_HOST
+              value: "{{ .Release.Name }}-hub"
+            - name: SE_EVENT_BUS_PUBLISH_PORT
+              value: "4442"
+            - name: SE_EVENT_BUS_SUBSCRIBE_PORT
+              value: "4443"
+            - name: SE_NODE_PORT
+              value: "4444"
+            - name: SE_NODE_MAX_SESSION
+              value: "{{ .Values.node.maxSession | default "1" }}"
+            - name: SE_NODE_SESSION_TIMEOUT
+              value: "{{ .Values.node.sessionTimeout | default "60" }}"
+            - name: SE_VNC_NO_PASSWORD
+              value: "true"
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 4444
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: 4444
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          {{- with .Values.node.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
