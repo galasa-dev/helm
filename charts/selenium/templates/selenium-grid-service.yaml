@@ -1,0 +1,29 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-hub
+  labels:
+    app: {{ .Release.Name }}-hub
+spec:
+  type: {{ .Values.hub.service.type }}
+  ports:
+    - name: web
+      port: 4444
+      targetPort: 4444
+      protocol: TCP
+    - name: event-pub
+      port: 4442
+      targetPort: 4442
+      protocol: TCP
+    - name: event-sub
+      port: 4443
+      targetPort: 4443
+      protocol: TCP
+  selector:
+    app: {{ .Release.Name }}-hub

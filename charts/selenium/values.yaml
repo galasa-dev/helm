@@ -1,0 +1,74 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+hub:
+  replicaCount: 1  # Number of Selenium Hub replicas to run
+
+  image:
+    repository: selenium/hub          # Docker image repository for Selenium Hub
+    tag: 4.8.3-20230328              # Specific image tag/version to use
+    pullPolicy: IfNotPresent         # Image pull policy (IfNotPresent to avoid pulling if image exists)
+
+  browserTimeout: "60"                # Timeout (in seconds) for browser requests to the hub
+  timeout: "60"                      # General timeout (in seconds) for hub operations
+
+  resources:                        # Kubernetes resource requests and limits for the hub pods
+    limits:
+      cpu: "500m"                   # Max CPU allowed
+      memory: "512Mi"               # Max memory allowed
+    requests:
+      cpu: "250m"                   # Minimum CPU requested
+      memory: "256Mi"               # Minimum memory requested
+
+  service:
+    type: ClusterIP                 # Kubernetes Service type (ClusterIP, NodePort, or LoadBalancer)
+    port: 4444                     # Port exposed by the Selenium Hub service
+
+serviceAccountName: ""             # Name of Kubernetes ServiceAccount to use
+
+nodeSelector:
+  kubernetes.io/arch: amd64        # Node architecture selector; schedules pods to amd64 nodes
+
+ingress:
+  enabled: true                    # Enable or disable Ingress for the Selenium Hub
+  ingressClassName: nginx          # Ingress controller class name (e.g., nginx)
+  externalHostname: "justin-test-selenium-ingress.cicsk8s.hursley.ibm.com"
+                                  # External hostname for accessing the hub via ingress
+
+  annotations:                    # Annotations for the Ingress resource
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+                                  # Disable automatic SSL redirect
+    nginx.ingress.kubernetes.io/rewrite-target: /
+                                  # Rewrite target path for incoming requests
+
+  # tls:                         # TLS configuration (optional) for HTTPS ingress
+  #   - hosts:
+  #       - seleniumhub.example.com
+  #     secretName: seleniumhub-tls-secret
+
+node:
+  type: chrome                    # Browser type for nodes; options: "firefox" or "chrome"
+  replicaCount: 3                 # Number of browser nodes to deploy
+
+  service:
+    type: ClusterIP              # Service type for browser nodes (ClusterIP, NodePort, LoadBalancer)
+
+  image:
+    repository: selenium/node-chrome    # Docker image repo for browser node
+                                        # Change to "selenium/node-firefox" for Firefox nodes
+    tag: 4.8.3-20230328                 # Image tag/version
+    pullPolicy: IfNotPresent            # Image pull policy
+
+  maxSession: 1                   # Maximum concurrent sessions per browser node
+  sessionTimeout: 300             # Timeout in seconds for each session on the node
+
+  resources:                     # Kubernetes resource requests and limits for browser nodes
+    limits:
+      cpu: "500m"                # Max CPU allowed per node pod
+      memory: "512Mi"            # Max memory allowed per node pod
+    requests:
+      cpu: "250m"                # Minimum CPU requested per node pod
+      memory: "256Mi"            # Minimum memory requested per node pod

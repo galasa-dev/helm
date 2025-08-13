@@ -1,0 +1,66 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-hub
+  labels:
+    app: {{ .Release.Name }}-hub
+spec:
+  replicas: {{ .Values.hub.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-hub
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-hub
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountName | default "default" }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: hub
+          image: "{{ .Values.hub.image.repository }}:{{ .Values.hub.image.tag }}"
+          imagePullPolicy: {{ .Values.hub.image.pullPolicy }}
+          ports:
+            - name: web
+              containerPort: 4444
+              protocol: TCP
+            - name: event-pub
+              containerPort: 4442
+              protocol: TCP
+            - name: event-sub
+              containerPort: 4443
+              protocol: TCP
+          env:
+            - name: GRID_BROWSER_TIMEOUT
+              value: "{{ .Values.hub.browserTimeout }}"
+            - name: GRID_TIMEOUT
+              value: "{{ .Values.hub.timeout }}"
+            - name: SE_EVENT_BUS_PUBLISH_PORT
+              value: "4442"
+            - name: SE_EVENT_BUS_SUBSCRIBE_PORT
+              value: "4443"
+          {{- with .Values.hub.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 4444
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: 4444
+            initialDelaySeconds: 5
+            periodSeconds: 5
