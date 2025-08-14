@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   ecosystem:
   - apiVersion: v2
+    created: "2025-08-14T12:50:42.443957298Z"
+    description: Galasa Ecosystem
+    digest: 44a40ad55ced0685256544bf927c093536f3ba0f81f1cbe96ed70d34d29fbea8
+    home: galasa.dev
+    name: ecosystem
+    type: application
+    urls:
+    - https://github.com/galasa-dev/helm/releases/download/ecosystem-0.43.0/ecosystem-0.43.0.tgz
+    version: 0.43.0
+  - apiVersion: v2
     created: "2025-06-10T14:16:27.069924068Z"
     description: Galasa Ecosystem
     digest: fc4576dd12e461536e00d3a654a22e53b4849bfeb37b8dd0c4e27755986ce31a
@@ -201,4 +211,4 @@ entries:
     urls:
     - https://github.com/galasa-dev/helm/releases/download/ecosystem-0.0.1/ecosystem-0.0.1.tgz
     version: 0.0.1
-generated: "2025-06-10T14:16:27.070076453Z"
+generated: "2025-08-14T12:50:42.444146813Z"
