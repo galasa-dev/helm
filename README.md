@@ -29,6 +29,7 @@ Galasa provides Helm charts to install various components, the main one being a 
       - [Linux](#linux)
       - [macOS](#macos)
     - [Development](#development)
+  - [Certificate Installer chart](./charts/cert-installer/README.md)
 
 ## Galasa Ecosystem chart
 ### Kubernetes RBAC setup
