@@ -153,6 +153,8 @@ spec:
               key: GALASA_EVENT_STREAMS_TOKEN
         - name: GALASA_ENCRYPTION_KEYS_PATH
           value: {{ include "ecosystem.encryption.keys.path" . }}
+        - name: MAX_GRPC_MESSAGE_SIZE
+          value: {{ include "max.grpc.message.size" . }}
         ports:
         - containerPort: 9010
           name: metrics

@@ -65,4 +65,11 @@
 */}}
 {{- define "framework.extra.bundles" -}}
   {{- print "dev.galasa.cps.etcd,dev.galasa.ras.couchdb,dev.galasa.events.kafka" }}
+{{- end -}}s
+
+{{/*
+  Returns the maximum message size in bytes allowed for a single gRPC frame as an integer value.
+*/}}
+{{- define "max.grpc.message.size" -}}
+  {{- empty .Values.maxgRPCMessageSize | ternary ("4194304") (.Values.maxgRPCMessageSize) }}
 {{- end -}}
