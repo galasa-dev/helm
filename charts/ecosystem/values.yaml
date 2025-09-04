@@ -368,12 +368,11 @@ dex:
 # publish events from Galasa to a Kafka cluster. When this chart is installed, it
 # will check for the existence of the Secret, and if it exists, will provide the
 # token as an environment variable to Pods that need to authenticate to a Kafka cluster.
-# If the Secret doesn't exist, one will be generated.
 #
 # If no value is provided, then the Galasa service will not load its Kafka extension
 # to publish events to a Kafka cluster.
 #
-eventStreamsSecretName: "event-streams-token"
+eventStreamsSecretName: ""
 #
 # The values below allow the location of the ETCD stores, DSS, CREDS, and CPS,
 # to be configurable. There is a separate URL for each store as you may want to
