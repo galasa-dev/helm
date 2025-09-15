@@ -52,6 +52,9 @@ data:
   # The amount of time in seconds the engine controller will wait before it deletes an interrupted run's test pod
   interrupted_test_run_cleanup_grace_period_seconds: "{{ .Values.enginecontroller.interruptedTestRunCleanupGracePeriodSecs | default 300 }}"
 
+  # The amount of time in minutes that test runs will be allowed to remain in the 'allocated' state before being cleaned up
+  allocated_test_run_timeout_minutes: "{{ .Values.enginecontroller.allocatedTestRunTimeoutMinutes | default 30 }}"
+
   # The time between scheduling a bunch of queued tests in fresh test pods, and when we look again for more test pods to queue.
   # Unit is seconds. Defaults to 60 seconds if not set.
   run_poll: "5"

@@ -470,6 +470,10 @@ enginecontroller:
   # an interrupted run's test pod is deleted from the Kubernetes namespace
   interruptedTestRunCleanupGracePeriodSecs: 300
 
+  # The amount of time in minutes that test runs will be allowed to remain in
+  # the 'allocated' state before being automatically interrupted and cleaned up.
+  allocatedTestRunTimeoutMinutes: 30
+
   # Best practice is to set memory limits for each pod.
   # This section sets some limits which Dex should be happy working within.
   # Omitting this resources: section will cause no memory or cpi limits to be set.
