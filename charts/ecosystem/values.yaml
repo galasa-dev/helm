@@ -363,14 +363,16 @@ dex:
       memory: "500Mi"
 
 #
-# The name of the Kubernetes Secret that Galasa will look for in your Galasa service's
+# Optional. The name of the Kubernetes Secret that Galasa will look for in your Galasa service's
 # namespace to authenticate to a configured Kafka cluster, if you optionally wish to
 # publish events from Galasa to a Kafka cluster. When this chart is installed, it
 # will check for the existence of the Secret, and if it exists, will provide the
 # token as an environment variable to Pods that need to authenticate to a Kafka cluster.
-# If the Secret doesn't exist, one will be generated.
 #
-eventStreamsSecretName: "event-streams-token"
+# If no value is provided, then the Galasa service will not load its Kafka extension
+# to publish events to a Kafka cluster.
+#
+eventStreamsSecretName: ""
 #
 # The values below allow the location of the ETCD stores, DSS, CREDS, and CPS,
 # to be configurable. There is a separate URL for each store as you may want to
@@ -467,6 +469,10 @@ enginecontroller:
   # The amount of time in seconds the engine controller will wait before
   # an interrupted run's test pod is deleted from the Kubernetes namespace
   interruptedTestRunCleanupGracePeriodSecs: 300
+
+  # The amount of time in minutes that test runs will be allowed to remain in
+  # the 'allocated' state before being automatically interrupted and cleaned up.
+  allocatedTestRunTimeoutMinutes: 30
 
   # Best practice is to set memory limits for each pod.
   # This section sets some limits which Dex should be happy working within.

@@ -146,11 +146,13 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
+        {{- if .Values.eventStreamsSecretName }}
         - name: GALASA_EVENT_STREAMS_TOKEN
           valueFrom:
             secretKeyRef:
-              name: event-streams-token
+              name: "{{ .Values.eventStreamsSecretName }}"
               key: GALASA_EVENT_STREAMS_TOKEN
+        {{- end }}
         - name: GALASA_ENCRYPTION_KEYS_PATH
           value: {{ include "ecosystem.encryption.keys.path" . }}
         ports:
