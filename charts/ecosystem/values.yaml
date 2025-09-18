@@ -120,7 +120,7 @@ catalogDiskSize: "1Gi"
 etcdImage: "quay.io/coreos/etcd:v3.5.18"
 couchdbImage: "couchdb:3.3.3"
 dexImage: "ghcr.io/dexidp/dex:v2.38.0"
-kubectlImage: "bitnami/kubectl:1.28"
+kubectlImage: "rancher/kubectl:v1.33.5"
 #
 #
 # New users logging into the system get a user record created and that user is assigned a role
