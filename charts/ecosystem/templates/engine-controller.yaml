@@ -80,8 +80,8 @@ spec:
           - /bin/bash
           - -ec
           - |
-            java -jar boot.jar --obr file:galasa.obr --setupeco
-            java -jar boot.jar --obr file:galasa.obr --k8scontroller
+            java -jar boot.jar --obr file:galasa.obr --setupeco --log4j2-properties-file file:/log4j2.properties
+            java -jar boot.jar --obr file:galasa.obr --k8scontroller --log4j2-properties-file file:/log4j2.properties
         env:
         - name: GALASA_INSTALL_NAME
           value: {{ .Release.Name }}
@@ -143,7 +143,14 @@ spec:
         - name: encryption-keys
           mountPath: {{ include "ecosystem.encryption.keys.directory" . }}
           readOnly: true
+        - name: log4j2-config
+          mountPath: /log4j2.properties
+          subPath: log4j2.properties
+          readOnly: true
       volumes:
       - name: encryption-keys
         secret:
           secretName: {{ include "ecosystem.encryption.keys.secret.name" . }}
+      - name: log4j2-config
+        configMap:
+          name: {{ .Release.Name }}-log4j2-config
