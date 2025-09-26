@@ -105,6 +105,8 @@ spec:
         - --api
         - --bootstrap
         - file:/bootstrap.properties
+        - --log4j2-properties-file
+        - file:/log4j2.properties
         env:
         # The Kubernetes namespace that the Galasa service is running within is passed into the API server
         # so that the API server can query Kubernetes for monitor deployments in the /monitors REST APIs
@@ -178,6 +180,10 @@ spec:
         - name: bootstrap
           mountPath: /bootstrap.properties
           subPath: bootstrap.properties
+        - name: log4j2-config
+          mountPath: /log4j2.properties
+          subPath: log4j2.properties
+          readOnly: true
         - name: testcatalog
           mountPath: /galasa/load/dev.galasa.testcatalog.cfg
           subPath: dev.galasa.testcatalog.cfg
@@ -190,6 +196,9 @@ spec:
       - name: bootstrap
         configMap:
           name: {{ .Release.Name }}-bootstrap-file
+      - name: log4j2-config
+        configMap:
+          name: {{ .Release.Name }}-log4j2-config
       - name: testcatalog
         configMap:
           name: {{ .Release.Name }}-testcatalog-file

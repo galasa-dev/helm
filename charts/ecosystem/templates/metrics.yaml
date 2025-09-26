@@ -83,7 +83,8 @@ spec:
         - --obr
         - file:galasa.obr
         - --metricserver
-        - --trace
+        - --log4j2-properties-file
+        - file:/log4j2.properties
         env:
         - name: GALASA_EXTRA_BUNDLES
           value: {{ include "framework.extra.bundles" . }}
@@ -117,3 +118,12 @@ spec:
             port: 9010
           initialDelaySeconds: 5
           periodSeconds: 10
+        volumeMounts:
+        - name: log4j2-config
+          mountPath: /log4j2.properties
+          subPath: log4j2.properties
+          readOnly: true
+      volumes:
+      - name: log4j2-config
+        configMap:
+          name: {{ .Release.Name }}-log4j2-config

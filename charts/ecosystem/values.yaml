@@ -572,3 +572,41 @@ resourceMonitor:
       memory: "300Mi"
     limits:
       memory: "500Mi"
+#
+# The global Log4j2 configuration properties applied to all Galasa service pods.
+# By default, a console appender with debug level logging is configured to send logs to stdout.
+#
+# This value is expected to be supplied properties as a string in the form:
+#
+# log4j2Properties: |
+#   status = error
+#   name = Default
+#
+#   appender.console.type = Console
+#   appender.console.name = stdout
+#   appender.console.layout.type = PatternLayout
+#   appender.console.layout.pattern = %d{dd/MM/yyyy HH:mm:ss.SSS} %-5p %c{1.} - %m%n
+#
+#   rootLogger.level = debug
+#   rootLogger.appenderRef.stdout.ref = stdout
+#
+log4j2Properties: |
+  status = error
+  name = Default
+
+  appender.console.type = Console
+  appender.console.name = stdout
+  appender.console.layout.type = PatternLayout
+  appender.console.layout.pattern = %d{dd/MM/yyyy HH:mm:ss.SSS} %-5p %c{1.} - %m%n
+
+  rootLogger.level = debug
+  rootLogger.appenderRef.stdout.ref = stdout
+
+  logger.http.name = org.apache.http
+  logger.http.level = info
+
+  logger.sshtools.name = com.sshtools
+  logger.sshtools.level = warn
+
+  logger.ftp.name = ftp
+  logger.ftp.level = info
