@@ -1,0 +1,13 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+# A ConfigMap that contains the global Log4j2 configuration that will be applied to all Galasa service pods
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-log4j2-config
+data:
+  log4j2.properties: {{ .Values.log4j2Properties | quote }}
