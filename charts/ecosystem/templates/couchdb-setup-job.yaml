@@ -7,7 +7,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}-couchdb-setup"
+  name: "{{ .Release.Name }}-couchdb-setup-{{ randAlphaNum 5 | lower }}"
 spec:
   ttlSecondsAfterFinished: 120
   backoffLimit: 1
