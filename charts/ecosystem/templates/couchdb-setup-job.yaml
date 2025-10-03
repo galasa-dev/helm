@@ -8,6 +8,10 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: "{{ .Release.Name }}-couchdb-setup"
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   ttlSecondsAfterFinished: 120
   backoffLimit: 1
@@ -35,7 +39,7 @@ spec:
           - --for=condition=Ready
           - --timeout=90s
       containers:
-      - name: create-couchdb-users-database
+      - name: create-couchdb-users-database-and-set-revision-limits
         image: {{ .Values.couchdbImage }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         command:
@@ -43,13 +47,41 @@ spec:
           - -ec
           - |
             auth_header="Authorization: Basic ${GALASA_RAS_TOKEN}"
-            db_exists_code=$(curl --silent --output /dev/null -w "%{http_code}" --head -H "${auth_header}" http://{{ .Release.Name }}-couchdb:5984/_users)
 
-            if [[ ${db_exists_code} == "404" ]]; then
-              curl --silent --show-error -X PUT -H "${auth_header}" http://{{ .Release.Name }}-couchdb:5984/_users
-            else
-              echo "Users database already exists - OK"
-            fi
+            # Sets the document revision limit for a given CouchDB database
+            # Parameters:
+            # $1 - The name of the database to update
+            function set_revision_limit() {
+              database="$1"
+              new_limit="{{ .Values.couchdb.documentRevisionLimit }}"
+
+              echo "Setting revision limit for database ${database} to ${new_limit}"
+              curl --silent --show-error -X PUT -d "${new_limit}" -H "${auth_header}" http://{{ .Release.Name }}-couchdb:5984/${database}/_revs_limit
+              rc=$?
+              if [[ "${rc}" != "0" ]]; then
+                echo "Failed to set revision limit. rc=${rc}"
+              else
+                echo "Revision limit set - OK"
+              fi
+            }
+
+            # Creates the CouchDB _users database if it does not already exist
+            function create_users_db() {
+              db_exists_code=$(curl --silent --output /dev/null -w "%{http_code}" --head -H "${auth_header}" http://{{ .Release.Name }}-couchdb:5984/_users)
+              if [[ ${db_exists_code} == "404" ]]; then
+                curl --silent --show-error -X PUT -H "${auth_header}" http://{{ .Release.Name }}-couchdb:5984/_users
+              else
+                echo "Users database already exists - OK"
+              fi
+            }
+
+            create_users_db
+
+            set_revision_limit "galasa_artifacts"
+            set_revision_limit "galasa_log"
+            set_revision_limit "galasa_run"
+            set_revision_limit "galasa_tokens"
+            set_revision_limit "galasa_users"
         env:
         - name: GALASA_RAS_TOKEN
           valueFrom:
