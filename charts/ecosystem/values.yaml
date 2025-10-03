@@ -612,7 +612,7 @@ log4j2Properties: |
   logger.ftp.level = info
 
 # The name of an existing ConfigMap in the same Kubernetes namespace that the Helm chart will be installed
-# in containing one or more custom Log4j2 JSON template layouts to customize the Log4j events generated
+# in containing one or more custom Log4j JSON template layouts to customize the Log4j events generated
 # using the 'JsonTemplateLayout' layout.
 #
 # To create a ConfigMap called 'my-json-layouts' with JSON data from existing .json files, run:
@@ -627,11 +627,11 @@ log4j2Properties: |
 # directory.
 # 
 # If you wish to use any of your custom JSON templates, for example a template called 'MyLayout.json',
-# your Log4j2 properties should contain the following properties:
+# your Log4j properties should contain the following properties:
 #
 #   appender.<appender-name>.layout.type = JsonTemplateLayout
 #   appender.<appender-name>.layout.eventTemplateUri = file:/log4j-config/MyLayout.json
 #
 # If no name is given, only Log4j's pre-defined JSON layouts will be available for use.
 # See https://logging.apache.org/log4j/2.x/manual/json-template-layout.html for details.
-log4j2JsonTemplatesConfigMapName: ""
+log4jJsonTemplatesConfigMapName: ""
