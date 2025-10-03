@@ -123,7 +123,17 @@ spec:
           mountPath: /log4j2.properties
           subPath: log4j2.properties
           readOnly: true
+      {{- if .Values.log4jJsonTemplatesConfigMapName }}
+        - name: log4j-json-templates
+          mountPath: /log4j-config
+          readOnly: true
+      {{- end }}
       volumes:
       - name: log4j2-config
         configMap:
           name: {{ .Release.Name }}-log4j2-config
+      {{- if .Values.log4jJsonTemplatesConfigMapName }}
+      - name: log4j-json-templates
+        configMap:
+          name: {{ .Values.log4jJsonTemplatesConfigMapName | quote }}
+      {{- end }}

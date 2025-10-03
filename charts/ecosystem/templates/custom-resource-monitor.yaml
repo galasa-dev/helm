@@ -49,6 +49,8 @@ spec:
         - --obr
         - file:galasa.obr
         - --resourcemanagement
+        - --log4j2-properties-file
+        - file:/log4j2.properties
         env:
         - name: NAMESPACE
           valueFrom:
@@ -94,3 +96,22 @@ spec:
             port: 9011
           initialDelaySeconds: 5
           periodSeconds: 10
+        volumeMounts:
+        - name: log4j2-config
+          mountPath: /log4j2.properties
+          subPath: log4j2.properties
+          readOnly: true
+      {{- if .Values.log4jJsonTemplatesConfigMapName }}
+        - name: log4j-json-templates
+          mountPath: /log4j-config
+          readOnly: true
+      {{- end }}
+      volumes:
+      - name: log4j2-config
+        configMap:
+          name: {{ .Release.Name }}-log4j2-config
+      {{- if .Values.log4jJsonTemplatesConfigMapName }}
+      - name: log4j-json-templates
+        configMap:
+          name: {{ .Values.log4jJsonTemplatesConfigMapName | quote }}
+      {{- end }}
