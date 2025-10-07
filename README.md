@@ -178,6 +178,50 @@ data:
 When the chart is installed, it will check for existence of the Secret, and provide the token as an environment variable to the Pods that will require it to authenticate to your Kafka cluster.
 
 
+#### Configuring Log4j for the Galasa service's logs (Optional)
+
+If you would like to modify the format of the Galasa service's log messages, you can do so by providing a custom set of Log4j2 properties using the `log4j2Properties` value. Refer to the [Log4j documentation](https://logging.apache.org/log4j/2.x/manual/configuration.html) for available properties.
+
+By default, a console appender with debug level logging is configured to send logs to stdout.
+
+The `log4j2Properties` value is expected to be supplied properties as a string in the form:
+
+```yaml
+log4j2Properties: |
+  status = error
+  name = Default
+
+  appender.console.type = Console
+  appender.console.name = stdout
+  appender.console.layout.type = PatternLayout
+  appender.console.layout.pattern = %d{dd/MM/yyyy HH:mm:ss.SSS} %-5p %c{1.} - %m%n
+
+  rootLogger.level = debug
+  rootLogger.appenderRef.stdout.ref = stdout
+```
+
+If you are using Log4j's `JsonTemplateLayout` layout type and would like to use a custom JSON template for your log messages, then you can create a ConfigMap containing the JSON templates that you wish to make available to the Galasa service and supply the name of that ConfigMap in the `log4jJsonTemplatesConfigMapName` value.
+
+The ConfigMap is mounted into the Galasa service pods in the `/log4j-config` directory, so any Log4j properties that need to refer to a template's URI will need a value to be prefixed with `file:/log4j-config`.
+
+For example, if you have a custom JSON template in a file called `MyLayout.json`, then you would take the following steps:
+
+1. Create a ConfigMap by running:
+    ```
+    kubectl create configmap my-json-layouts --from-file=/path/to/MyLayout.json
+    ```
+
+2. Set `log4jJsonTemplatesConfigMapName` in the Helm values to:
+    ```yaml
+    log4jJsonTemplatesConfigMapName: "my-json-layouts"
+    ```
+
+3. Use the custom layout in the `log4j2Properties` value by adding these properties:
+    ```properties
+    appender.myAppender.layout.type = JsonTemplateLayout
+    appender.myAppender.layout.eventTemplateUri = file:/log4j-config/MyLayout.json
+    ```
+
 #### Installing your Galasa Ecosystem
 
 Having configured your [values.yaml](charts/ecosystem/values.yaml) file, use the following command to install the Galasa Ecosystem Helm chart:
