@@ -487,8 +487,10 @@ enginecontroller:
 # The couchdb component stores run history and records, user records and other
 # persistent storage objects.
 couchdb:
-  # The number of document revisions that will be stored in CouchDB
-  # for each database used by the Galasa service. 
+  # The number of document revisions that will be stored in CouchDB for each database used by the Galasa service.
+  # A low value will reduce disk usage and make compaction faster as there are fewer revisions to compact.
+  # However, a low value can also cause more conflicts when replicating databases.
+  # See https://docs.couchdb.org/en/stable/replication/conflicts.html for details around CouchDB conflicts.
   documentRevisionLimit: 1
 
   # Best practice is to set memory limits for each pod.
