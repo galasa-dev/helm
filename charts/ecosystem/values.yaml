@@ -53,14 +53,16 @@ kubeLaunchIntervalMillisecs: 1000
 galasaWebUiImage: "galasa-ui"
 #
 #
-# Optional. The label of a Kubernetes node that the engine controller should
-# have an affinity for. If possible, the engine controller will schedule
+# Optional. The label of a Kubernetes node that test pods should have
+# an affinity for. If possible, the engine controller will schedule
 # Galasa runs on this node.
 #
-# This value must be supplied a string in the form "<label key>=<label value>".
+# This value must be supplied a string in the form "<label key>=<label value>",
+# where the label's key and value match against a user-defined label on a Kubernetes node.
 #
-# For example, if a Kubernetes node has a label of 'galasa-engines: schedule',
-# then the following value can be set to schedule Galasa runs on the node:
+# For example, if your systems administrator has set a label of 'galasa-engines: schedule'
+# on the Kubernetes node that you wish to schedule runs on, then the following value can
+# be set:
 #
 # k8sNodePreferredAffinity: "galasa-engines=schedule"
 #
