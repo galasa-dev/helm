@@ -101,6 +101,10 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
+        {{- if .Values.certificatesConfigMapName }}
+        - name: JDK_JAVA_OPTIONS
+          value: -Djavax.net.ssl.trustStore=/galasa/certificates/cacerts
+        {{- end }}
         ports:
         - containerPort: 9010
           name: metrics
@@ -128,6 +132,12 @@ spec:
           mountPath: /log4j-config
           readOnly: true
       {{- end }}
+      {{- if .Values.certificatesConfigMapName }}
+        - name: galasa-cacerts
+          mountPath: /galasa/certificates/cacerts
+          subPath: cacerts
+          readOnly: true
+      {{- end }}
       volumes:
       - name: log4j2-config
         configMap:
@@ -136,4 +146,9 @@ spec:
       - name: log4j-json-templates
         configMap:
           name: {{ .Values.log4jJsonTemplatesConfigMapName | quote }}
+      {{- end }}
+      {{- if .Values.certificatesConfigMapName }}
+      - name: galasa-cacerts
+        configMap:
+          name: {{ .Release.Name }}-cacerts
       {{- end }}

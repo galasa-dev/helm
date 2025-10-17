@@ -157,6 +157,10 @@ spec:
         {{- end }}
         - name: GALASA_ENCRYPTION_KEYS_PATH
           value: {{ include "ecosystem.encryption.keys.path" . }}
+        {{- if .Values.certificatesConfigMapName }}
+        - name: JDK_JAVA_OPTIONS
+          value: -Djavax.net.ssl.trustStore=/galasa/certificates/cacerts
+        {{- end }}
         ports:
         - containerPort: 9010
           name: metrics
@@ -197,6 +201,12 @@ spec:
         - name: encryption-keys
           mountPath: {{ include "ecosystem.encryption.keys.directory" . }}
           readOnly: true
+        {{- if .Values.certificatesConfigMapName }}
+        - name: galasa-cacerts
+          mountPath: /galasa/certificates/cacerts
+          subPath: cacerts
+          readOnly: true
+        {{- end }}
       volumes:
       - name: bootstrap
         configMap:
@@ -218,3 +228,8 @@ spec:
       - name: encryption-keys
         secret:
           secretName: {{ include "ecosystem.encryption.keys.secret.name" . }}
+      {{- if .Values.certificatesConfigMapName }}
+      - name: galasa-cacerts
+        configMap:
+          name: {{ .Release.Name }}-cacerts
+      {{- end }}
