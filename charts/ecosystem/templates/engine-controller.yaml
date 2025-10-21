@@ -22,6 +22,8 @@ spec:
       name: {{ .Release.Name }}-engine-controller
       labels:
         app: {{ .Release.Name }}-engine-controller
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
     spec:
       serviceAccountName: galasa
       nodeSelector:

@@ -22,6 +22,8 @@ spec:
       name: {{ .Release.Name }}-custom-resource-monitor
       labels:
         app: {{ .Release.Name }}-custom-resource-monitor
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
     spec:
       serviceAccountName: galasa
       nodeSelector:

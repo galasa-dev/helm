@@ -22,6 +22,8 @@ spec:
       name: {{ .Release.Name }}-webui
       labels:
         app: {{ .Release.Name }}-webui
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
     spec:
       serviceAccountName: galasa
       nodeSelector:

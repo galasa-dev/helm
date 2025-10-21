@@ -22,6 +22,8 @@ spec:
       name: {{ .Release.Name }}-metrics
       labels:
         app: {{ .Release.Name }}-metrics
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
     spec:
       serviceAccountName: galasa
       nodeSelector:

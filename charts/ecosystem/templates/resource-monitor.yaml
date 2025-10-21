@@ -23,6 +23,8 @@ spec:
       name: {{ .Release.Name }}-resource-monitor
       labels:
         app: {{ .Release.Name }}-resource-monitor
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
     spec:
       serviceAccountName: galasa
       nodeSelector:
