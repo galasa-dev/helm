@@ -16,6 +16,8 @@ Galasa provides Helm charts to install various components, the main one being a 
       - [Configuring Ingress](#configuring-ingress)
       - [Configuring Dex](#configuring-dex)
       - [Configuring your Kafka cluster to use the Galasa Kafka extension (Optional)](#configuring-your-kafka-cluster-to-use-the-galasa-kafka-extension-optional)
+      - [Configuring Log4j for the Galasa service's logs (Optional)](#configuring-log4j-for-the-galasa-services-logs-optional)
+      - [Configuring public certificates (Optional)](#configuring-public-certificates-optional)
       - [Installing your Galasa Ecosystem](#installing-your-galasa-ecosystem)
     - [Verifying your Galasa Ecosystem Installation](#verifying-your-galasa-ecosystem-installation)
       - [Accessing services](#accessing-services)
@@ -221,6 +223,25 @@ For example, if you have a custom JSON template in a file called `MyLayout.json`
     appender.myAppender.layout.type = JsonTemplateLayout
     appender.myAppender.layout.eventTemplateUri = file:/log4j-config/MyLayout.json
     ```
+
+#### Configuring Public Certificates (Optional)
+
+If you are deploying your Galasa service on an internal or corporate network and expect your Galasa tests to connect to servers that use internal certificates, you will need to supply the public certificates so that Galasa can contact those servers successfully.
+
+You can use the `certificatesConfigMapName` value to provide the name of an existing ConfigMap containing the certificates that you wish to inject into the Galasa service pods. To do this, take the following steps:
+
+1. Create a ConfigMap by running:
+    ```
+    kubectl create configmap my-certificates --from-file=/path/to/my/certificate.pem
+    ```
+    where `/path/to/my/certificate.pem` is a file path on your machine to a certificate that you wish to include. You can supply multiple `--from-file` flags if you wish to load multiple certificates into the ConfigMap.
+
+2. Set `certificatesConfigMapName` in the Helm values to the name of the ConfigMap that you created (in this example, the name is `my-certificates`):
+    ```yaml
+    certificatesConfigMapName: "my-certificates"
+    ```
+
+You can then proceed with the installation of the Galasa service and the Helm chart will inject the certificates inside the ConfigMap into the Galasa service pods.
 
 #### Installing your Galasa Ecosystem
 
