@@ -1,0 +1,85 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+{{- if .Values.certificatesConfigMapName }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-import-certs"
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  ttlSecondsAfterFinished: 120
+  backoffLimit: 1
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-import-certs"
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: {{ .Values.architecture }}
+        {{- if .Values.nodeSelectors }}
+{{ toYaml .Values.nodeSelectors | indent 8 }}
+        {{- end }}
+      restartPolicy: Never
+      serviceAccountName: galasa
+      initContainers:
+      - name: import-ca-certs
+        image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 0
+        command:
+          - /bin/bash
+          - -ec
+          - |
+            java_cacerts_file=${JAVA_HOME}/lib/security/cacerts
+            certs_dir=/certificates-to-import
+            cacerts_file_to_share=/shared/cacerts
+
+            # Copy the default Java cacerts file into the shared volume
+            cp "${java_cacerts_file}" /shared
+
+            # Import the certificates into the Java keystore
+            for cert_file in ${certs_dir}/*; do
+              alias_name=$(basename "${cert_file}" | sed 's/[.][^.]*$//')
+              keytool -import \
+                -file "${cert_file}" \
+                -alias "${alias_name}" \
+                -keystore "${cacerts_file_to_share}" \
+                -storepass "changeit" \
+                -trustcacerts \
+                -noprompt
+            done
+        volumeMounts:
+          - name: certificates-to-import
+            mountPath: /certificates-to-import
+            readOnly: true
+          - name: cacert-share
+            mountPath: /shared
+      containers:
+      - name: create-cacerts-configmap
+        image: {{ .Values.galasaRegistry }}/{{ .Values.galasaBootImage }}:{{ .Values.galasaVersion }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        command:
+          - /bin/sh
+          - -ec
+          - |
+            kubectl create configmap {{ .Release.Name }}-cacerts \
+            --namespace={{ .Release.Namespace }} \
+            --from-file=/shared/cacerts \
+            -o yaml --dry-run=client | kubectl apply -f -
+        volumeMounts:
+          - name: cacert-share
+            mountPath: /shared
+      volumes:
+      - name: certificates-to-import
+        configMap:
+          name: {{ .Values.certificatesConfigMapName }}
+      - name: cacert-share
+        emptyDir: {}
+{{- end }}

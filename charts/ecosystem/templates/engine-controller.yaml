@@ -22,6 +22,8 @@ spec:
       name: {{ .Release.Name }}-engine-controller
       labels:
         app: {{ .Release.Name }}-engine-controller
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
     spec:
       serviceAccountName: galasa
       nodeSelector:
@@ -122,6 +124,12 @@ spec:
         {{- end }}
         - name: GALASA_ENCRYPTION_KEYS_PATH
           value: {{ include "ecosystem.encryption.keys.path" . }}
+        {{- if .Values.certificatesConfigMapName }}
+        - name: GALASA_CACERTS_FILE_PATH
+          value: /galasa/certificates/cacerts
+        - name: JDK_JAVA_OPTIONS
+          value: -Djavax.net.ssl.trustStore=/galasa/certificates/cacerts
+        {{- end }}
         ports:
         - containerPort: 9010
           name: metrics
@@ -152,6 +160,12 @@ spec:
           mountPath: /log4j-config
           readOnly: true
       {{- end }}
+      {{- if .Values.certificatesConfigMapName }}
+        - name: galasa-cacerts
+          mountPath: /galasa/certificates/cacerts
+          subPath: cacerts
+          readOnly: true
+      {{- end }}
       volumes:
       - name: encryption-keys
         secret:
@@ -163,4 +177,9 @@ spec:
       - name: log4j-json-templates
         configMap:
           name: {{ .Values.log4jJsonTemplatesConfigMapName | quote }}
+      {{- end }}
+      {{- if .Values.certificatesConfigMapName }}
+      - name: galasa-cacerts
+        configMap:
+          name: {{ .Release.Name }}-cacerts
       {{- end }}

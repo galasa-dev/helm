@@ -647,3 +647,16 @@ log4j2Properties: |
 # If no name is given, only Log4j's pre-defined JSON layouts will be available for use.
 # See https://logging.apache.org/log4j/2.x/manual/json-template-layout.html for details.
 log4jJsonTemplatesConfigMapName: ""
+
+# Optional. The name of an existing ConfigMap in the same Kubernetes namespace that the Helm chart will be installed
+# in containing one or more public certificates for the Galasa service and test pods to make secure connections to
+# servers that use those certificates.
+#
+# To create a ConfigMap called 'my-public-certificates' with certificates from existing certificate files
+# (e.g. .crt, .pem, and .der files), run:
+#
+#   kubectl create configmap my-public-certificates --from-file=/path/to/your/certificate.pem
+#
+# You can supply multiple '--from-file' flags if you would like to load the contents of multiple certificates
+# into the ConfigMap.
+certificatesConfigMapName: ""

@@ -60,3 +60,20 @@ spec:
           value: couchdb:http://{{ .Release.Name }}-couchdb:5984
         - name: GALASA_CREDENTIALS_STORE
           value: etcd:{{ include "creds.url" . }}
+        {{- if .Values.certificatesConfigMapName }}
+        - name: JDK_JAVA_OPTIONS
+          value: -Djavax.net.ssl.trustStore=/galasa/certificates/cacerts
+        {{- end }}
+        volumeMounts:
+        {{- if .Values.certificatesConfigMapName }}
+        - name: galasa-cacerts
+          mountPath: /galasa/certificates/cacerts
+          subPath: cacerts
+          readOnly: true
+        {{- end }}
+      volumes:
+      {{- if .Values.certificatesConfigMapName }}
+      - name: galasa-cacerts
+        configMap:
+          name: {{ .Release.Name }}-cacerts
+      {{- end }}

@@ -10,6 +10,7 @@
 # sure that the ServiceAccount was created by Helm means that this template will not be rendered as an empty template,
 # which would otherwise cause Helm to delete these resources.
 #
+# These resources are defined as Helm hooks that are loaded first, so they can be used by other hooks if needed.
 {{- $serviceAccount := (lookup "v1" "ServiceAccount" .Release.Namespace "galasa") }}
 {{- $isServiceAccountOwnedByHelm := false }}
 
@@ -26,7 +27,14 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: galasa
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-1"
+    helm.sh/resource-policy: keep
+    meta.helm.sh/release-name: {{ .Release.Name | quote }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace | quote }}
   labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
     app.kubernetes.io/instance: {{ .Release.Name | quote }}
 
 ---
@@ -35,13 +43,22 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: galasa
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-1"
+    helm.sh/resource-policy: keep
+    meta.helm.sh/release-name: {{ .Release.Name | quote }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
 rules:
 - apiGroups: [""]
   resources: ["services"]
   verbs: ["get"]
 - apiGroups: [""]
   resources: ["configmaps"]
-  verbs: ["get","update"]
+  verbs: ["get","create","update","patch"]
 - apiGroups: ["apps"]
   resources: ["deployments"]
   verbs: ["get","patch","list","watch","update"]
@@ -55,6 +72,15 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: galasa
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-1"
+    helm.sh/resource-policy: keep
+    meta.helm.sh/release-name: {{ .Release.Name | quote }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
 roleRef:
   kind: Role
   name: galasa
