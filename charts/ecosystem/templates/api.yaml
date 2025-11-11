@@ -136,6 +136,8 @@ spec:
           value: {{ .Release.Name }}-dex:5557
         - name: GALASA_EXTERNAL_API_URL
           value: {{ include "ecosystem.host.url" . }}/api
+        - name: GALASA_EXTERNAL_WEBUI_URL
+          value: {{ include "ecosystem.host.url" . }}
         - name: GALASA_USERNAME_CLAIMS
           value: {{ join "," .Values.dex.usernameClaims | quote }}
         - name: GALASA_ALLOWED_ORIGINS
