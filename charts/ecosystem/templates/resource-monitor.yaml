@@ -108,6 +108,8 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-couchdb-secret
               key: GALASA_RAS_TOKEN
+        - name: GALASA_ENCRYPTION_KEYS_PATH
+          value: {{ include "ecosystem.encryption.keys.path" . }}
         - name: GALASA_MONITOR_INCLUDES_GLOB_PATTERNS
           value: "{{ join "," .Values.resourceMonitor.includes }}"
         - name: GALASA_MONITOR_EXCLUDES_GLOB_PATTERNS
@@ -134,6 +136,9 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 10
         volumeMounts:
+        - name: encryption-keys
+          mountPath: {{ include "ecosystem.encryption.keys.directory" . }}
+          readOnly: true
         - name: log4j2-config
           mountPath: /log4j2.properties
           subPath: log4j2.properties
@@ -150,6 +155,9 @@ spec:
           readOnly: true
       {{- end }}
       volumes:
+      - name: encryption-keys
+        secret:
+          secretName: {{ include "ecosystem.encryption.keys.secret.name" . }}
       - name: log4j2-config
         configMap:
           name: {{ .Release.Name }}-log4j2-config
