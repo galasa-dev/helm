@@ -64,9 +64,9 @@
   Returns the extra bundles to load when starting the framework
 */}}
 {{- define "framework.extra.bundles" -}}
+  {{- $extraBundles := "dev.galasa.cps.etcd,dev.galasa.ras.couchdb,dev.galasa.auth.couchdb" }}
   {{- if .Values.eventStreamsSecretName }}
-    {{- print "dev.galasa.cps.etcd,dev.galasa.ras.couchdb,dev.galasa.events.kafka" }}
-  {{- else }}
-    {{- print "dev.galasa.cps.etcd,dev.galasa.ras.couchdb" }}
+    {{- $extraBundles = printf "%s,dev.galasa.events.kafka" $extraBundles }}
   {{- end }}
+  {{- print $extraBundles }}
 {{- end -}}
