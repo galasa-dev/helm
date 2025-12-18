@@ -1,0 +1,34 @@
+{{- $kubeVersion := .Capabilities.KubeVersion.Version }}
+{{- if not (and (semverCompare (include "KUBERNETES_MIN_SUPPORTED_SEMVER" .) $kubeVersion) (semverCompare (include "KUBERNETES_MAX_SUPPORTED_SEMVER" .) $kubeVersion)) -}}
+⚠️ WARNING: Kubernetes {{ .Capabilities.KubeVersion.Version }} is not officially supported in this Galasa release ({{ .Chart.Version }}).
+
+Refer to the Galasa documentation at https://galasa.dev/docs/ecosystem/ecosystem-installing-k8s for a list of supported Kubernetes versions.
+{{- end }}
+---------------
+
+Thank you for installing the Galasa service chart!
+To learn more about the Galasa service, visit https://galasa.dev/docs/ecosystem/#running-tests-in-the-galasa-ecosystem
+
+Release information:
+    - Release Name: {{ .Release.Name }}
+    - Namespace:    {{ .Release.Namespace }}
+    - Chart Name: {{ .Chart.Name }}
+    - Chart Version: {{ .Chart.Version }}
+
+To learn more about this release, run the following commands:
+    - Get a list of installed releases:
+      helm ls
+
+    - Check the status of this release:
+      helm status {{ .Release.Name }} --show-resources
+
+    - Monitor the statuses of the deployed Kubernetes pods:
+      kubectl --namespace {{ .Release.Namespace }} get pods
+
+Once all pods are in the 'Running' state, you can access the Galasa service as follows:
+
+  Galasa UI: {{ include "ecosystem.host.url" . }}
+  Galasa Bootstrap: {{ include "ecosystem.host.url" . }}/api/bootstrap
+
+To uninstall the Galasa service, run the following command:
+    helm uninstall {{ .Release.Name }} --namespace {{ .Release.Namespace }}

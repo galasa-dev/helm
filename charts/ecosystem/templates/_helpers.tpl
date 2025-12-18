@@ -5,6 +5,20 @@
 #
 
 {{/*
+  Returns the semver constraint for the minimum supported Kubernetes version
+*/}}
+{{- define "KUBERNETES_MIN_SUPPORTED_SEMVER" -}}
+  {{- print ">=1.28.0" }}
+{{- end -}}
+
+{{/*
+  Returns the semver constraint for the maximum supported Kubernetes version
+*/}}
+{{- define "KUBERNETES_MAX_SUPPORTED_SEMVER" -}}
+  {{- print "<1.35.0" }}
+{{- end -}}
+
+{{/*
   Returns the URI scheme of the host serving the ecosystem
 */}}
 {{- define "ecosystem.host.scheme" -}}
