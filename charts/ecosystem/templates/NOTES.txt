@@ -25,7 +25,7 @@ To learn more about this release, run the following commands:
     - Monitor the statuses of the deployed Kubernetes pods:
       kubectl --namespace {{ .Release.Namespace }} get pods
 
-Once all pods are in the 'Running' state, you can access the Galasa service as follows:
+Once all pods are in the 'Ready' state, you can access the Galasa service as follows:
 
   Galasa UI: {{ include "ecosystem.host.url" . }}
   Galasa Bootstrap: {{ include "ecosystem.host.url" . }}/api/bootstrap
