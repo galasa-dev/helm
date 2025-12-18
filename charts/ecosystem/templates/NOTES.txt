@@ -10,9 +10,9 @@ Thank you for installing the Galasa service chart!
 To learn more about the Galasa service, visit https://galasa.dev/docs/ecosystem/#running-tests-in-the-galasa-ecosystem
 
 Release information:
-    - Release Name: {{ .Release.Name }}
-    - Namespace:    {{ .Release.Namespace }}
-    - Chart Name: {{ .Chart.Name }}
+    - Release Name:  {{ .Release.Name }}
+    - Namespace:     {{ .Release.Namespace }}
+    - Chart Name:    {{ .Chart.Name }}
     - Chart Version: {{ .Chart.Version }}
 
 To learn more about this release, run the following commands:
