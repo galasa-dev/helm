@@ -57,6 +57,9 @@ galasaWebUiImage: "galasa-ui"
 # an affinity for. If possible, the engine controller will schedule
 # Galasa runs on this node.
 #
+# If scheduling is not possible on the node with the given label, then test pods
+# will be scheduled on a different Kubernetes node.
+#
 # This value must be supplied a string in the form "<label key>=<label value>",
 # where the label's key and value match against a user-defined label on a Kubernetes node.
 #
@@ -67,6 +70,26 @@ galasaWebUiImage: "galasa-ui"
 # k8sNodePreferredAffinity: "galasa-engines=schedule"
 #
 k8sNodePreferredAffinity: ""
+#
+#
+# Optional. The label of a Kubernetes node that test pods should have
+# an affinity for. If possible, the engine controller will schedule
+# Galasa runs on this node.
+#
+# Unlike the "k8sNodePreferredAffinity" value, if scheduling is not possible on the Kubernetes node 
+# with the given label, then test pods will not be scheduled until the node with the given label
+# is available.
+#
+# This value must be supplied a string in the form "<label key>=<label value>",
+# where the label's key and value match against a user-defined label on a Kubernetes node.
+#
+# For example, if your systems administrator has set a label of 'galasa-engines: schedule'
+# on the Kubernetes node that you wish to schedule runs on, then the following value can
+# be set:
+#
+# k8sNodeRequiredAffinity: "galasa-engines=schedule"
+#
+k8sNodeRequiredAffinity: ""
 #
 #
 #
