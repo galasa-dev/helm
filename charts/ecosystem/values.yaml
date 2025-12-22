@@ -92,7 +92,6 @@ k8sNodePreferredAffinity: ""
 k8sNodeRequiredAffinity: ""
 #
 #
-#
 # Optional. The definition of a Kubernetes node taint toleration behaviour.
 # You may wish to prevent other workloads from being scheduled on your dedicated
 # Galasa k8s nodes. This can be achieved by tainting the Galasa k8s nodes. If this
