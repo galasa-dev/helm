@@ -66,6 +66,9 @@ data:
 # Label of k8s node that Galasa test pods should be scheduled on preferrentially
   galasa_node_preferred_affinity: "{{ .Values.k8sNodePreferredAffinity }}"
 #
+# Label of the k8s node that Galasa test pods must be scheduled on
+  galasa_node_required_affinity: "{{ .Values.k8sNodeRequiredAffinity }}"
+#
 # List of node toleration conditions
   galasa_node_tolerations: "{{ .Values.k8sNodeTolerations }}"
 
