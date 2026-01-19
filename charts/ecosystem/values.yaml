@@ -607,6 +607,20 @@ resourceMonitor:
     limits:
       memory: "500Mi"
 #
+#
+#
+# Optional - The maximum message size in bytes allowed for a single gRPC frame.
+# This will be used by the KVClient that is set up to interact with the etcd3 cluster.
+# 
+# Defaults to 4194304 if not set.
+# 
+# The maximum value this can be set to is 2147483647.
+# There may be effects on performance when setting to larger than 10485760.
+#
+# Example value: 4194304
+#
+maxgRPCMessageSize: {}
+#
 # The global Log4j2 configuration properties applied to all Galasa service pods.
 # By default, a console appender with debug level logging is configured to send logs to stdout.
 #

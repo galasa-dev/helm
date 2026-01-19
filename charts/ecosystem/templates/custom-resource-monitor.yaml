@@ -87,6 +87,8 @@ spec:
         - name: JDK_JAVA_OPTIONS
           value: -Djavax.net.ssl.trustStore=/galasa/certificates/cacerts
         {{- end }}
+        - name: MAX_GRPC_MESSAGE_SIZE
+          value: "{{ include "max.grpc.message.size" . }}"
         ports:
         - containerPort: 9010
           name: metrics
