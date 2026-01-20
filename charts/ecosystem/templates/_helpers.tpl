@@ -84,3 +84,10 @@
   {{- end }}
   {{- print $extraBundles }}
 {{- end -}}
+
+{{/*
+  Returns the maximum message size in bytes allowed for a single gRPC frame as an integer value.
+*/}}
+{{- define "max.grpc.message.size" -}}
+  {{- empty .Values.maxgRPCMessageSize | ternary (4194304) (.Values.maxgRPCMessageSize) }}
+{{- end -}}
