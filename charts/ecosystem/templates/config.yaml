@@ -75,4 +75,22 @@ data:
 #
 # The name of the Kubernetes Secret that stores the encryption-related keys,
 # so that test pods can decrypt credentials where necessary
+
+#
+# ISTIO Service Mesh Configuration for Test Pods
+# These values are used by the Engine Controller to configure ISTIO sidecars for dynamically created test pods
+#
+{{- if .Values.istio.enabled }}
+  # ISTIO sidecar injection for test pods
+  engine_istio_enabled: "true"
+  # ISTIO proxy resource requests
+  engine_istio_proxy_cpu: {{ .Values.istio.proxy.resources.requests.cpu | quote }}
+  engine_istio_proxy_memory: {{ .Values.istio.proxy.resources.requests.memory | quote }}
+  # ISTIO proxy resource limits
+  engine_istio_proxy_cpu_limit: {{ .Values.istio.proxy.resources.limits.cpu | quote }}
+  engine_istio_proxy_memory_limit: {{ .Values.istio.proxy.resources.limits.memory | quote }}
+{{- else }}
+  # ISTIO is disabled
+  engine_istio_enabled: "false"
+{{- end }}
   encryption_keys_secret_name: {{ include "ecosystem.encryption.keys.secret.name" . }}

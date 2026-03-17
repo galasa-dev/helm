@@ -6,9 +6,42 @@
 
 apiVersion: v2
 name: ecosystem
-description: Galasa Ecosystem
+description: Galasa Ecosystem with optional ISTIO service mesh support
 type: application
 #
 home: "galasa.dev"
 #
 version: "0.47.0"
+
+# Keywords for chart discovery
+keywords:
+  - galasa
+  - testing
+  - automation
+  - istio
+  - service-mesh
+  - mtls
+
+# ISTIO compatibility and requirements
+annotations:
+  # Minimum ISTIO version required for this chart
+  istio.io/min-version: "1.18.0"
+  # Recommended ISTIO version for optimal compatibility
+  istio.io/recommended-version: "1.20.0"
+  # ISTIO features used by this chart
+  istio.io/features: "sidecar-injection,mtls,peer-authentication,destination-rules"
+  # Chart supports ISTIO but does not require it
+  istio.io/required: "false"
+
+# Optional: Uncomment to add ISTIO as a Helm chart dependency (Option B - not recommended)
+# This approach installs ISTIO as part of the Galasa deployment
+# Only use if ISTIO is not already installed cluster-wide
+# dependencies:
+#   - name: base
+#     version: "1.20.0"
+#     repository: "https://istio-release.storage.googleapis.com/charts"
+#     condition: istio.install
+#   - name: istiod
+#     version: "1.20.0"
+#     repository: "https://istio-release.storage.googleapis.com/charts"
+#     condition: istio.install

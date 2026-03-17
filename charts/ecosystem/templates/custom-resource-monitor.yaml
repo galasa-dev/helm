@@ -24,6 +24,19 @@ spec:
         app: {{ .Release.Name }}-custom-resource-monitor
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
+        {{- if .Values.istio.enabled }}
+        # Enable ISTIO sidecar injection
+        sidecar.istio.io/inject: "true"
+        # Include all inbound ports in ISTIO mesh
+        traffic.sidecar.istio.io/includeInboundPorts: "*"
+        # Proxy resource configuration
+        sidecar.istio.io/proxyCPU: {{ .Values.istio.proxy.resources.requests.cpu | quote }}
+        sidecar.istio.io/proxyMemory: {{ .Values.istio.proxy.resources.requests.memory | quote }}
+        sidecar.istio.io/proxyCPULimit: {{ .Values.istio.proxy.resources.limits.cpu | quote }}
+        sidecar.istio.io/proxyMemoryLimit: {{ .Values.istio.proxy.resources.limits.memory | quote }}
+        # Readiness probe configuration for ISTIO proxy
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        {{- end }}
     spec:
       serviceAccountName: galasa
       nodeSelector:

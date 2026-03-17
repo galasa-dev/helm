@@ -1,0 +1,87 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+{{- if .Values.istio.enabled }}
+#
+# ISTIO Validation Checks
+# These checks ensure ISTIO is properly installed and configured before deploying Galasa
+#
+
+{{- $istioNamespace := "istio-system" }}
+
+# Check if ISTIO namespace exists
+{{- if not (lookup "v1" "Namespace" "" $istioNamespace) }}
+{{- fail (printf "ISTIO is enabled but namespace '%s' does not exist. Please install ISTIO first. See docs/istio-installation.md for installation instructions." $istioNamespace) }}
+{{- end }}
+
+# Check if istiod deployment exists
+{{- $istiodDeployment := lookup "apps/v1" "Deployment" $istioNamespace "istiod" }}
+{{- if not $istiodDeployment }}
+{{- fail (printf "ISTIO is enabled but 'istiod' deployment not found in namespace '%s'. Please install ISTIO first. See docs/istio-installation.md" $istioNamespace) }}
+{{- end }}
+
+# Check if istiod is ready
+{{- if $istiodDeployment }}
+{{- $replicas := $istiodDeployment.status.replicas | default 0 }}
+{{- $readyReplicas := $istiodDeployment.status.readyReplicas | default 0 }}
+{{- if lt $readyReplicas 1 }}
+{{- fail (printf "ISTIO is enabled but istiod is not ready. Ready replicas: %d/%d. Please ensure ISTIO is running properly." $readyReplicas $replicas) }}
+{{- end }}
+{{- end }}
+
+# Check if namespace has istio-injection label
+{{- $namespace := lookup "v1" "Namespace" "" .Release.Namespace }}
+{{- if $namespace }}
+{{- $injectionLabel := index $namespace.metadata.labels "istio-injection" | default "" }}
+{{- if ne $injectionLabel "enabled" }}
+{{- fail (printf "ISTIO is enabled but namespace '%s' does not have 'istio-injection=enabled' label.\n\nTo fix this, run:\n  kubectl label namespace %s istio-injection=enabled\n\nSee docs/istio-installation.md for more information." .Release.Namespace .Release.Namespace) }}
+{{- end }}
+{{- end }}
+
+# Check if mutating webhook configuration exists
+{{- $webhookConfig := lookup "admissionregistration.k8s.io/v1" "MutatingWebhookConfiguration" "" "istio-sidecar-injector" }}
+{{- if not $webhookConfig }}
+{{- fail "ISTIO is enabled but 'istio-sidecar-injector' MutatingWebhookConfiguration not found. Please ensure ISTIO is properly installed." }}
+{{- end }}
+
+# Validation passed - create a ConfigMap to document the validation
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-istio-validation
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "ecosystem.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation
+data:
+  validation-status: "passed"
+  validation-timestamp: {{ now | date "2006-01-02T15:04:05Z07:00" | quote }}
+  istio-namespace: {{ $istioNamespace | quote }}
+  istio-enabled: "true"
+  mtls-mode: {{ .Values.istio.mtlsMode | quote }}
+  sidecar-injection: {{ .Values.istio.injection | quote }}
+  message: |
+    ISTIO validation checks passed successfully.
+    
+    Validated:
+    - ISTIO namespace '{{ $istioNamespace }}' exists
+    - istiod deployment is running and ready
+    - Namespace '{{ .Release.Namespace }}' has istio-injection=enabled label
+    - Sidecar injection webhook is configured
+    
+    Configuration:
+    - mTLS Mode: {{ .Values.istio.mtlsMode }}
+    - Sidecar Injection: {{ .Values.istio.injection }}
+    
+    All Galasa pods will be deployed with ISTIO sidecars for secure service mesh communication.
+{{- end }}
+
+# Made with Bob

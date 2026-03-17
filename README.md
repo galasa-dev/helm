@@ -90,6 +90,7 @@ Your Galasa Ecosystem is now accessible at `https://galasa.example.com/api/boots
     - [Configuring Authentication (Dex)](#configuring-authentication-dex)
       - [GitHub Example](#github-example)
       - [Other Identity Providers](#other-identity-providers)
+    - [Configuring ISTIO Service Mesh (Optional)](#configuring-istio-service-mesh-optional)
     - [Optional Configurations](#optional-configurations)
       - [Storage Class](#storage-class)
       - [Kafka Integration](#kafka-integration)
@@ -223,6 +224,163 @@ Galasa uses [Dex](https://dexidp.io) for authentication. Configure a connector t
 #### Other Identity Providers
 
 Dex supports many connectors including Microsoft, LDAP, OIDC, and more. See the [Dex connectors documentation](https://dexidp.io/docs/connectors) for configuration examples.
+
+### Configuring ISTIO Service Mesh (Optional)
+
+As of Galasa version 0.47.0, the Galasa Ecosystem supports ISTIO service mesh integration to provide secure mutual TLS (mTLS) communication between all services within the Kubernetes cluster.
+
+#### Prerequisites
+
+Before enabling ISTIO in your Galasa deployment:
+
+1. **ISTIO must be installed** in your Kubernetes cluster (version 1.18.0 or higher, 1.20.0+ recommended)
+2. **Namespace must be labeled** for automatic sidecar injection
+
+If ISTIO is not yet installed, follow the comprehensive [ISTIO Installation Guide](./docs/istio-installation.md).
+
+#### Quick Start
+
+1. **Install ISTIO** (if not already installed):
+   ```bash
+   # Using istioctl (recommended)
+   curl -L https://istio.io/downloadIstio | sh -
+   cd istio-1.20.0
+   export PATH=$PWD/bin:$PATH
+   istioctl install --set profile=default -y
+   ```
+
+2. **Label your Galasa namespace** for automatic sidecar injection:
+   ```bash
+   kubectl label namespace <your-namespace> istio-injection=enabled
+   ```
+
+3. **Enable ISTIO in your `values.yaml`**:
+   ```yaml
+   istio:
+     enabled: true
+     mtlsMode: "PERMISSIVE"  # Use PERMISSIVE for initial deployment
+     
+     proxy:
+       resources:
+         requests:
+           cpu: "100m"
+           memory: "128Mi"
+         limits:
+           cpu: "200m"
+           memory: "256Mi"
+   ```
+
+4. **Deploy or upgrade your Galasa ecosystem**:
+   ```bash
+   helm upgrade --install galasa galasa/ecosystem \
+     -f values.yaml \
+     -n <your-namespace> \
+     --wait
+   ```
+
+5. **Verify ISTIO sidecars are injected**:
+   ```bash
+   kubectl get pods -n <your-namespace>
+   ```
+   Each pod should show `2/2` containers (application + istio-proxy)
+
+6. **After validation, switch to STRICT mTLS mode** (recommended for production):
+   ```yaml
+   istio:
+     enabled: true
+     mtlsMode: "STRICT"  # Only accept mTLS connections
+   ```
+   
+   Then upgrade again:
+   ```bash
+   helm upgrade galasa galasa/ecosystem -f values.yaml -n <your-namespace>
+   ```
+
+#### Configuration Options
+
+The ISTIO integration provides several configuration options in `values.yaml`:
+
+```yaml
+istio:
+  # Enable/disable ISTIO integration
+  enabled: false
+  
+  # mTLS mode: PERMISSIVE (mixed) or STRICT (mTLS only)
+  mtlsMode: "PERMISSIVE"
+  
+  # Sidecar injection mode
+  injection: "enabled"
+  
+  # ISTIO proxy resource limits
+  proxy:
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "200m"
+        memory: "256Mi"
+  
+  # Traffic management policies
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+    outlierDetection:
+      consecutiveErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+```
+
+#### Security Benefits
+
+Enabling ISTIO provides:
+
+- **Encryption in Transit**: All pod-to-pod traffic encrypted with mutual TLS
+- **Identity Verification**: SPIFFE-based workload identity for service-to-service authentication
+- **Zero Trust Security**: No implicit trust between services
+- **Automatic Certificate Management**: Certificates automatically issued and rotated (default: 24h)
+- **Traffic Observability**: Enhanced monitoring and tracing capabilities
+- **Circuit Breaking**: Automatic failure detection and traffic management
+
+#### Migration Path
+
+For existing Galasa deployments, follow the [ISTIO Migration Guide](./docs/istio-migration.md) for a zero-downtime migration strategy.
+
+**Recommended migration steps:**
+1. Install ISTIO in your cluster
+2. Label namespace for sidecar injection
+3. Enable ISTIO with `mtlsMode: "PERMISSIVE"` (accepts both mTLS and plain text)
+4. Validate all services are functioning correctly
+5. Switch to `mtlsMode: "STRICT"` (mTLS only) for maximum security
+
+#### Monitoring and Troubleshooting
+
+After enabling ISTIO, you can access various dashboards for monitoring:
+
+```bash
+# Kiali (Service Mesh Dashboard)
+istioctl dashboard kiali
+
+# Grafana (Metrics)
+istioctl dashboard grafana
+
+# Jaeger (Distributed Tracing)
+istioctl dashboard jaeger
+```
+
+For troubleshooting, see the [ISTIO Troubleshooting Guide](./docs/istio-troubleshooting.md).
+
+#### Additional Resources
+
+- [ISTIO Installation Guide](./docs/istio-installation.md) - Detailed installation instructions
+- [ISTIO Migration Guide](./docs/istio-migration.md) - Zero-downtime migration for existing deployments
+- [ISTIO Test Plan](./docs/istio-test-plan.md) - Comprehensive testing procedures
+- [ISTIO Official Documentation](https://istio.io/latest/docs/) - Complete ISTIO documentation
+
 
 ### Optional Configurations
 

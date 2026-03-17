@@ -1,0 +1,236 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+{{- if .Values.istio.enabled }}
+---
+# API Server DestinationRule
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .Release.Name }}-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "ecosystem.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  host: {{ .Release.Name }}-api.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.istio.trafficPolicy.connectionPool.tcp.maxConnections }}
+      http:
+        http1MaxPendingRequests: {{ .Values.istio.trafficPolicy.connectionPool.http.http1MaxPendingRequests }}
+        http2MaxRequests: {{ .Values.istio.trafficPolicy.connectionPool.http.http2MaxRequests }}
+    outlierDetection:
+      consecutiveErrors: {{ .Values.istio.trafficPolicy.outlierDetection.consecutiveErrors }}
+      interval: {{ .Values.istio.trafficPolicy.outlierDetection.interval }}
+      baseEjectionTime: {{ .Values.istio.trafficPolicy.outlierDetection.baseEjectionTime }}
+
+---
+# etcd DestinationRule
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .Release.Name }}-etcd
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "ecosystem.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  host: {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.istio.trafficPolicy.connectionPool.tcp.maxConnections }}
+      http:
+        http2MaxRequests: {{ .Values.istio.trafficPolicy.connectionPool.http.http2MaxRequests }}
+    outlierDetection:
+      consecutiveErrors: {{ .Values.istio.trafficPolicy.outlierDetection.consecutiveErrors }}
+      interval: {{ .Values.istio.trafficPolicy.outlierDetection.interval }}
+      baseEjectionTime: {{ .Values.istio.trafficPolicy.outlierDetection.baseEjectionTime }}
+
+---
+# RAS/CouchDB DestinationRule
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .Release.Name }}-ras
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "ecosystem.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  host: {{ .Release.Name }}-ras.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.istio.trafficPolicy.connectionPool.tcp.maxConnections }}
+      http:
+        http1MaxPendingRequests: {{ .Values.istio.trafficPolicy.connectionPool.http.http1MaxPendingRequests }}
+    outlierDetection:
+      consecutiveErrors: {{ .Values.istio.trafficPolicy.outlierDetection.consecutiveErrors }}
+      interval: {{ .Values.istio.trafficPolicy.outlierDetection.interval }}
+      baseEjectionTime: {{ .Values.istio.trafficPolicy.outlierDetection.baseEjectionTime }}
+
+---
+# Dex DestinationRule
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .Release.Name }}-dex
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "ecosystem.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  host: {{ .Release.Name }}-dex.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.istio.trafficPolicy.connectionPool.tcp.maxConnections }}
+      http:
+        http1MaxPendingRequests: {{ .Values.istio.trafficPolicy.connectionPool.http.http1MaxPendingRequests }}
+    outlierDetection:
+      consecutiveErrors: {{ .Values.istio.trafficPolicy.outlierDetection.consecutiveErrors }}
+      interval: {{ .Values.istio.trafficPolicy.outlierDetection.interval }}
+      baseEjectionTime: {{ .Values.istio.trafficPolicy.outlierDetection.baseEjectionTime }}
+
+---
+# WebUI DestinationRule
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .Release.Name }}-webui
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "ecosystem.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  host: {{ .Release.Name }}-webui.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.istio.trafficPolicy.connectionPool.tcp.maxConnections }}
+      http:
+        http1MaxPendingRequests: {{ .Values.istio.trafficPolicy.connectionPool.http.http1MaxPendingRequests }}
+    outlierDetection:
+      consecutiveErrors: {{ .Values.istio.trafficPolicy.outlierDetection.consecutiveErrors }}
+      interval: {{ .Values.istio.trafficPolicy.outlierDetection.interval }}
+      baseEjectionTime: {{ .Values.istio.trafficPolicy.outlierDetection.baseEjectionTime }}
+
+---
+# Metrics DestinationRule
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .Release.Name }}-metrics
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "ecosystem.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  host: {{ .Release.Name }}-metrics.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.istio.trafficPolicy.connectionPool.tcp.maxConnections }}
+    outlierDetection:
+      consecutiveErrors: {{ .Values.istio.trafficPolicy.outlierDetection.consecutiveErrors }}
+      interval: {{ .Values.istio.trafficPolicy.outlierDetection.interval }}
+      baseEjectionTime: {{ .Values.istio.trafficPolicy.outlierDetection.baseEjectionTime }}
+
+---
+# Resource Monitor DestinationRule
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .Release.Name }}-resource-monitor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "ecosystem.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  host: {{ .Release.Name }}-resource-monitor.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.istio.trafficPolicy.connectionPool.tcp.maxConnections }}
+    outlierDetection:
+      consecutiveErrors: {{ .Values.istio.trafficPolicy.outlierDetection.consecutiveErrors }}
+      interval: {{ .Values.istio.trafficPolicy.outlierDetection.interval }}
+      baseEjectionTime: {{ .Values.istio.trafficPolicy.outlierDetection.baseEjectionTime }}
+
+---
+# Custom Resource Monitor DestinationRule
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .Release.Name }}-custom-resource-monitor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "ecosystem.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  host: {{ .Release.Name }}-custom-resource-monitor.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.istio.trafficPolicy.connectionPool.tcp.maxConnections }}
+    outlierDetection:
+      consecutiveErrors: {{ .Values.istio.trafficPolicy.outlierDetection.consecutiveErrors }}
+      interval: {{ .Values.istio.trafficPolicy.outlierDetection.interval }}
+      baseEjectionTime: {{ .Values.istio.trafficPolicy.outlierDetection.baseEjectionTime }}
+
+---
+# Engine Controller DestinationRule
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .Release.Name }}-engine-controller
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "ecosystem.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  host: {{ .Release.Name }}-engine-controller.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.istio.trafficPolicy.connectionPool.tcp.maxConnections }}
+    outlierDetection:
+      consecutiveErrors: {{ .Values.istio.trafficPolicy.outlierDetection.consecutiveErrors }}
+      interval: {{ .Values.istio.trafficPolicy.outlierDetection.interval }}
+      baseEjectionTime: {{ .Values.istio.trafficPolicy.outlierDetection.baseEjectionTime }}
+{{- end }}
+
+# Made with Bob

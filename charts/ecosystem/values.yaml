@@ -76,7 +76,7 @@ k8sNodePreferredAffinity: ""
 # an affinity for. If possible, the engine controller will schedule
 # Galasa runs on this node.
 #
-# Unlike the "k8sNodePreferredAffinity" value, if scheduling is not possible on the Kubernetes node 
+# Unlike the "k8sNodePreferredAffinity" value, if scheduling is not possible on the Kubernetes node
 # with the given label, then test pods will not be scheduled until the node with the given label
 # is available.
 #
@@ -601,7 +601,7 @@ testPod:
     max: 0
 #
 #
-# resourceMonitor represents the values used to configure the system resource cleanup 
+# resourceMonitor represents the values used to configure the system resource cleanup
 # monitor used by the Galasa service. Only the monitors that are available in the
 # dev.galasa.uber.OBR bundle can be included and excluded. For custom monitors,
 # see the 'cleanupMonitor' values.
@@ -610,7 +610,7 @@ resourceMonitor:
   #
   # A list of glob patterns to be used in identifying which resource cleanup providers to load.
   #
-  # Supported glob patterns include the following special characters: 
+  # Supported glob patterns include the following special characters:
   # '*' (wildcard) Matches zero or more characters
   # '?' matches exactly one character
   #
@@ -619,12 +619,12 @@ resourceMonitor:
   #
   # By default, all of the providers matching 'dev.galasa.*' are included.
   includes:
-    - 'dev.galasa.*'
+    - "dev.galasa.*"
   #
   # A list of glob patterns to be used in identifying which resource cleanup providers
   # should not be loaded.
   #
-  # Supported glob patterns include the following special characters: 
+  # Supported glob patterns include the following special characters:
   # '*' (wildcard) Matches zero or more characters
   # '?' matches exactly one character
   #
@@ -648,9 +648,9 @@ resourceMonitor:
 #
 # Optional - The maximum message size in bytes allowed for a single gRPC frame.
 # This will be used by the KVClient that is set up to interact with the etcd3 cluster.
-# 
+#
 # Defaults to 4194304 if not set.
-# 
+#
 # The maximum value this can be set to is 2147483647.
 # There may be effects on performance when setting to larger than 10485760.
 #
@@ -704,13 +704,13 @@ log4j2Properties: |
 #
 #   kubectl create configmap my-json-layouts --from-file=/path/to/your/custom/layout.json
 #
-# You can supply multiple '--from-file' flags if you would like to load the contents of multiple files 
+# You can supply multiple '--from-file' flags if you would like to load the contents of multiple files
 # into the ConfigMap.
 #
 # If a name is provided, the ConfigMap with the given name will be mounted into the Galasa service
 # pods and all of the ConfigMap's JSON layout files will be available inside the pods' '/log4j-config'
 # directory.
-# 
+#
 # If you wish to use any of your custom JSON templates, for example a template called 'MyLayout.json',
 # your Log4j properties should contain the following properties:
 #
@@ -733,3 +733,88 @@ log4jJsonTemplatesConfigMapName: ""
 # You can supply multiple '--from-file' flags if you would like to load the contents of multiple certificates
 # into the ConfigMap.
 certificatesConfigMapName: ""
+
+#
+# ISTIO Service Mesh Configuration
+# Requires ISTIO to be pre-installed in the cluster (version 1.18.0 or higher)
+# See docs/istio-installation.md for installation instructions
+#
+# IMPORTANT: Before enabling ISTIO, ensure:
+# 1. ISTIO is installed in your cluster
+# 2. Your namespace is labeled with: istio-injection=enabled
+#    Run: kubectl label namespace <namespace> istio-injection=enabled
+#
+istio:
+  # Enable ISTIO service mesh integration
+  # Set to true only after ISTIO is installed and namespace is labeled
+  enabled: false
+
+  # Whether to install ISTIO as part of this chart (Option B - not recommended)
+  # Only use if ISTIO is not already installed cluster-wide
+  # Requires ISTIO Helm charts to be added as dependencies in Chart.yaml
+  install: false
+
+  # Sidecar injection mode
+  # "enabled" - Inject ISTIO sidecars into all pods
+  # "disabled" - Do not inject sidecars (not recommended if istio.enabled is true)
+  injection: "enabled"
+
+  # Mutual TLS mode for service-to-service communication
+  # "PERMISSIVE" - Accept both mTLS and plain text (recommended for initial deployment)
+  # "STRICT" - Only accept mTLS connections (recommended for production after validation)
+  #
+  # Migration path: Start with PERMISSIVE, validate functionality, then switch to STRICT
+  mtlsMode: "PERMISSIVE"
+
+  # ISTIO proxy (Envoy sidecar) resource configuration
+  # These resources are added to each pod that gets a sidecar injected
+  # Adjust based on your workload requirements and cluster capacity
+  proxy:
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "200m"
+        memory: "256Mi"
+
+  # ISTIO Ingress Gateway configuration
+  # Used for external access to Galasa services
+  gateway:
+    # Name of the ISTIO gateway to use
+    # If empty, a gateway will be created automatically
+    name: ""
+
+    # Create a new ISTIO Gateway resource
+    # Set to false if using an existing gateway
+    create: true
+
+    # Selector for the ingress gateway pods
+    # Default selector matches the standard ISTIO ingress gateway
+    selector:
+      istio: ingressgateway
+
+  # Traffic management settings
+  # These settings apply to all services in the mesh
+  trafficPolicy:
+    # Connection pool settings for all services
+    # Helps prevent resource exhaustion and improves reliability
+    connectionPool:
+      tcp:
+        # Maximum number of TCP connections to a service
+        maxConnections: 100
+      http:
+        # Maximum number of pending HTTP/1.1 requests
+        http1MaxPendingRequests: 50
+        # Maximum number of HTTP/2 requests
+        http2MaxRequests: 100
+
+    # Outlier detection for circuit breaking
+    # Automatically removes unhealthy instances from the load balancing pool
+    outlierDetection:
+      # Number of consecutive errors before ejecting an instance
+      consecutiveErrors: 5
+      # Time interval for outlier detection checks
+      interval: 30s
+      # Minimum time an instance remains ejected
+      baseEjectionTime: 30s
