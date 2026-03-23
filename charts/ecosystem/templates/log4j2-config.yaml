@@ -5,9 +5,11 @@
 #
 # A ConfigMap that contains the global Log4j2 configuration that will be applied to all Galasa service pods
 #
+{{- if .Values.log4j2Properties }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-log4j2-config
 data:
   log4j2.properties: {{ .Values.log4j2Properties | quote }}
+{{- end }}

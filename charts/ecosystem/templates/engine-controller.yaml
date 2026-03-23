@@ -82,8 +82,11 @@ spec:
           - /bin/bash
           - -ec
           - |
-            java -jar boot.jar --obr file:galasa.obr --setupeco --log4j2-properties-file file:/log4j2.properties
-            java -jar boot.jar --obr file:galasa.obr --k8scontroller --log4j2-properties-file file:/log4j2.properties
+            {{- if .Values.log4j2Properties }}
+            LOG4J_PROPERTIES_FLAG="--log4j2-properties-file file:/log4j2.properties"
+            {{- end }}
+            java -jar boot.jar --obr file:galasa.obr --setupeco ${LOG4J_PROPERTIES_FLAG}
+            java -jar boot.jar --obr file:galasa.obr --k8scontroller ${LOG4J_PROPERTIES_FLAG}
         env:
         - name: GALASA_INSTALL_NAME
           value: {{ .Release.Name }}
@@ -153,10 +156,12 @@ spec:
         - name: encryption-keys
           mountPath: {{ include "ecosystem.encryption.keys.directory" . }}
           readOnly: true
+        {{- if .Values.log4j2Properties }}
         - name: log4j2-config
           mountPath: /log4j2.properties
           subPath: log4j2.properties
           readOnly: true
+        {{- end }}
       {{- if .Values.log4jJsonTemplatesConfigMapName }}
         - name: log4j-json-templates
           mountPath: /log4j-config
@@ -172,9 +177,11 @@ spec:
       - name: encryption-keys
         secret:
           secretName: {{ include "ecosystem.encryption.keys.secret.name" . }}
+      {{- if .Values.log4j2Properties }}
       - name: log4j2-config
         configMap:
           name: {{ .Release.Name }}-log4j2-config
+      {{- end }}
       {{- if .Values.log4jJsonTemplatesConfigMapName }}
       - name: log4j-json-templates
         configMap:

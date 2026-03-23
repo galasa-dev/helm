@@ -675,29 +675,7 @@ maxgRPCMessageSize: {}
 #   rootLogger.level = debug
 #   rootLogger.appenderRef.stdout.ref = stdout
 #
-log4j2Properties: |
-  status = error
-  name = Default
-
-  appender.console.type = Console
-  appender.console.name = stdout
-  appender.console.layout.type = PatternLayout
-  appender.console.layout.pattern = %d{dd/MM/yyyy HH:mm:ss.SSS} %-5p %c{1.} - %m%n
-
-  rootLogger.level = debug
-  rootLogger.appenderRef.stdout.ref = stdout
-
-  logger.http.name = org.apache.http
-  logger.http.level = info
-
-  logger.http5.name = org.apache.hc
-  logger.http5.level = info
-
-  logger.sshtools.name = com.sshtools
-  logger.sshtools.level = warn
-
-  logger.ftp.name = ftp
-  logger.ftp.level = info
+log4j2Properties: ""
 
 # The name of an existing ConfigMap in the same Kubernetes namespace that the Helm chart will be installed
 # in containing one or more custom Log4j JSON template layouts to customize the Log4j events generated
