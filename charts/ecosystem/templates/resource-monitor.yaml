@@ -116,6 +116,10 @@ spec:
           value: "{{ join "," .Values.resourceMonitor.includes }}"
         - name: GALASA_MONITOR_EXCLUDES_GLOB_PATTERNS
           value: "{{ join "," .Values.resourceMonitor.excludes }}"
+        - name: GALASA_TEST_RUN_CLEANUP_INTERVAL_HOURS
+          value: "{{ .Values.resourceMonitor.testRunCleanupIntervalHours }}"
+        - name: GALASA_TEST_RUN_CLEANUP_MAX_AGE_DAYS
+          value: "{{ .Values.resourceMonitor.testRunCleanupMaxAgeDays }}"
         {{- if .Values.certificatesConfigMapName }}
         - name: JDK_JAVA_OPTIONS
           value: -Djavax.net.ssl.trustStore=/galasa/certificates/cacerts

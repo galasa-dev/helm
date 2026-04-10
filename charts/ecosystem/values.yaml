@@ -607,6 +607,15 @@ testPod:
 # see the 'cleanupMonitor' values.
 #
 resourceMonitor:
+  # The number of hours between each run of the test run cleanup monitor, which is used to
+  # clean up old test runs from the Result Archive Store.
+  # The default value is 24 hours. A value of 0 disables the cleanup of old test runs.
+  testRunCleanupIntervalHours: 24
+
+  # The maximum age of a test run in the Result Archive Store, in days.
+  # The default value is 30 days. A value of 0 disables the cleanup of old test runs.
+  testRunCleanupMaxAgeDays: 30
+
   #
   # A list of glob patterns to be used in identifying which resource cleanup providers to load.
   #
