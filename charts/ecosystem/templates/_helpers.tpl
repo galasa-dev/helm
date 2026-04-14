@@ -100,5 +100,5 @@
   Returns Istio mTLS mode
 */}}
 {{- define "istio.mtls.mode" -}}
-  {{- .Values.istio.mtls.mode | default "STRICT" | upper }}
+  {{- .Values.istio.mtlsMode | default "STRICT" | upper }}
 {{- end -}}

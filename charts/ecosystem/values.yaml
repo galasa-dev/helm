@@ -737,15 +737,9 @@ istio:
   # that automatically encrypts traffic between services using mTLS.
   enabled: false
   
-  # mTLS (mutual TLS) configuration
-  mtls:
-    # The mTLS enforcement mode. Valid values:
-    # - "STRICT": Only mTLS traffic is allowed. Recommended for production.
-    # - "PERMISSIVE": Both mTLS and plaintext traffic are allowed. Useful for
-    #                 gradual migration from non-Istio to Istio deployments.
-    # - "DISABLE": mTLS is disabled (not recommended if Istio is enabled).
-    #
-    # For new deployments, use "STRICT".
-    # For existing deployments being migrated to Istio, start with "PERMISSIVE"
-    # and switch to "STRICT" after verifying all services work correctly.
-    mode: "STRICT"
+  # The mTLS enforcement mode. Valid values:
+  # - "STRICT": Only mTLS traffic is allowed. Recommended for production.
+  # - "PERMISSIVE": Both mTLS and plaintext traffic are allowed. Useful for
+  #                 gradual migration from non-Istio to Istio deployments.
+  # - "DISABLE": mTLS is disabled (not recommended if Istio is enabled).
+  mtlsMode: "STRICT"
