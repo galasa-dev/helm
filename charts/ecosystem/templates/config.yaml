@@ -76,3 +76,6 @@ data:
 # The name of the Kubernetes Secret that stores the encryption-related keys,
 # so that test pods can decrypt credentials where necessary
   encryption_keys_secret_name: {{ include "ecosystem.encryption.keys.secret.name" . }}
+#
+# Istio sidecar injection for test pods
+  is_istio_enabled: "{{ .Values.istio.enabled }}"

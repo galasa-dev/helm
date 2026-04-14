@@ -35,6 +35,9 @@ spec:
       name: {{ .Release.Name }}-etcd
       labels:
         app: {{ .Release.Name }}-etcd
+        {{- if .Values.istio.enabled }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
       annotations:
         serviceName: {{ .Release.Name }}-etcd
     spec:

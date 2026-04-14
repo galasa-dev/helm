@@ -22,6 +22,9 @@ spec:
       name: {{ .Release.Name }}-metrics
       labels:
         app: {{ .Release.Name }}-metrics
+        {{- if .Values.istio.enabled }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
     spec:

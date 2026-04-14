@@ -19,6 +19,9 @@ spec:
     metadata:
       labels:
         app: {{ .Release.Name }}-dex
+        {{- if .Values.istio.enabled }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
     spec:
       serviceAccountName: galasa
       nodeSelector:

@@ -1,0 +1,16 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+{{- if .Values.istio.enabled }}
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: {{ .Release.Name }}-mtls
+  namespace: {{ .Release.Namespace }}
+spec:
+  mtls:
+    mode: {{ include "istio.mtls.mode" . }}
+{{- end }}

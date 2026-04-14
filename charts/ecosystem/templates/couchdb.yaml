@@ -21,6 +21,9 @@ spec:
       name: {{ .Release.Name }}-ras
       labels:
         app: {{ .Release.Name }}-ras
+        {{- if .Values.istio.enabled }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
     spec:
       nodeSelector:
         kubernetes.io/arch: {{ .Values.architecture }}

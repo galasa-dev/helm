@@ -23,6 +23,9 @@ spec:
       name: {{ .Release.Name }}-resource-monitor
       labels:
         app: {{ .Release.Name }}-resource-monitor
+        {{- if .Values.istio.enabled }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
     spec:

@@ -91,6 +91,7 @@ Your Galasa Ecosystem is now accessible at `https://galasa.example.com/api/boots
       - [GitHub Example](#github-example)
       - [Other Identity Providers](#other-identity-providers)
     - [Optional Configurations](#optional-configurations)
+      - [Istio Service Mesh](#istio-service-mesh)
       - [Storage Class](#storage-class)
       - [Kafka Integration](#kafka-integration)
       - [Custom Logging (Log4j2)](#custom-logging-log4j2)
@@ -225,6 +226,135 @@ Galasa uses [Dex](https://dexidp.io) for authentication. Configure a connector t
 Dex supports many connectors including Microsoft, LDAP, OIDC, and more. See the [Dex connectors documentation](https://dexidp.io/docs/connectors) for configuration examples.
 
 ### Optional Configurations
+
+#### Istio Service Mesh
+
+Galasa supports integration with [Istio](https://istio.io) service mesh to automatically encrypt all pod-to-pod traffic using mutual TLS (mTLS).
+
+**Prerequisites:**
+- Istio 1.29+ installed in your Kubernetes cluster
+- See [Istio installation guide](https://istio.io/latest/docs/setup/getting-started/)
+
+**Basic Configuration (Internal Traffic Only):**
+
+To enable mTLS for internal pod-to-pod traffic:
+
+```yaml
+istio:
+  enabled: true
+  mtls:
+    mode: "STRICT"  # Recommended for production
+```
+
+**External Traffic Routing:**
+
+Istio can also handle external traffic routing. Choose one option:
+
+**Option 1: Istio with Kubernetes Gateway API (Recommended)**
+
+```yaml
+istio:
+  enabled: true
+  mtls:
+    mode: "STRICT"
+
+gatewayApi:
+  enabled: true
+  gatewayClassName: "istio"  # Use Istio's Gateway implementation
+
+```
+
+**Option 2: Istio with Kubernetes Ingress**
+
+First, create an Istio IngressClass:
+
+```yaml
+kubectl apply -f - <<EOF
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: istio
+spec:
+  controller: istio.io/ingress-controller
+EOF
+```
+
+Then configure the chart's values:
+
+```yaml
+istio:
+  enabled: true
+  mtls:
+    mode: "STRICT"
+
+ingress:
+  enabled: true
+  ingressClassName: "istio"  # Use Istio's Ingress controller
+
+```
+
+**Note:** When using Istio for external traffic, Istio handles both external ingress and internal mTLS encryption.
+
+**Configuration Options:**
+
+- `istio.enabled`: Enable or disable Istio integration (default: `false`)
+- `istio.mtls.mode`: mTLS enforcement mode
+  - `STRICT`: Only mTLS traffic allowed (recommended for production)
+  - `PERMISSIVE`: Both mTLS and plaintext allowed (useful for migration)
+  - `DISABLE`: mTLS disabled
+
+**How It Works:**
+
+When Istio is enabled:
+1. All Galasa service pods receive an Istio sidecar proxy
+2. The sidecar automatically encrypts all pod-to-pod traffic using mTLS
+3. Application code continues to use HTTP URLs - encryption is transparent
+4. Test pods launched by the Engine Controller also receive Istio sidecars
+
+**Migration Strategy:**
+
+For existing deployments, use a gradual migration approach:
+
+1. **Enable with PERMISSIVE mode:**
+   ```yaml
+   istio:
+     enabled: true
+     mtls:
+       mode: "PERMISSIVE"
+   ```
+
+2. **Upgrade your deployment:**
+   ```bash
+   helm upgrade my-galasa galasa/ecosystem -f values.yaml --wait
+   ```
+
+3. **Verify all services are working:**
+   ```bash
+   # Check that all pods have Istio sidecars (should show 2 containers per pod)
+   kubectl get pods
+   
+   # Verify mTLS is enabled by checking Istio proxy config
+   istioctl proxy-status 
+   ```
+
+4. **Switch to STRICT mode:**
+   ```yaml
+   istio:
+     enabled: true
+     mtls:
+       mode: "STRICT"
+   ```
+
+5. **Upgrade again:**
+   ```bash
+   helm upgrade my-galasa galasa/ecosystem -f values.yaml --wait
+   ```
+
+**Troubleshooting:**
+
+- **Pods not getting sidecars:** Verify Istio is installed with `kubectl get pods -n istio-system`
+- **Connection failures:** Use PERMISSIVE mode during migration, then switch to STRICT
+- **Check Istio proxy logs:** `kubectl logs <pod-name> -c istio-proxy`
 
 #### Storage Class
 

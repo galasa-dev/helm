@@ -723,3 +723,29 @@ log4jJsonTemplatesConfigMapName: ""
 # You can supply multiple '--from-file' flags if you would like to load the contents of multiple certificates
 # into the ConfigMap.
 certificatesConfigMapName: ""
+
+# Optional. Values to configure the use of Istio for Galasa services.
+# Istio provides automatic mutual TLS (mTLS) encryption for all pod-to-pod
+# communication within the cluster, enhancing security without requiring
+# application code changes.
+#
+# Istio must be installed in your Kubernetes cluster.
+#
+istio:
+  # Enable or disable Istio integration.
+  # When enabled, all Galasa service pods will receive an Istio sidecar proxy
+  # that automatically encrypts traffic between services using mTLS.
+  enabled: false
+  
+  # mTLS (mutual TLS) configuration
+  mtls:
+    # The mTLS enforcement mode. Valid values:
+    # - "STRICT": Only mTLS traffic is allowed. Recommended for production.
+    # - "PERMISSIVE": Both mTLS and plaintext traffic are allowed. Useful for
+    #                 gradual migration from non-Istio to Istio deployments.
+    # - "DISABLE": mTLS is disabled (not recommended if Istio is enabled).
+    #
+    # For new deployments, use "STRICT".
+    # For existing deployments being migrated to Istio, start with "PERMISSIVE"
+    # and switch to "STRICT" after verifying all services work correctly.
+    mode: "STRICT"

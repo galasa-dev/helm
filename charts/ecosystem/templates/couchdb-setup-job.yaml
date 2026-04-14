@@ -18,6 +18,10 @@ spec:
   template:
     metadata:
       name: "{{ .Release.Name }}-couchdb-setup"
+      {{- if .Values.istio.enabled }}
+      labels:
+        sidecar.istio.io/inject: "true"
+      {{- end }}
     spec:
       nodeSelector:
         kubernetes.io/arch: {{ .Values.architecture }}
