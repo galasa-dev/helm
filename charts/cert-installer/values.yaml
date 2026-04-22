@@ -17,6 +17,12 @@ dnsNames: []
 # offers 'public-iks-k8s-nginx' and 'private-iks-k8s-nginx' classes.
 ingressClassName: nginx
 
+# The name of the Gateway resource that should have certificates issued for
+gatewayName: ""
+
+# The namespace of the Gateway resource provided in the "gatewayName" value
+gatewayNamespace: ""
+
 # Determines whether the Issuer resource should use a production URL to issue certificates.
 # When `useIssuerProductionUrl` is false, the ACME staging URL will be used (https://acme-staging-v02.api.letsencrypt.org/directory).
 # When `useIssuerProductionUrl` is true, the ACME production URL will be used (https://acme-v02.api.letsencrypt.org/directory).

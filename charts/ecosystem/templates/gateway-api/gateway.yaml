@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-{{- if and .Values.gatewayApi.enabled (not .Values.ingress.enabled) }}
+{{- if and (and .Values.gatewayApi.enabled (not .Values.ingress.enabled)) (not .Values.gatewayApi.gatewayName) }}
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -16,12 +16,11 @@ metadata:
 spec:
   gatewayClassName: {{ .Values.gatewayApi.gatewayClassName }}
   listeners:
-  {{- if eq (include "ecosystem.host.scheme" .) "http" }}
   - hostname: {{ .Values.externalHostname }}
     name: {{ .Release.Name }}-http
     port: 80
     protocol: HTTP
-  {{- else }}
+  {{- if eq (include "ecosystem.host.scheme" .) "https" }}
   - hostname: {{ .Values.externalHostname }}
     name: {{ .Release.Name }}-https
     port: 443

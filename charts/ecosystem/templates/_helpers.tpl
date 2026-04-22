@@ -102,3 +102,17 @@
 {{- define "istio.mtls.mode" -}}
   {{- .Values.istio.mtlsMode | default "STRICT" | upper }}
 {{- end -}}
+
+{{/*
+  Returns the Gateway resource name
+*/}}
+{{- define "gateway.name" -}}
+  {{- .Values.gatewayApi.gatewayName | default "{{ .Release.Name }}-gateway" }}
+{{- end -}}
+
+{{/*
+  Returns the Gateway resource namespace
+*/}}
+{{- define "gateway.namespace" -}}
+  {{- .Values.gatewayApi.gatewayNamespace | default .Release.Namespace }}
+{{- end -}}

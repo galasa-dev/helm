@@ -17,7 +17,9 @@ spec:
   hostnames:
   - {{ .Values.externalHostname }}
   parentRefs:
-  - name: {{ .Release.Name}}-gateway
+  - name: {{ include "gateway.name" . }}
+    namespace: {{ include "gateway.namespace" . }}
+    kind: Gateway
   rules:
   - backendRefs:
     - name: {{ .Release.Name }}-api

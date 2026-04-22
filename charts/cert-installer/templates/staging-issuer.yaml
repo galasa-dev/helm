@@ -29,6 +29,14 @@ spec:
     # Enable the HTTP-01 challenge provider
     solvers:
       - http01:
+        {{- if .Values.ingressClassName }}
           ingress:
             ingressClassName: {{ .Values.ingressClassName }}
+        {{- else if .Values.gatewayName }}
+          gatewayHTTPRoute:
+            parentRefs:
+              - name: {{ .Values.gatewayName }}
+                namespace: {{ .Values.gatewayNamespace }}
+                kind: Gateway
+        {{- end }}
 {{- end }}
