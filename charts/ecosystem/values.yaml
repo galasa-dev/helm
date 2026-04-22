@@ -280,11 +280,12 @@ gatewayApi:
   # A true/false value that determines whether to create Gateway API resources for accessing the Galasa service.
   enabled: false
 
-  # The name of an existing Gateway resource that you would like to re-use for this Galasa service
+  # Optional. The name of an existing Gateway resource that you would like to re-use for this Galasa service
   # If no value is provided, a new Gateway resource will be created in the namespace where the Helm chart is installed.
   gatewayName: ""
 
-  # The namespace where the existing Gateway resource referenced in the "gatewayName" value is located
+  # Optional. The namespace where the existing Gateway resource referenced in the `gatewayName` value is located.
+  # If no value is provided and the `gatewayName` value is not empty, the namespace where the Helm chart is installed will be used.
   gatewayNamespace: ""
 
   # The name of the GatewayClass to use for the Gateway API resources.
