@@ -100,19 +100,19 @@
   Returns Istio mTLS mode
 */}}
 {{- define "istio.mtls.mode" -}}
-  {{- .Values.istio.mtlsMode | default "STRICT" | upper }}
+  {{- empty .Values.istio.mtlsMode | ternary "STRICT" .Values.istio.mtlsMode | upper }}
 {{- end -}}
 
 {{/*
   Returns the Gateway resource name
 */}}
 {{- define "gateway.name" -}}
-  {{- .Values.gatewayApi.gatewayName | default "{{ .Release.Name }}-gateway" }}
+  {{- empty .Values.gatewayApi.gatewayName | ternary (printf "%s-gateway" .Release.Name) .Values.gatewayApi.gatewayName }}
 {{- end -}}
 
 {{/*
   Returns the Gateway resource namespace
 */}}
 {{- define "gateway.namespace" -}}
-  {{- .Values.gatewayApi.gatewayNamespace | default .Release.Namespace }}
+  {{- empty .Values.gatewayApi.gatewayNamespace | ternary .Release.Namespace .Values.gatewayApi.gatewayNamespace }}
 {{- end -}}
