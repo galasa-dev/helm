@@ -1,0 +1,31 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.node.type }}-node
+  labels:
+    app: {{ .Release.Name }}-{{ .Values.node.type }}-node
+  annotations:
+    description: "Exposes the {{ .Values.node.type | title }} node's WebDriver (4444), VNC (5900), and noVNC (7900) ports for live view access if headless mode is not turned on"
+spec:
+  type: {{ .Values.node.service.type }}
+  ports:
+    - name: webdriver
+      port: 4444
+      targetPort: 4444
+      protocol: TCP
+    - name: vnc
+      port: 5900
+      targetPort: 5900
+      protocol: TCP
+    - name: novnc
+      port: 7900
+      targetPort: 7900
+      protocol: TCP
+  selector:
+    app: {{ .Release.Name }}-{{ .Values.node.type }}-node
