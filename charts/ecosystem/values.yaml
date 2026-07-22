@@ -31,7 +31,7 @@ galasaServiceName: Galasa Service
 #
 # The container registry the Galasa images can be found in
 #
-galasaRegistry: "icr.io/galasadev"
+galasaRegistry: "icr.io/galasa"
 #
 #
 # The name of the Docker image that contains Galasa's boot.jar file to launch ecosystem services
