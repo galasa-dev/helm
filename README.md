@@ -2,6 +2,16 @@
 
 Helm charts for deploying Galasa components to Kubernetes, including the complete Galasa Ecosystem.
 
+> **⚠️ Migration notice — Galasa v1.0.0 image registry change**
+>
+> From Galasa **v1.0.0**, Docker images are published to **`icr.io/galasa`** (public, no credentials required).
+> Images will continue to be mirrored to `icr.io/galasadev` for a limited number of releases to give you time to migrate, after which `icr.io/galasadev` will no longer receive updates.
+>
+> **What you need to do:** If your automation or `values.yaml` references `icr.io/galasadev`, update it to `icr.io/galasa`.
+> The `galasaRegistry` value in this chart already defaults to `icr.io/galasa` from v1.0.0 onwards — remove any override you may have set.
+>
+> See [Migrating to `icr.io/galasa`](#migrating-to-icriogalasa) for full details.
+
 ## Quick Start
 
 ### Prerequisites
@@ -112,6 +122,7 @@ Your Galasa Ecosystem is now accessible at `https://galasa.example.com/api/boots
       - [Manual Rotation](#manual-rotation)
   - [Development](#development)
   - [Support](#support)
+  - [Migrating to `icr.io/galasa`](#migrating-to-icriogalasa)
 
 ---
 
@@ -563,7 +574,7 @@ To upgrade to a newer Galasa version:
 helm repo update
 helm upgrade <release-name> galasa/ecosystem \
   --reuse-values \
-  --set galasaVersion=0.38.0 \
+  --set galasaVersion=1.0.0 \
   --wait
 ```
 
@@ -571,6 +582,8 @@ Or update your `values.yaml` and run:
 ```bash
 helm upgrade <release-name> galasa/ecosystem -f values.yaml --wait
 ```
+
+> **Upgrading to v1.0.0 or later?** See [Migrating to `icr.io/galasa`](#migrating-to-icriogalasa) below.
 
 ### Uninstalling
 
@@ -710,6 +723,45 @@ To install the latest development version:
    ```bash
    helm install my-galasa ./charts/ecosystem -f values.yaml --wait
    ```
+
+---
+
+## Migrating to `icr.io/galasa`
+
+From Galasa **v1.0.0**, all Docker images are published to the public IBM Container Registry namespace **`icr.io/galasa`**.
+No credentials are required to pull from this registry.
+
+### What is changing
+
+| Before v1.0.0 | From v1.0.0 |
+|---|---|
+| `icr.io/galasadev` | `icr.io/galasa` |
+
+Images will continue to be published to `icr.io/galasadev` for a limited number of releases after v1.0.0 to give you time to switch. After that grace period, `icr.io/galasadev` will no longer receive updates and you must use `icr.io/galasa`.
+
+### Is any action required for the Helm chart?
+
+The `galasaRegistry` value in the chart already defaults to `icr.io/galasa` from v1.0.0. If you:
+
+- **Use the default** — no action needed.
+- **Pinned `galasaRegistry: icr.io/galasadev`** in your `values.yaml` — remove or update that line:
+  ```yaml
+  galasaRegistry: "icr.io/galasa"
+  ```
+
+### What if I pull images outside of the Helm chart?
+
+If you have scripts, CI pipelines, or other automation that pulls Galasa images directly, update the registry prefix in those references:
+
+```bash
+# Before
+icr.io/galasadev/galasa-boot-embedded-amd64:0.x.x
+
+# After
+icr.io/galasa/galasa-boot-embedded-amd64:1.0.0
+```
+
+Image names and tags remain the same — only the registry namespace changes.
 
 ---
 
