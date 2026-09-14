@@ -5,17 +5,17 @@
 Refer to the Galasa documentation at https://galasa.dev/docs/ecosystem/ecosystem-installing-k8s for a list of supported Kubernetes versions.
 {{- end }}
 ---------------
-⚠️ MIGRATION NOTICE — Image registry change from v1.0.0
+⚠️ MIGRATION NOTICE — Image registry change from v1.1.1
 
-From Galasa v1.0.0, Docker images are published to icr.io/galasa (public, no credentials required).
+From Galasa v1.1.1, Docker images are published to ghcr.io/galasa-dev (public, no credentials required).
 
 Images will continue to be published to icr.io/galasadev for a limited number of releases to give
 you time to switch, after which icr.io/galasadev will no longer be updated.
 
 ACTION REQUIRED: If you or your automation pull Galasa images directly from icr.io/galasadev,
-update your configuration to use icr.io/galasa instead.
+update your configuration to use ghcr.io/galasa-dev instead.
 
-The galasaRegistry value in this chart already defaults to icr.io/galasa from v1.0.0 onwards.
+The galasaRegistry value in this chart already defaults to ghcr.io/galasa-dev from v1.1.1 onwards.
 If you have previously overridden galasaRegistry to icr.io/galasadev, remove that override.
 
 For more details see the migration guide in the chart README.
