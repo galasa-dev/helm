@@ -1,0 +1,107 @@
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+name: Ecosystem Helm Chart Install Test
+
+on:
+  pull_request:
+    paths:
+      - 'charts/ecosystem/**'
+  workflow_dispatch:
+
+jobs:
+  install-test:
+    name: Install ecosystem chart
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install kind, kubectl, and helm
+      run: |
+        mkdir -p "$RUNNER_TEMP/bin"
+        export PATH="$RUNNER_TEMP/bin:$PATH"
+        echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+        curl -sSLo "$RUNNER_TEMP/bin/kind" \
+          "https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64"
+        chmod +x "$RUNNER_TEMP/bin/kind"
+        kind version
+
+        KUBECTL_VERSION=$(curl -sSL https://dl.k8s.io/release/stable.txt)
+        curl -sSLo "$RUNNER_TEMP/bin/kubectl" \
+          "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+        chmod +x "$RUNNER_TEMP/bin/kubectl"
+        kubectl version --client
+
+        curl -sSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | \
+          HELM_INSTALL_DIR="$RUNNER_TEMP/bin" USE_SUDO=false bash
+        helm version
+
+    - name: Create kind cluster
+      run: kind create cluster --wait 120s
+
+    - name: Verify cluster is ready
+      run: |
+        kubectl cluster-info
+        kubectl wait --for=condition=Ready nodes --all --timeout=60s
+
+    - name: Install Istio Gateway API provider
+      run: |
+        kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/latest/download/standard-install.yaml
+
+        helm repo add istio https://istio-release.storage.googleapis.com/charts
+        helm repo update
+        helm install istio-base istio/base \
+          --namespace istio-system \
+          --create-namespace \
+          --wait \
+          --timeout 5m
+        helm install istiod istio/istiod \
+          --namespace istio-system \
+          --wait \
+          --timeout 5m
+
+        kubectl wait --namespace istio-system \
+          --for=condition=Available deployment/istiod \
+          --timeout=120s
+        kubectl get gatewayclass istio
+
+    - name: Install ecosystem chart
+      run: |
+        helm install galasa ./charts/ecosystem \
+          -f .github/ecosystem-chart-pr-test-values.yaml \
+          --wait \
+          --timeout 5m
+
+    - name: Show pod status
+      if: always()
+      run: kubectl get pods
+    
+    - name: Test ecosystem installation
+      run: |
+        helm test galasa
+
+    - name: Diagnose pod failures
+      if: failure()
+      run: |
+        for pod in $(kubectl get pods -o name); do
+          echo "::group::Describe ${pod}"
+          kubectl describe "$pod" || true
+          echo "::endgroup::"
+
+          echo "::group::Current logs for ${pod}"
+          kubectl logs "$pod" --all-containers --prefix || true
+          echo "::endgroup::"
+
+          echo "::group::Previous logs for ${pod}"
+          kubectl logs "$pod" --all-containers --prefix --previous || true
+          echo "::endgroup::"
+        done
+
+        echo "::group::Namespace events"
+        kubectl get events --sort-by=.metadata.creationTimestamp
+        echo "::endgroup::"
